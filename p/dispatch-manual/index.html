@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="dispatch 插件手册：分层方案、七条核心原理、运行过程、五个级别、模型与消耗、知识库接入和上手步骤">
+<meta name="description" content="dispatch 插件手册：分层方案、七条核心原理、运行过程、五个级别、模型与消耗、知识库、文档站和上手步骤">
 <link rel="index" href="../../">
 <title>dispatch 分级调度手册</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -177,6 +177,7 @@ dl.faq dd{margin:4px 0 0;color:var(--muted);font-size:14.5px}
     <li><a href="#tiers">五个级别</a></li>
     <li><a href="#agents">模型与消耗</a></li>
     <li><a href="#kb">知识库</a></li>
+    <li><a href="#pages">文档站</a></li>
     <li><a href="#start">如何使用</a></li>
     <li><a href="#ref">命令与文件</a></li>
     <li><a href="#faq">问题与限制</a></li>
@@ -185,15 +186,16 @@ dl.faq dd{margin:4px 0 0;color:var(--muted);font-size:14.5px}
 
 <main>
 <header>
-  <span class="eyebrow">Claude Code 插件 · dispatch 0.3.0</span>
+  <span class="eyebrow">Claude Code 插件 · dispatch 0.4.0</span>
   <h1>dispatch 分级调度</h1>
   <p class="lede">先判断任务有多复杂，再决定走多重的流程。小事直接做；大事才请出需求拷问、规格文档、子 agent 和终审。目标是在 Pro 订阅的额度里，把 token 花在真正需要的地方。</p>
   <div class="ramp" aria-hidden="true"><i style="background:var(--t0)"></i><i style="background:var(--t1)"></i><i style="background:var(--t2)"></i><i style="background:var(--t3)"></i><i style="background:var(--t4)"></i></div>
   <div class="chips">
     <span class="chip"><b>✔</b> 已加载 · 校验通过</span>
-    <span class="chip">常驻约 2.0k token / 会话</span>
+    <span class="chip">常驻约 2.1k token / 会话</span>
     <span class="chip">与技术栈无关</span>
     <span class="chip">接入个人知识库</span>
+    <span class="chip">HTML 自动发布到文档站</span>
   </div>
 </header>
 
@@ -205,8 +207,8 @@ dl.faq dd{margin:4px 0 0;color:var(--muted);font-size:14.5px}
     <div class="layer"><b>规则层</b><code>ROUTER.md · KB.md</code><span>会话开始时注入：怎么定级、每级怎么做、何时查和写知识库</span></div>
     <div class="layer"><b>编排层</b><code>主会话</code><span>定级、执行、判断要不要派子 agent，所有决策留在这里</span></div>
     <div class="layer"><b>委派层</b><code>scout · reviewer · builder</code><span>只做两件事：替主会话省上下文，或给出独立判断</span></div>
-    <div class="layer det"><b>确定性层</b><code>hooks · dispatch-verify · dispatch-kb</code><span>本地脚本完成，不调用模型、不耗额度</span></div>
-    <div class="layer"><b>沉淀层</b><code>知识库 · OpenSpec 归档 · overrides.log</code><span>把方案、决策、踩坑和定级偏差留下来，下次复用</span></div>
+    <div class="layer det"><b>确定性层</b><code>hooks · dispatch-verify · dispatch-kb · dispatch-pages</code><span>本地脚本完成，不调用模型、不耗额度</span></div>
+    <div class="layer"><b>沉淀层</b><code>知识库 · 文档站 · OpenSpec 归档 · overrides.log</code><span>把方案、决策、踩坑、HTML 文档和定级偏差留下来，下次复用</span></div>
   </div>
   <p>插件本身不含任何项目事实。验证命令和知识库目录由 <code>/dispatch:setup</code> 写进各项目的 CLAUDE.md，个人路径放在本机的 <code>~/.claude/dispatch/config</code>。同一个插件可以原样用在任何项目、任何机器上。</p>
 </section>
@@ -238,6 +240,7 @@ dl.faq dd{margin:4px 0 0;color:var(--muted);font-size:14.5px}
     <li><div class="when">执行</div><div class="what"><b>按级别走流程</b><p>按下一节的流程执行，需要时派子 agent。执行中随时重判，升级或降级时说明原因。</p><span class="cost model">主会话 + 按需子 agent</span></div></li>
     <li><div class="when">收尾</div><div class="what"><b>验证</b><p><code>dispatch-verify &lt;命令&gt;</code>：完整日志写进临时文件，只回显退出码、报错行和末尾几行。没通过不得声称完成。</p><span class="cost zero">本地脚本</span></div></li>
     <li><div class="when">值得留下时</div><div class="what"><b>沉淀</b><p>L3 归档后，或 L2 得出值得保留的结论时，提议用 <code>/dispatch:note</code> 写笔记，你确认后才写入。</p><span class="cost model">主会话</span></div></li>
+    <li><div class="when">生成 HTML 后</div><div class="what"><b>发布到文档站</b><p>发布 Artifact 页面后，hook 给出现成的发布命令；<code>dispatch-pages</code> 做敏感检查、补全页面、更新目录页并推送。</p><span class="cost zero">本地脚本</span></div></li>
   </ol>
 </section>
 
@@ -311,6 +314,21 @@ source: dispatch
   </ul>
 </section>
 
+<section id="pages">
+  <span class="kicker">文档站</span>
+  <h2>生成的 HTML，自动汇成一个文档站</h2>
+  <p class="sub">每次生成或更新 HTML 文档（包括 Artifact 页面），都同步发布到 <a href="https://lhanman.github.io/">lhanman.github.io</a>。目录页按发布记录自动生成，可以搜索、按标签筛选。</p>
+  <div class="ladder">
+    <div class="rung"><span class="k">触发</span><code>PostToolUse · Artifact</code><span>Artifact 页面发布后，hook 给出带文件路径和 slug 的发布命令；已发布过的页面按更新处理</span><span class="out">没配置文档站时不输出</span></div>
+    <div class="rung"><span class="k">把关</span><code>dispatch-pages publish</code><span>先查本机路径、邮箱、密钥、敏感词和 Artifact 专属能力，命中就停下给你看</span><span class="out">退出码 3，未发布</span></div>
+    <div class="rung"><span class="k">上线</span><code>p/&lt;slug&gt;/index.html</code><span>补全页面外壳，更新 catalog.json 和目录页，提交并推送</span><span class="out">约 1 分钟后生效</span></div>
+  </div>
+  <p><strong>站点是公开的。</strong>GitHub Pages 即使用私有仓库发布，页面也谁都能打开，所以工作项目的内部内容不发布。拦截哪些词写在 <code>~/.claude/dispatch/config</code> 的 <code>pages_deny</code> 里，随时可以增删；确认无妨的内容，可以用 <code>--allow</code> 放行。</p>
+<pre><code>dispatch-pages publish page.html --slug my-page --desc "一句话摘要" --tags 标签1,标签2
+dispatch-pages search 手册          <span class="c"># 每篇一行，先查有没有发布过，避免重复</span>
+dispatch-pages list · check · remove · rebuild</code></pre>
+</section>
+
 <section id="start">
   <span class="kicker">如何使用</span>
   <h2>第一次使用</h2>
@@ -357,6 +375,7 @@ source: dispatch
       <tr><td><code>/opsx:explore</code></td><td>L4 先探索、定架构决策</td></tr>
       <tr><td><code>dispatch-verify &lt;命令&gt;</code></td><td>跑验证命令，只回显摘要；失败时列出报错行和末尾 40 行</td></tr>
       <tr><td><code>dispatch-kb search</code> · <code>outline</code> · <code>dirs</code> · <code>list</code></td><td>分层检索知识库</td></tr>
+      <tr><td><code>dispatch-pages publish</code> · <code>search</code> · <code>list</code> · <code>remove</code></td><td>发布 HTML 到文档站、查找已发布的文档、下线</td></tr>
       <tr><td><code>claude plugin details dispatch</code></td><td>查看插件的常驻 token 开销</td></tr>
     </tbody>
   </table></div>
@@ -368,7 +387,8 @@ source: dispatch
     <tbody>
       <tr><td><code>~/workbench/claude-dispatch/</code></td><td>插件源码，通过 <code>~/.claude/skills/dispatch</code> 软链加载；改完执行 <code>/reload-plugins</code></td></tr>
       <tr><td><code>router/ROUTER.md</code> · <code>KB.md</code></td><td>定级和流程规则、知识库规则，想调整行为就改这两个文件</td></tr>
-      <tr><td><code>~/.claude/dispatch/config</code></td><td>本机配置：<code>kb_dir</code> 知识库目录、<code>kb_exclude</code> 不参与检索的顶层目录</td></tr>
+      <tr><td><code>~/.claude/dispatch/config</code></td><td>本机配置：知识库（<code>kb_dir</code>、<code>kb_exclude</code>）和文档站（<code>pages_repo</code>、<code>pages_url</code>、<code>pages_title</code>、<code>pages_deny</code>）</td></tr>
+      <tr><td><code>~/workbench/lhanman.github.io/</code></td><td>文档站仓库：<code>catalog.json</code>、自动生成的目录页、<code>p/&lt;slug&gt;/</code> 下的各篇文档</td></tr>
       <tr><td><code>~/.claude/dispatch/overrides.log</code></td><td>每次手动指定级别的记录：时间、级别、目录</td></tr>
       <tr><td><code>$TMPDIR/dispatch-verify/</code></td><td>验证命令的完整日志</td></tr>
       <tr><td>项目 <code>CLAUDE.md</code></td><td>「dispatch 验证矩阵」和「dispatch 知识库」两节，由 setup 写入</td></tr>
@@ -394,12 +414,14 @@ source: dispatch
   </dl>
   <h3>已知限制</h3>
   <ul>
-    <li>常驻开销约 2.0k token/会话：路由规则约 1.1k，知识库规则约 250，其余是各 skill 和 agent 的描述。</li>
+    <li>常驻开销约 2.1k token/会话：路由规则约 1.1k，知识库规则约 250，文档站规则约 100，其余是各 skill 和 agent 的描述。</li>
+    <li>文档站是公开的，是否发布只靠敏感检查判断；敏感词列表要你自己维护。</li>
     <li>消耗对比是用 API 价格估算的相对值；Pro 额度的实际折算方式未公开。</li>
     <li>定级由模型判断，会有偏差；目前靠 <code>#L</code> 纠正和手动复盘，还没有自动复盘。</li>
     <li>知识库里的旧笔记没有 frontmatter，检索时摘要取的是正文第一段，可能不准。</li>
     <li>插件里的 agent 不支持 <code>hooks</code>、<code>mcpServers</code>、<code>permissionMode</code> 这几个字段，这是 Claude Code 对插件 agent 的限制。</li>
     <li>插件仓库只执行过 <code>git init</code>，还没有提交。</li>
+    <li>Artifact 发布后的提醒 hook 已用模拟输入测过，还没在真实会话里触发过。</li>
   </ul>
 </section>
 </main>
