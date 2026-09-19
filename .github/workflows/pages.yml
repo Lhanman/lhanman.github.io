@@ -1,0 +1,29 @@
+# 由 dispatch-pages 生成，不要手改。
+# 仓库里的文档用中文路径存放，部署时按 catalog.json 复制成英文网址 p/<slug>/ 再上线。
+# 需要在仓库 Settings → Pages → Source 选 GitHub Actions。
+name: 部署文档站
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+      - run: python3 .github/build-site.py _site
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v5
