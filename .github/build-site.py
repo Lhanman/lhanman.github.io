@@ -17,13 +17,21 @@ shutil.rmtree(out, ignore_errors=True)
 os.makedirs(out)
 with open(os.path.join(root, "catalog.json"), encoding="utf-8") as f:
     pages = json.load(f)["pages"]
+done = 0
 for p in pages:
-    with open(os.path.join(root, p["path"]), encoding="utf-8") as f:
-        text = f.read()
+    # 旧条目没有 path 时按早期的 p/<slug>/ 结构找；单篇出错只跳过这一篇，不拖垮整站部署。
+    rel = p.get("path") or f"p/{p['slug']}/index.html"
+    try:
+        with open(os.path.join(root, rel), encoding="utf-8") as f:
+            text = f.read()
+    except OSError as err:
+        print(f"跳过 {p['slug']}：读不到 {rel}（{err.strerror}）", file=sys.stderr)
+        continue
     text = re.sub(r'<link rel="index" href="[^"]*">', '<link rel="index" href="../../index.html">', text, count=1)
     dst = os.path.join(out, "p", p["slug"])
     os.makedirs(dst, exist_ok=True)
     with open(os.path.join(dst, "index.html"), "w", encoding="utf-8") as f:
         f.write(text)
+    done += 1
 shutil.copy(os.path.join(root, "index.html"), os.path.join(out, "index.html"))
-print(f"已生成 {len(pages)} 篇 → {out}")
+print(f"已生成 {done}/{len(pages)} 篇 → {out}")
