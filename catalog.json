@@ -1,6 +1,20 @@
 {
   "pages": [
     {
+      "slug": "grill-openspec",
+      "title": "grill-me 与 OpenSpec 手册",
+      "description": "grill-me 需求拷问与 OpenSpec 规格驱动开发的使用手册：安装位置、命令、流程和两者的配合",
+      "tags": [
+        "Claude Code",
+        "OpenSpec",
+        "grill-me",
+        "手册"
+      ],
+      "project": "claude-dispatch",
+      "created": "2026-09-19",
+      "updated": "2026-09-19"
+    },
+    {
       "slug": "dispatch-manual",
       "title": "dispatch 分级调度手册",
       "description": "dispatch 插件手册：分层方案、七条核心原理、运行过程、五个级别、模型与消耗、知识库接入和上手步骤",

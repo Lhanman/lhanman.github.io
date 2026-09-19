@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="grill-me 需求拷问与 OpenSpec 规格驱动开发的使用手册：安装位置、命令、流程和两者的配合">
+<link rel="index" href="../../">
+<title>grill-me 与 OpenSpec 手册</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+:root{
+  --ground:#F5F6F3; --paper:#FFFFFF; --ink:#1A211E; --muted:#5A6560; --rule:#DCE1DC;
+  --grill:#A3360F; --grill-soft:#F7E6DD;
+  --spec:#1E4FB8; --spec-soft:#E3EAF8;
+  --ok:#2F7A4B; --warn:#9A6A00; --warn-soft:#FBF1D6;
+  --code-bg:#EEF1EC;
+  --serif:"Noto Serif SC","Songti SC",serif;
+  --sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#141816; --paper:#1B201D; --ink:#E6EAE6; --muted:#9AA69F; --rule:#2E3531;
+    --grill:#F08A5D; --grill-soft:#3A241A; --spec:#7FA4F2; --spec-soft:#1C2740;
+    --ok:#6CC08C; --warn:#E3B546; --warn-soft:#3A3016; --code-bg:#222925;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#141816; --paper:#1B201D; --ink:#E6EAE6; --muted:#9AA69F; --rule:#2E3531;
+  --grill:#F08A5D; --grill-soft:#3A241A; --spec:#7FA4F2; --spec-soft:#1C2740;
+  --ok:#6CC08C; --warn:#E3B546; --warn-soft:#3A3016; --code-bg:#222925;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:15.5px/1.8 var(--sans);padding-inline:20px;padding-block:0 80px}
+.wrap{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:200px minmax(0,1fr);gap:56px}
+nav.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 32px);align-self:start;padding-top:56px;font-size:13.5px}
+nav.toc p{font:600 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+nav.toc a{color:var(--muted);text-decoration:none}
+nav.toc a:hover,nav.toc a:focus-visible{color:var(--ink)}
+nav.toc .g{border-left:2px solid var(--grill);padding-left:10px}
+nav.toc .s{border-left:2px solid var(--spec);padding-left:10px}
+nav.toc .n{border-left:2px solid var(--rule);padding-left:10px}
+main{min-width:0;max-width:720px}
+header{padding-block:56px 32px;border-bottom:1px solid var(--rule)}
+.eyebrow{font:600 11.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1{font:900 clamp(30px,5vw,44px)/1.2 var(--serif);margin:14px 0 12px;text-wrap:balance;letter-spacing:.01em}
+h1 .x{color:var(--muted);font-weight:600;margin-inline:.2em}
+h1 .g{color:var(--grill)} h1 .s{color:var(--spec)}
+.lede{color:var(--muted);margin:0;max-width:36em}
+h2{font:900 26px/1.3 var(--serif);margin:0 0 6px;text-wrap:balance}
+h3{font:700 17px/1.5 var(--sans);margin:32px 0 8px}
+section{padding-block:48px;border-bottom:1px solid var(--rule)}
+section:last-of-type{border-bottom:0}
+.tag{display:inline-block;font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:6px 8px;border-radius:3px;margin-bottom:14px}
+.tag.g{background:var(--grill-soft);color:var(--grill)}
+.tag.s{background:var(--spec-soft);color:var(--spec)}
+.tag.n{background:var(--code-bg);color:var(--muted)}
+p{margin:10px 0}
+.sub{color:var(--muted);margin-top:0}
+code{font:0.88em var(--mono);background:var(--code-bg);padding:1px 5px;border-radius:3px}
+pre{font:13px/1.7 var(--mono);background:var(--code-bg);padding:16px 18px;border-radius:6px;overflow-x:auto;margin:14px 0}
+pre code{background:none;padding:0;font-size:inherit}
+pre .c{color:var(--muted)}
+pre .gk{color:var(--grill);font-weight:600}
+pre .sk{color:var(--spec);font-weight:600}
+ul{padding-left:1.2em;margin:10px 0}
+li{margin:4px 0}
+strong{font-weight:700}
+
+/* status */
+.status{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:20px}
+.st{background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:18px 20px}
+.st h4{margin:0 0 4px;font:700 15px/1.4 var(--sans);display:flex;align-items:center;gap:10px}
+.pill{font:600 11px/1 var(--mono);padding:5px 8px;border-radius:99px;letter-spacing:.04em}
+.pill.ok{color:var(--ok);border:1px solid currentColor}
+.pill.warn{color:var(--warn);background:var(--warn-soft)}
+.st p{margin:6px 0 0;font-size:14px;color:var(--muted)}
+.st pre{margin:10px 0 0;font-size:12.5px;padding:10px 12px}
+
+/* tables */
+.tbl{overflow-x:auto;margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font:600 11.5px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+td:first-child{white-space:nowrap}
+td code{color:var(--spec);background:var(--spec-soft)}
+
+/* design tree round sample */
+.round{background:var(--paper);border:1px solid var(--rule);border-radius:6px;overflow:hidden;margin:16px 0}
+.round .hd{font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:12px 18px;border-bottom:1px solid var(--rule)}
+.q{padding:14px 18px;border-bottom:1px dashed var(--rule)}
+.q:last-child{border-bottom:0}
+.q b{color:var(--grill)}
+.q .rec{color:var(--muted);margin-top:4px;font-size:14px}
+
+/* pipeline */
+.flow{list-style:none;padding:0;margin:20px 0;display:grid;gap:0;counter-reset:f}
+.flow li{position:relative;padding:0 0 22px 44px;margin:0}
+.flow li::before{counter-increment:f;content:counter(f);position:absolute;left:0;top:2px;width:28px;height:28px;border-radius:50%;background:var(--spec-soft);color:var(--spec);font:600 13px/28px var(--mono);text-align:center}
+.flow li::after{content:"";position:absolute;left:13.5px;top:34px;bottom:4px;width:1px;background:var(--rule)}
+.flow li:last-child::after{display:none}
+.flow li.pre::before{background:var(--grill-soft);color:var(--grill)}
+.flow .cmd{font:600 14px var(--mono);color:var(--ink)}
+.flow .d{color:var(--muted);font-size:14px;display:block}
+
+.tips{display:grid;gap:12px;margin:14px 0}
+.tip{border-left:2px solid var(--grill);padding:2px 0 2px 16px}
+.tip b{display:block}
+.tip span{color:var(--muted);font-size:14.5px}
+
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
+.pair > div{background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:16px 18px}
+.pair h4{margin:0 0 6px;font:700 15px var(--sans)}
+.pair .g h4{color:var(--grill)} .pair .s h4{color:var(--spec)}
+.pair p{margin:0;font-size:14px;color:var(--muted)}
+
+a{color:var(--spec)}
+a:focus-visible{outline:2px solid var(--spec);outline-offset:2px}
+footer{color:var(--muted);font-size:13px;padding-top:24px}
+
+@media (max-width:860px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:0}
+  nav.toc{display:none}
+  .pair{grid-template-columns:1fr}
+}
+</style>
+
+<div class="wrap">
+  <nav class="toc" aria-label="目录">
+    <p>目录</p>
+    <ol>
+      <li class="n"><a href="#status">安装状态</a></li>
+      <li class="g"><a href="#grill">grill-me</a></li>
+      <li class="s"><a href="#openspec">OpenSpec</a></li>
+      <li class="n"><a href="#together">两者搭配</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header>
+      <div class="eyebrow">Claude Code · 工作流手册 · kmp-video-player</div>
+      <h1><span class="g">grill-me</span><span class="x">×</span><span class="s">OpenSpec</span></h1>
+      <p class="lede">先把想法问透，再把需求写成规格，最后按任务清单实现。这份手册介绍两个工具各自怎么用、怎么串起来用。</p>
+    </header>
+
+    <section id="status">
+      <span class="tag n">安装状态</span>
+      <h2>装在哪里、还差什么</h2>
+      <div class="status">
+        <div class="st">
+          <h4>grill-me <span class="pill ok">已安装</span></h4>
+          <p>位置：现在随 dispatch 插件一起提供，在 <code>~/workbench/claude-dispatch/skills/</code> 下的 <code>grill-me/</code> 和 <code>grilling/</code>。grill-me 只是入口，访谈逻辑在 grilling 里。命令因此带上了插件前缀：<code>/dispatch:grill-me</code>。</p>
+        </div>
+        <div class="st">
+          <h4>OpenSpec CLI <span class="pill ok">已安装 1.13.1</span></h4>
+          <p>装在 <code>~/.npm-global</code>，<code>~/.zshrc</code> 已让它在 PATH 里排在 <code>/usr/local</code> 的旧版 1.2.0 前面。kmp-video-player 里已运行 <code>openspec init --tools claude</code>，匿名统计已关闭。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="grill">
+      <span class="tag g">Skill · 访谈</span>
+      <h2>grill-me：拷问式需求梳理</h2>
+      <p class="sub">写代码之前，让 AI 追着问，直到每个设计决策都有答案。它不写任何文件，只是把你的想法梳理清楚。</p>
+
+      <h3>怎么启动</h3>
+<pre><code><span class="gk">/dispatch:grill-me</span> 我想给播放器加倍速和画中画功能</code></pre>
+      <ul>
+        <li>只能你手动输入 <code>/dispatch:grill-me</code> 触发，AI 不会自己调用。</li>
+        <li>最好在<strong>新会话</strong>里用，并且<strong>不要开 Plan 模式</strong>。Plan 模式会让 AI 急着出计划，而这里的目的是先把问题问透。</li>
+      </ul>
+
+      <h3>它怎么提问</h3>
+      <p>AI 把你的想法拆成一棵<strong>决策树</strong>。凡是前提已经确定、现在就能问的问题，它每轮一次问完，每题都附上推荐答案。能从代码或环境里查到的事实，它会自己查，不来问你。</p>
+      <div class="round" role="figure" aria-label="一轮提问示例">
+        <div class="hd">示例 · 第 1 轮</div>
+        <div class="q">❓ <b>Q1 · 倍速范围</b>：0.5x–2x，还是 0.25x–4x？
+          <div class="rec">➡️ 推荐 0.5x–2x。能覆盖绝大多数场景，Android 的 ExoPlayer 和 iOS 的 AVPlayer 都能稳定支持。</div></div>
+        <div class="q">❓ <b>Q2 · 画中画触发方式</b>：用户点按钮进入，还是切到后台时自动进入？
+          <div class="rec">➡️ 推荐两种都支持，自动进入做成设置里的开关。</div></div>
+        <div class="q">❓ <b>Q3 · 倍速是否记忆</b>：按视频分别记，还是全局记一个？
+          <div class="rec">➡️ 推荐全局记一个，实现简单，也更符合大多数用户的预期。</div></div>
+      </div>
+      <p>你回答后，它会重新整理决策树，问下一轮。所有分支都问完才算结束。结束前它不会动手，要等你确认双方理解一致。</p>
+
+      <h3>用好它的要点</h3>
+      <div class="tips">
+        <div class="tip"><b>主动掌控范围</b><span>敢反驳、敢说"不知道"、发现跑题就指出来。一路"同意、同意"下来的会话，结论其实是 AI 替你定的。</span></div>
+        <div class="tip"><b>靠聊聊不清的问题，先做原型</b><span>像"交互手感怎么样"这类问题，要先有个东西看。遇到时就停下来做个原型，看完再回来一句话回答。</span></div>
+        <div class="tip"><b>问题太多说明范围太大</b><span>看的是问了几轮，不是几个问题：4 轮 40 多个问题很正常。如果远超这个量，先让它把需求拆小，再逐块拷问。</span></div>
+        <div class="tip"><b>想一次只问一个问题</b><span>在 <code>~/.claude/CLAUDE.md</code> 里加一行：<code>When grilling, ask one question at a time.</code></span></div>
+      </div>
+    </section>
+
+    <section id="openspec">
+      <span class="tag s">CLI + 斜杠命令 · 规格</span>
+      <h2>OpenSpec：规格驱动开发</h2>
+      <p class="sub">在项目里加一层轻量的规格：先在 Markdown 里和 AI 对齐要做什么，再写代码。每个需求变更都有自己的文件夹，里面有提案、规格、设计和任务清单。</p>
+
+      <h3>初始化（每个项目一次）</h3>
+<pre><code>cd ~/workbench/kmp-video-player
+openspec init --tools claude    <span class="c"># 生成 openspec/ 目录和 /opsx:* 命令</span>
+openspec config set telemetry.enabled false   <span class="c"># 可选：关闭匿名统计</span></code></pre>
+
+      <h3>核心命令（在 Claude Code 对话里输入）</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>命令</th><th>作用</th></tr></thead>
+        <tbody>
+          <tr><td><code>/opsx:explore</code></td><td>自由探讨：读代码、比较方案，不写代码。适合想法还模糊的时候</td></tr>
+          <tr><td><code>/opsx:propose</code></td><td>创建一个变更，一次生成 proposal、specs、design、tasks</td></tr>
+          <tr><td><code>/opsx:apply</code></td><td>按 tasks.md 逐项实现</td></tr>
+          <tr><td><code>/opsx:update</code></td><td>修改变更里的规划文档，保持前后一致</td></tr>
+          <tr><td><code>/opsx:sync</code></td><td>把变更里的规格增量合并进主规格</td></tr>
+          <tr><td><code>/opsx:archive</code></td><td>变更完成后归档，同时更新主规格</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>一个变更的完整流程</h3>
+      <ol class="flow">
+        <li><span class="cmd">/opsx:explore 播放器要支持字幕，但不确定用哪种格式</span><span class="d">把方向讨论清楚。这一步不写任何文件。</span></li>
+        <li><span class="cmd">/opsx:propose add-subtitle-support</span><span class="d">生成 openspec/changes/add-subtitle-support/ 下的 proposal.md、specs/、design.md、tasks.md</span></li>
+        <li><span class="cmd">审阅，必要时 /opsx:update</span><span class="d">在写代码之前改规格，比写完再改便宜得多。</span></li>
+        <li><span class="cmd">/clear → /opsx:apply</span><span class="d">建议先清空上下文，再按任务清单实现。</span></li>
+        <li><span class="cmd">/opsx:archive</span><span class="d">归档到 openspec/changes/archive/，主规格同步更新。</span></li>
+      </ol>
+
+      <h3>规格长什么样</h3>
+      <p>就是普通 Markdown，用 SHALL / WHEN / THEN 描述需求和验收场景：</p>
+<pre><code><span class="sk">## ADDED Requirements</span>
+### Requirement: 倍速播放
+播放器 SHALL 支持 0.5x–2x 倍速，默认 1x。
+
+#### Scenario: 用户切换倍速
+- **WHEN** 用户选择 1.5x
+- **THEN** 播放速度变为 1.5x，且音调不变</code></pre>
+
+      <h3>扩展命令（可选）</h3>
+      <p>运行 <code>openspec config profile</code> 勾选需要的工作流，再在项目里运行 <code>openspec update</code>，就能用上这些：</p>
+      <div class="tbl"><table>
+        <tbody>
+          <tr><td><code>/opsx:new</code> + <code>/opsx:continue</code></td><td>逐个生成规划文档</td></tr>
+          <tr><td><code>/opsx:ff</code></td><td>一次生成全部规划文档</td></tr>
+          <tr><td><code>/opsx:verify</code></td><td>检查实现是否符合规格</td></tr>
+          <tr><td><code>/opsx:bulk-archive</code></td><td>一次归档多个变更</td></tr>
+          <tr><td><code>/opsx:onboard</code></td><td>带你走一遍完整流程的教程</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>常用终端命令</h3>
+<pre><code>openspec list        <span class="c"># 查看进行中的变更</span>
+openspec update      <span class="c"># 升级 CLI 后，刷新项目里的 AI 指令</span>
+openspec --help      <span class="c"># 查看全部命令</span></code></pre>
+    </section>
+
+    <section id="together">
+      <span class="tag n">搭配</span>
+      <h2>两者怎么串起来</h2>
+      <div class="pair">
+        <div class="g"><h4>grill-me：把想法问清楚</h4><p>适合想法还模糊的时候。不生成文件，不依赖代码仓库，产出是一组已经确定的决策。</p></div>
+        <div class="s"><h4>OpenSpec：把需求落成文档</h4><p>适合需求已经确定的时候。把它写成规格和任务清单，再按清单实现、验收、归档。</p></div>
+      </div>
+      <ol class="flow">
+        <li class="pre"><span class="cmd">/dispatch:grill-me 字幕功能</span><span class="d">在新会话里开始，关掉 Plan 模式。</span></li>
+        <li><span class="cmd">/opsx:propose add-subtitle-support</span><span class="d">在<strong>同一个会话</strong>里接着用，前面问出来的内容会直接写进规格。</span></li>
+        <li><span class="cmd">/clear → /opsx:apply → /opsx:archive</span><span class="d">清空上下文后实现、归档。</span></li>
+      </ol>
+      <footer>来源：mattpocock/skills（grill-me、grilling）· Fission-AI/OpenSpec v1.13.1 文档</footer>
+    </section>
+  </main>
+</div>
+</body>
+</html>
