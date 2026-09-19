@@ -1,0 +1,18 @@
+{
+  "pages": [
+    {
+      "slug": "dispatch-manual",
+      "title": "dispatch 分级调度手册",
+      "description": "dispatch 插件手册：分层方案、七条核心原理、运行过程、五个级别、模型与消耗、知识库接入和上手步骤",
+      "tags": [
+        "Claude Code",
+        "dispatch",
+        "工作流",
+        "手册"
+      ],
+      "project": "claude-dispatch",
+      "created": "2026-09-19",
+      "updated": "2026-09-19"
+    }
+  ]
+}

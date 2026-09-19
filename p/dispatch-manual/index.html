@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="dispatch 插件手册：分层方案、七条核心原理、运行过程、五个级别、模型与消耗、知识库接入和上手步骤">
+<link rel="index" href="../../">
+<title>dispatch 分级调度手册</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+:root{
+  --ground:#F3F4F6; --paper:#FFFFFF; --ink:#161A21; --muted:#5B6372; --rule:#DADDE3; --code-bg:#E9EBEF;
+  --t0:#8E97AA; --t1:#6680B3; --t2:#4865AA; --t3:#2E4893; --t4:#1B2D6A; --t-soft:#E4E8F2;
+  --accent:#A86A12; --accent-soft:#F6EBD8; --ok:#2C7A4F; --ok-soft:#E1F0E7;
+  --serif:"Noto Serif SC","Songti SC",serif;
+  --sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#12151B; --paper:#1A1E26; --ink:#E5E8EE; --muted:#9AA2B1; --rule:#2C323D; --code-bg:#232834;
+    --t0:#737D91; --t1:#7F97C8; --t2:#95ABDB; --t3:#AFC1EA; --t4:#CBD8F7; --t-soft:#222B3D;
+    --accent:#E2A84B; --accent-soft:#3A2D17; --ok:#6CC08C; --ok-soft:#1D3326;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#12151B; --paper:#1A1E26; --ink:#E5E8EE; --muted:#9AA2B1; --rule:#2C323D; --code-bg:#232834;
+  --t0:#737D91; --t1:#7F97C8; --t2:#95ABDB; --t3:#AFC1EA; --t4:#CBD8F7; --t-soft:#222B3D;
+  --accent:#E2A84B; --accent-soft:#3A2D17; --ok:#6CC08C; --ok-soft:#1D3326;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:15.5px/1.8 var(--sans);padding-inline:20px;padding-block:0 96px}
+.wrap{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:180px minmax(0,1fr);gap:56px}
+nav.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 32px);align-self:start;padding-top:56px;font-size:13.5px}
+nav.toc p{font:600 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+nav.toc a{color:var(--muted);text-decoration:none;border-left:2px solid var(--rule);padding-left:10px;display:block}
+nav.toc a:hover,nav.toc a:focus-visible{color:var(--ink);border-color:var(--ink)}
+main{min-width:0;max-width:780px}
+header{padding-block:56px 36px;border-bottom:1px solid var(--rule)}
+.eyebrow,.kicker{font:600 11.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.kicker{display:block;margin-bottom:12px;font-size:11px}
+h1{font:900 clamp(32px,5vw,46px)/1.2 var(--serif);margin:14px 0;text-wrap:balance}
+.lede{color:var(--muted);margin:0;max-width:40em}
+.ramp{display:flex;gap:3px;margin-top:22px;height:6px;max-width:320px}
+.ramp i{flex:1;border-radius:1px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.chip{font:500 12px/1 var(--mono);padding:7px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--paper);color:var(--muted)}
+.chip b{color:var(--ok);font-weight:600}
+h2{font:900 25px/1.35 var(--serif);margin:0 0 8px;text-wrap:balance}
+h3{font:700 16.5px/1.5 var(--sans);margin:30px 0 8px}
+section{padding-block:48px;border-bottom:1px solid var(--rule)}
+p{margin:10px 0}
+.sub{color:var(--muted);margin-top:0}
+code{font:.86em var(--mono);background:var(--code-bg);padding:1px 5px;border-radius:3px}
+pre{font:12.8px/1.7 var(--mono);background:var(--code-bg);padding:16px 18px;border-radius:6px;overflow-x:auto;margin:14px 0}
+pre code{background:none;padding:0;font-size:inherit}
+pre .c{color:var(--muted)}
+ul{padding-left:1.2em;margin:10px 0} li{margin:4px 0}
+a{color:var(--t2)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* 分层架构 */
+.layers{display:grid;gap:6px;margin-top:20px}
+.layer{display:grid;grid-template-columns:96px minmax(0,1fr) minmax(0,1.3fr);gap:16px;align-items:baseline;background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:12px 16px}
+.layer b{font:700 14.5px/1.4 var(--sans)}
+.layer code{font-size:12px}
+.layer span{color:var(--muted);font-size:14px}
+.layer.det{background:var(--ok-soft);border-color:transparent}
+.layer.det b{color:var(--ok)}
+
+/* 原理 */
+.principles{list-style:none;margin:18px 0 0;padding:0;counter-reset:p}
+.principles li{padding:16px 0;border-top:1px solid var(--rule);margin:0;display:grid;gap:4px}
+.principles b{font-weight:700;font-size:16px}
+.principles span{color:var(--muted);font-size:14.5px}
+.principles em{font:500 12px/1.6 var(--mono);font-style:normal;color:var(--t2)}
+
+/* 运行流程 */
+.flow{list-style:none;margin:20px 0 0;padding:0;display:grid}
+.flow li{display:grid;grid-template-columns:92px minmax(0,1fr);gap:18px;margin:0}
+.flow .when{font:600 12px/1.5 var(--mono);color:var(--muted);padding-top:14px;text-align:right}
+.flow .what{border-left:2px solid var(--rule);padding:12px 0 14px 20px;position:relative}
+.flow .what::before{content:"";position:absolute;left:-6px;top:19px;width:10px;height:10px;border-radius:50%;background:var(--paper);border:2px solid var(--t2)}
+.flow .what b{display:block;font-size:15.5px}
+.flow .what p{margin:2px 0 6px;color:var(--muted);font-size:14.5px}
+.cost{display:inline-block;font:500 11.5px/1 var(--mono);padding:4px 8px;border-radius:3px}
+.cost.zero{background:var(--ok-soft);color:var(--ok)}
+.cost.model{background:var(--accent-soft);color:var(--accent)}
+
+/* 级别 */
+.tiers{display:grid;gap:12px;margin-top:20px}
+.tier{background:var(--paper);border:1px solid var(--rule);border-radius:6px;display:grid;grid-template-columns:92px minmax(0,1fr);overflow:hidden}
+.tier .lv{padding:16px 0 16px 18px;border-left:5px solid var(--c)}
+.tier .lv b{display:block;font:600 22px/1 var(--mono);color:var(--c)}
+.tier .lv span{font-size:13px;color:var(--muted)}
+.tier .bd{padding:14px 18px 16px}
+.tier .when{font-weight:500;margin:0 0 6px}
+.tier .steps{font-size:14px;color:var(--muted);margin:0}
+.tier .gate{display:inline-block;margin-top:8px;font:500 11.5px/1 var(--mono);padding:4px 8px;border-radius:3px;background:var(--t-soft);color:var(--t3)}
+.tier .gate.ask{background:var(--accent-soft);color:var(--accent)}
+
+/* 表格 */
+.tbl{overflow-x:auto;margin:16px 0;border:1px solid var(--rule);border-radius:6px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:600px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font:600 11px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--ground)}
+td.n{font-weight:700;white-space:nowrap}
+td code{white-space:nowrap}
+
+/* 消耗条 */
+.bars{display:grid;gap:10px;margin:18px 0 6px;font-variant-numeric:tabular-nums}
+.bar{display:grid;grid-template-columns:minmax(0,15em) minmax(0,1fr) 3.4em;gap:12px;align-items:center;font-size:14px}
+.bar .track{height:12px;background:var(--t-soft);border-radius:2px;overflow:hidden}
+.bar .track i{display:block;height:100%;background:var(--t1)}
+.bar.now .track i{background:var(--accent)}
+.bar.now .lbl{font-weight:700}
+.bar .v{font:600 13px var(--mono);text-align:right}
+.note{font-size:13px;color:var(--muted)}
+
+/* 知识库阶梯 */
+.ladder{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:18px}
+.rung{background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;display:grid;gap:6px;align-content:start}
+.rung .k{font:600 11px/1 var(--mono);letter-spacing:.1em;color:var(--muted)}
+.rung code{font-size:12px;white-space:normal}
+.rung span{font-size:13.5px;color:var(--muted)}
+.rung .out{font:600 12.5px/1.4 var(--mono);color:var(--ok)}
+
+/* 上手步骤 */
+.start{list-style:none;margin:18px 0 0;padding:0;display:grid;gap:10px;counter-reset:s}
+.start li{counter-increment:s;display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;margin:0;background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:14px 16px}
+.start li::before{content:counter(s);font:600 18px/1.3 var(--mono);color:var(--t2)}
+.start b{display:block}
+.start span{color:var(--muted);font-size:14.5px}
+
+/* 示例对话 */
+.ex{display:grid;gap:8px;margin-top:16px}
+.ex div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;padding:10px 14px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;font-size:14px}
+.ex q{quotes:none;font-weight:500}
+.ex span{color:var(--muted)}
+.ex span code{color:var(--t3)}
+
+/* 问答 */
+dl.faq{margin:16px 0 0}
+dl.faq dt{font-weight:700;margin-top:18px}
+dl.faq dd{margin:4px 0 0;color:var(--muted);font-size:14.5px}
+
+@media (max-width:900px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:0}
+  nav.toc{display:none}
+}
+@media (max-width:620px){
+  .layer{grid-template-columns:minmax(0,1fr);gap:2px}
+  .ladder{grid-template-columns:minmax(0,1fr)}
+  .flow li{grid-template-columns:minmax(0,1fr);gap:0}
+  .flow .when{text-align:left;padding:10px 0 0 22px}
+  .ex div{grid-template-columns:minmax(0,1fr);gap:2px}
+  .bar{grid-template-columns:minmax(0,1fr) 3.4em}
+  .bar .track{grid-column:1 / -1;grid-row:2}
+  .tier{grid-template-columns:72px minmax(0,1fr)}
+}
+</style>
+
+<div class="wrap">
+<nav class="toc" aria-label="目录">
+  <p>目录</p>
+  <ol>
+    <li><a href="#design">方案</a></li>
+    <li><a href="#principles">核心原理</a></li>
+    <li><a href="#flow">运行过程</a></li>
+    <li><a href="#tiers">五个级别</a></li>
+    <li><a href="#agents">模型与消耗</a></li>
+    <li><a href="#kb">知识库</a></li>
+    <li><a href="#start">如何使用</a></li>
+    <li><a href="#ref">命令与文件</a></li>
+    <li><a href="#faq">问题与限制</a></li>
+  </ol>
+</nav>
+
+<main>
+<header>
+  <span class="eyebrow">Claude Code 插件 · dispatch 0.3.0</span>
+  <h1>dispatch 分级调度</h1>
+  <p class="lede">先判断任务有多复杂，再决定走多重的流程。小事直接做；大事才请出需求拷问、规格文档、子 agent 和终审。目标是在 Pro 订阅的额度里，把 token 花在真正需要的地方。</p>
+  <div class="ramp" aria-hidden="true"><i style="background:var(--t0)"></i><i style="background:var(--t1)"></i><i style="background:var(--t2)"></i><i style="background:var(--t3)"></i><i style="background:var(--t4)"></i></div>
+  <div class="chips">
+    <span class="chip"><b>✔</b> 已加载 · 校验通过</span>
+    <span class="chip">常驻约 2.0k token / 会话</span>
+    <span class="chip">与技术栈无关</span>
+    <span class="chip">接入个人知识库</span>
+  </div>
+</header>
+
+<section id="design">
+  <span class="kicker">方案</span>
+  <h2>一套规则，五层分工</h2>
+  <p class="sub">同一套重流程用在所有任务上，小改动也要付出拷问、规格和审查的成本；一律轻装上阵，大改动又容易返工。dispatch 在动手前先定级，让流程的重量和任务的风险相称。</p>
+  <div class="layers">
+    <div class="layer"><b>规则层</b><code>ROUTER.md · KB.md</code><span>会话开始时注入：怎么定级、每级怎么做、何时查和写知识库</span></div>
+    <div class="layer"><b>编排层</b><code>主会话</code><span>定级、执行、判断要不要派子 agent，所有决策留在这里</span></div>
+    <div class="layer"><b>委派层</b><code>scout · reviewer · builder</code><span>只做两件事：替主会话省上下文，或给出独立判断</span></div>
+    <div class="layer det"><b>确定性层</b><code>hooks · dispatch-verify · dispatch-kb</code><span>本地脚本完成，不调用模型、不耗额度</span></div>
+    <div class="layer"><b>沉淀层</b><code>知识库 · OpenSpec 归档 · overrides.log</code><span>把方案、决策、踩坑和定级偏差留下来，下次复用</span></div>
+  </div>
+  <p>插件本身不含任何项目事实。验证命令和知识库目录由 <code>/dispatch:setup</code> 写进各项目的 CLAUDE.md，个人路径放在本机的 <code>~/.claude/dispatch/config</code>。同一个插件可以原样用在任何项目、任何机器上。</p>
+</section>
+
+<section id="principles">
+  <span class="kicker">核心原理</span>
+  <h2>七条原则</h2>
+  <p class="sub">每一条都对应插件里的一个具体机制。</p>
+  <ol class="principles">
+    <li><b>按风险最高的那个信号定级，不取平均</b><span>改 2 个文件但动了公共接口，按公共接口算。流程是为最坏情况准备的。</span><em>ROUTER.md · 定级</em></li>
+    <li><b>主会话是消耗大头，子 agent 要算账</b><span>约九成消耗在主会话。子 agent 只在两种情况下派：替主会话读大量文件，或需要一个不受主会话思路影响的审查。</span><em>ROUTER.md · 子 agent</em></li>
+    <li><b>能用脚本的地方不用模型</b><span>验证不派 agent，改用脚本跑命令；知识库检索不派 agent，改用脚本出摘要；级别标记由 hook 识别。</span><em>dispatch-verify · dispatch-kb · hooks</em></li>
+    <li><b>上下文是最稀缺的资源</b><span>构建日志落盘，只回摘要；知识库逐层打开；子 agent 回报限 30–40 行；任务组之间 <code>/clear</code>。</span><em>输出上限 · 上下文卫生</em></li>
+    <li><b>判断留在主会话，重复劳动交出去</b><span>需要权衡的实现留在主会话；规格已经写清的机械性任务组才交给 builder。</span><em>dispatch:builder</em></li>
+    <li><b>人在关键节点把关</b><span>L3 以上先征得同意；规格经你审阅才执行；写进知识库的内容先给你看。</span><em>征得同意 · 规格审阅 · 写入确认</em></li>
+    <li><b>定级可以纠正，也可以校准</b><span>写 <code>#L2</code> 就能改级别；每次纠正都记一行日志，积累下来就是修改定级规则的依据。</span><em>prompt-submit.sh · overrides.log</em></li>
+  </ol>
+</section>
+
+<section id="flow">
+  <span class="kicker">运行过程</span>
+  <h2>一条需求经过什么</h2>
+  <p class="sub">绿色标签的环节由本地脚本完成，不调用模型。</p>
+  <ol class="flow">
+    <li><div class="when">会话开始</div><div class="what"><b>注入规则</b><p>SessionStart hook 输出 ROUTER.md；配置了知识库时追加 KB.md。新会话、<code>/clear</code>、<code>/compact</code> 之后都会重新注入。</p><span class="cost zero">本地脚本</span></div></li>
+    <li><div class="when">每条消息</div><div class="what"><b>识别手动级别</b><p>UserPromptSubmit hook 查找 <code>#L0</code>–<code>#L4</code>。找到就告诉模型按该级别执行，并往 overrides.log 记一行；找不到就什么也不输出。</p><span class="cost zero">本地脚本</span></div></li>
+    <li><div class="when">动手前</div><div class="what"><b>定级</b><p>主会话按风险最高的信号判定级别，回复第一行写 <code>〔L2 · 依据〕</code>。L0 和问答、调研类请求不写。</p><span class="cost model">主会话</span></div></li>
+    <li><div class="when">L2 以上</div><div class="what"><b>查知识库</b><p><code>dispatch-kb search</code> 每篇笔记只回一行摘要，挑中后再看大纲、读小节。</p><span class="cost zero">本地脚本</span></div></li>
+    <li><div class="when">执行</div><div class="what"><b>按级别走流程</b><p>按下一节的流程执行，需要时派子 agent。执行中随时重判，升级或降级时说明原因。</p><span class="cost model">主会话 + 按需子 agent</span></div></li>
+    <li><div class="when">收尾</div><div class="what"><b>验证</b><p><code>dispatch-verify &lt;命令&gt;</code>：完整日志写进临时文件，只回显退出码、报错行和末尾几行。没通过不得声称完成。</p><span class="cost zero">本地脚本</span></div></li>
+    <li><div class="when">值得留下时</div><div class="what"><b>沉淀</b><p>L3 归档后，或 L2 得出值得保留的结论时，提议用 <code>/dispatch:note</code> 写笔记，你确认后才写入。</p><span class="cost model">主会话</span></div></li>
+  </ol>
+</section>
+
+<section id="tiers">
+  <span class="kicker">五个级别</span>
+  <h2>定级与流程</h2>
+  <p class="sub">执行中改动文件数超过预估的 2 倍、出现架构决策、同一问题修了 2 轮没好、碰到公共接口或迁移，都会升级。问不出未决问题、只需改 1 个文件时降级。升级时，已写的意图和问答结论带到下一级，不重做。</p>
+  <div class="tiers">
+    <div class="tier" style="--c:var(--t0)"><div class="lv"><b>L0</b><span>直做</span></div><div class="bd"><p class="when">一句话说得清的改动：错字、配置值、重命名。</p><p class="steps">直接改 → 最小验证</p><span class="gate">直接执行 · 无判定行</span></div></div>
+    <div class="tier" style="--c:var(--t1)"><div class="lv"><b>L1</b><span>快修</span></div><div class="bd"><p class="when">位置明确的 bug 或小功能，不超过 3 个文件，不碰公共接口。</p><p class="steps">三行意图（目标 / 不做什么 / 验收）→ 修 bug 先写复现测试 → 改 → 验证。原因不明时转 systematic-debugging。</p><span class="gate">判定后直接执行</span></div></div>
+    <div class="tier" style="--c:var(--t2)"><div class="lv"><b>L2</b><span>标准</span></div><div class="bd"><p class="when">跨模块、需求有歧义、新依赖，或碰到公共接口、数据模型、并发、删除。</p><p class="steps">查知识库 → 范围不清派 scout → grilling 最多一轮 → Plan 模式出方案 → 测试先行实现 → 碰到高风险项时派 reviewer。</p><span class="gate">判定后直接执行</span></div></div>
+    <div class="tier" style="--c:var(--t3)"><div class="lv"><b>L3</b><span>特性</span></div><div class="bd"><p class="when">一个会话做不完；改公共接口、持久化格式或做数据迁移；新增一块完整能力。</p><p class="steps">grill-me → OpenSpec 提案 → 你审规格 → 按任务组执行（组间 <code>/clear</code>）→ reviewer 终审（Opus）→ 核对规格 → 归档 → 沉淀笔记。没有 OpenSpec 时，方案写到 <code>docs/plans/</code>。</p><span class="gate ask">先征得你同意</span></div></div>
+    <div class="tier" style="--c:var(--t4)"><div class="lv"><b>L4</b><span>史诗</span></div><div class="bd"><p class="when">新子系统或大改造，要先做架构决策。</p><p class="steps"><code>/opsx:explore</code> 定决策 → 拆成多个 L3 逐个走。只有真正独立的部分才并行，最多 3 路，用 git worktree 隔离。</p><span class="gate ask">先征得你同意</span></div></div>
+  </div>
+</section>
+
+<section id="agents">
+  <span class="kicker">模型与消耗</span>
+  <h2>谁用什么模型</h2>
+  <p class="sub">插件的 agent 在各自文件里写死了模型，不随主会话变贵。主会话的模型和强度由你自己设置，插件不改。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>角色</th><th>模型</th><th>什么时候用</th><th>边界</th></tr></thead>
+    <tbody>
+      <tr><td class="n">主会话</td><td>你的设置（当前 Opus 5 xhigh）</td><td>所有任务</td><td>负责定级和所有需要判断的决策</td></tr>
+      <tr><td class="n">scout</td><td>Haiku 4.5</td><td>要读 5 个以上文件，或进入不熟悉的区域</td><td>只读，不加载 CLAUDE.md，最多 12 轮，回报 ≤ 40 行</td></tr>
+      <tr><td class="n">reviewer</td><td>Sonnet 5；L3 终审指定 Opus 5</td><td>L2 碰到高风险项；L3 交付前一次</td><td>只看改动差异，只报正确性问题和遗漏的需求，≤ 40 行</td></tr>
+      <tr><td class="n">builder</td><td>Sonnet 5</td><td>规格明确的机械性任务组、L4 并行分支</td><td>遇到歧义就停下回报，≤ 30 行</td></tr>
+      <tr><td class="n">验证</td><td>不用模型</td><td>每次声称完成之前</td><td><code>dispatch-verify</code> 脚本</td></tr>
+    </tbody>
+  </table></div>
+  <h3>各种配置的相对消耗</h3>
+  <div class="bars">
+    <div class="bar"><span class="lbl">Fable 5.1 xhigh，子 agent 全继承</span><span class="track"><i style="width:100%"></i></span><span class="v">100%</span></div>
+    <div class="bar now"><span class="lbl">Opus 5 xhigh + 本插件编制（当前）</span><span class="track"><i style="width:28%"></i></span><span class="v">≈28%</span></div>
+    <div class="bar"><span class="lbl">Opus 5 medium + 本插件编制</span><span class="track"><i style="width:23%"></i></span><span class="v">≈23%</span></div>
+    <div class="bar"><span class="lbl">Sonnet 5 + 本插件编制</span><span class="track"><i style="width:12%"></i></span><span class="v">≈12%</span></div>
+  </div>
+  <p class="note">按一个月 60 个 L1、25 个 L2、6 个 L3 估算，用 API 价格作权重，只用于比较高低。Pro 额度按模型怎么折算官方没有公布，实际以 <code>/usage</code> 为准。当前配置里约九成消耗在主会话，额度紧张时先调主会话的模型或 <code>/effort</code>。</p>
+</section>
+
+<section id="kb">
+  <span class="kicker">知识库</span>
+  <h2>查的时候逐层打开，写的时候先确认</h2>
+  <p class="sub">直接读写 Markdown 文件，不需要 Obsidian 在运行，也不经过 MCP。没有配置知识库时，这部分规则不注入会话。</p>
+  <h3>查：三步，每一步只多读一点</h3>
+  <div class="ladder">
+    <div class="rung"><span class="k">第 1 步 · 找</span><code>dispatch-kb search 词… -d 目录</code><span>按关键词匹配路径、标题、摘要和正文</span><span class="out">每篇 1 行，默认最多 10 行</span></div>
+    <div class="rung"><span class="k">第 2 步 · 看结构</span><code>dispatch-kb outline 路径</code><span>摘要、tags 和带行号的标题大纲</span><span class="out">一篇约 10–30 行</span></div>
+    <div class="rung"><span class="k">第 3 步 · 读一节</span><code>Read offset / limit</code><span>按大纲的行号，只读需要的那一节</span><span class="out">只读一节</span></div>
+  </div>
+  <p>不整篇通读，也不对整个知识库 Grep。L0、L1 不查。</p>
+  <h3>写：固定格式，便于检索</h3>
+  <p><code>/dispatch:note</code> 先查重（已有同主题的笔记就问你是更新还是新建），再按下面的格式起草，把路径、摘要、tags 和结论给你看，你确认后才写入项目对应的目录。</p>
+<pre><code>---
+title: 订单导出改为分批流式写出
+type: 方案            <span class="c"># 方案 / 决策 / 踩坑 / 指南</span>
+project: 订单系统
+summary: 导出超过 1 万行时按 2000 行分批流式写出，内存峰值从 1.2G 降到 150M  <span class="c"># ≤ 60 字，检索只看这一行</span>
+tags: [订单导出, 流式写出, 内存, ExportService]
+created: 2026-09-19
+updated: 2026-09-19
+source: dispatch
+---
+# 订单导出改为分批流式写出
+## 结论            <span class="c"># 3–5 条，放在最前面，只读这一节也能用上</span>
+## 背景 / 方案 / 决策记录 / 相关   <span class="c"># 小节由类型决定</span></code></pre>
+  <ul>
+    <li>每篇不超过 150 行，超出就按主题拆开，用 <code>[[笔记名]]</code> 互链。</li>
+    <li>只写事实和结论；不贴大段代码，用 <code>路径:行号</code> 指向代码。</li>
+    <li>不改你已有的笔记，不在知识库里执行 git 操作，除非你要求。</li>
+  </ul>
+</section>
+
+<section id="start">
+  <span class="kicker">如何使用</span>
+  <h2>第一次使用</h2>
+  <ol class="start">
+    <li><div><b>新开一个会话</b><span>规则在会话开始时才注入。提一个开发需求，回复第一行出现 <code>〔L2 · 依据〕</code> 这样的判定，就说明生效了。</span></div></li>
+    <li><div><b>在项目里执行 <code>/dispatch:setup</code></b><span>探测构建方式，拟出 L0 到 L3 以上各级的验证命令让你确认；检查 git 和 OpenSpec；确定这个项目在知识库里对应哪个目录。结果写进项目的 CLAUDE.md。每个项目做一次。</span></div></li>
+    <li><div><b>照常提需求</b><span>不需要记任何命令，级别自动判定。想指定级别，就在消息里任意位置写 <code>#L0</code>–<code>#L4</code>。</span></div></li>
+    <li><div><b>用上 1–2 周后复盘</b><span>看 <code>~/.claude/dispatch/overrides.log</code>，你手动改级别的次数和方向就是定级规则需要改的地方；再用 <code>/usage</code> 对比额度消耗。</span></div></li>
+  </ol>
+
+  <h3>平时会是什么样</h3>
+  <div class="ex">
+    <div><q>把 README 里的「安裝」改成「安装」</q><span>L0：直接改，不写判定行</span></div>
+    <div><q>#L1 修一下列表分页越界</q><span><code>〔L1 · 用户指定〕</code> 三行意图 → 复现测试 → 修复 → 验证</span></div>
+    <div><q>导出接口加分页参数，前后端都要改</q><span><code>〔L2 · 跨模块 + 公共接口〕</code> 查知识库 → Plan 模式 → 测试先行 → reviewer</span></div>
+    <div><q>缓存层重做，支持离线访问</q><span><code>〔L3 · 持久化格式 + 新能力〕</code> 先问你是否按 L3 走</span></div>
+    <div><q>这两种缓存方案各有什么优劣？</q><span>问答类：不定级，直接回答</span></div>
+  </div>
+
+  <h3>L3 完整走一遍</h3>
+<pre><code><span class="c"># 你同意按 L3 走之后</span>
+/dispatch:grill-me              <span class="c"># 逐条拷问，直到没有未决问题</span>
+/opsx:propose &lt;变更名&gt;          <span class="c"># 生成提案、规格、设计、任务清单</span>
+<span class="c"># 你审阅规格，满意后</span>
+/clear
+/opsx:apply                     <span class="c"># 按任务组执行，组与组之间 /clear；机械性任务组可交给 builder</span>
+<span class="c"># reviewer 以 Opus 终审一次</span>
+/opsx:verify                    <span class="c"># 核对实现是否符合规格</span>
+/opsx:archive                   <span class="c"># 归档</span>
+/dispatch:note                  <span class="c"># 沉淀到知识库，先给你确认</span></code></pre>
+</section>
+
+<section id="ref">
+  <span class="kicker">命令与文件</span>
+  <h2>速查</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>命令</th><th>作用</th></tr></thead>
+    <tbody>
+      <tr><td><code>#L0</code>–<code>#L4</code></td><td>手动指定本次级别，并记入 overrides.log</td></tr>
+      <tr><td><code>/dispatch:setup</code></td><td>项目接入：验证矩阵、git、OpenSpec、知识库目录（只能手动调用）</td></tr>
+      <tr><td><code>/dispatch:grill-me</code></td><td>L3 需求拷问，问到没有未决问题为止</td></tr>
+      <tr><td><code>/dispatch:note</code></td><td>把方案、决策、踩坑或指南写进知识库，先给你确认</td></tr>
+      <tr><td><code>/opsx:propose</code> · <code>apply</code> · <code>verify</code> · <code>archive</code></td><td>OpenSpec 规格流程：提案 → 执行 → 核对 → 归档</td></tr>
+      <tr><td><code>/opsx:explore</code></td><td>L4 先探索、定架构决策</td></tr>
+      <tr><td><code>dispatch-verify &lt;命令&gt;</code></td><td>跑验证命令，只回显摘要；失败时列出报错行和末尾 40 行</td></tr>
+      <tr><td><code>dispatch-kb search</code> · <code>outline</code> · <code>dirs</code> · <code>list</code></td><td>分层检索知识库</td></tr>
+      <tr><td><code>claude plugin details dispatch</code></td><td>查看插件的常驻 token 开销</td></tr>
+    </tbody>
+  </table></div>
+  <p>另有两个 skill 会在需要时由规则自动调用：<code>test-driven-development</code>（L2 以上）和 <code>systematic-debugging</code>（原因不明，或修过一次没好）。</p>
+
+  <h3>文件都在哪</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>位置</th><th>内容</th></tr></thead>
+    <tbody>
+      <tr><td><code>~/workbench/claude-dispatch/</code></td><td>插件源码，通过 <code>~/.claude/skills/dispatch</code> 软链加载；改完执行 <code>/reload-plugins</code></td></tr>
+      <tr><td><code>router/ROUTER.md</code> · <code>KB.md</code></td><td>定级和流程规则、知识库规则，想调整行为就改这两个文件</td></tr>
+      <tr><td><code>~/.claude/dispatch/config</code></td><td>本机配置：<code>kb_dir</code> 知识库目录、<code>kb_exclude</code> 不参与检索的顶层目录</td></tr>
+      <tr><td><code>~/.claude/dispatch/overrides.log</code></td><td>每次手动指定级别的记录：时间、级别、目录</td></tr>
+      <tr><td><code>$TMPDIR/dispatch-verify/</code></td><td>验证命令的完整日志</td></tr>
+      <tr><td>项目 <code>CLAUDE.md</code></td><td>「dispatch 验证矩阵」和「dispatch 知识库」两节，由 setup 写入</td></tr>
+      <tr><td><code>lhan_doc/个人项目/claude-dispatch/</code></td><td>知识库里的使用速查笔记</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="faq">
+  <span class="kicker">问题与限制</span>
+  <h2>常见问题</h2>
+  <dl class="faq">
+    <dt>回复里没有判定行？</dt>
+    <dd>规则只在新会话、<code>/clear</code>、<code>/compact</code> 之后注入，已经开着的会话不会生效。另外，L0 和问答、调研类请求本来就不写判定行。</dd>
+    <dt>定级偏高或偏低？</dt>
+    <dd>当下用 <code>#L</code> 纠正。积累 1–2 周后，看 overrides.log 里偏差集中在哪一级、哪类任务，再改 <code>router/ROUTER.md</code> 的定级信号。</dd>
+    <dt>额度还是不够用？</dt>
+    <dd>先降主会话：换 Sonnet 5，或把 <code>/effort</code> 调低；做 L3 规划时可以临时切到 <code>/model opusplan</code>（规划用 Opus，执行用 Sonnet）。再在 <code>settings.json</code> 的 <code>env</code> 里加 <code>"CLAUDE_CODE_SUBAGENT_MODEL": "sonnet"</code>，内置的 Explore、Plan agent 就不会继承主会话的贵模型。</dd>
+    <dt>项目没有 OpenSpec？</dt>
+    <dd>L3 会把方案写到 <code>docs/plans/</code>。需要时在项目里执行 <code>openspec init --tools claude</code>。</dd>
+    <dt>知识库没生效？</dt>
+    <dd>执行 <code>dispatch-kb path</code>，检查 <code>~/.claude/dispatch/config</code> 里的 <code>kb_dir</code>。这部分功能还需要本机有 python3。</dd>
+  </dl>
+  <h3>已知限制</h3>
+  <ul>
+    <li>常驻开销约 2.0k token/会话：路由规则约 1.1k，知识库规则约 250，其余是各 skill 和 agent 的描述。</li>
+    <li>消耗对比是用 API 价格估算的相对值；Pro 额度的实际折算方式未公开。</li>
+    <li>定级由模型判断，会有偏差；目前靠 <code>#L</code> 纠正和手动复盘，还没有自动复盘。</li>
+    <li>知识库里的旧笔记没有 frontmatter，检索时摘要取的是正文第一段，可能不准。</li>
+    <li>插件里的 agent 不支持 <code>hooks</code>、<code>mcpServers</code>、<code>permissionMode</code> 这几个字段，这是 Claude Code 对插件 agent 的限制。</li>
+    <li>插件仓库只执行过 <code>git init</code>，还没有提交。</li>
+  </ul>
+</section>
+</main>
+</div>
+</body>
+</html>
