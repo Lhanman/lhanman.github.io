@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="dispatch 接入指南：在另一台电脑或给其他人装插件，接上知识库和文档站，在项目里启用、检查和更新">
+<link rel="index" href="../../index.html">
+<title>dispatch 接入指南</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+:root{
+  --ground:#F3F4F6; --paper:#FFFFFF; --ink:#161A21; --muted:#5B6372; --rule:#DADDE3; --code-bg:#E9EBEF;
+  --t0:#8E97AA; --t1:#6680B3; --t2:#4865AA; --t3:#2E4893; --t4:#1B2D6A; --t-soft:#E4E8F2;
+  --accent:#A86A12; --accent-soft:#F6EBD8; --ok:#2C7A4F; --ok-soft:#E1F0E7;
+  --serif:"Noto Serif SC","Songti SC",serif;
+  --sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#12151B; --paper:#1A1E26; --ink:#E5E8EE; --muted:#9AA2B1; --rule:#2C323D; --code-bg:#232834;
+    --t0:#737D91; --t1:#7F97C8; --t2:#95ABDB; --t3:#AFC1EA; --t4:#CBD8F7; --t-soft:#222B3D;
+    --accent:#E2A84B; --accent-soft:#3A2D17; --ok:#6CC08C; --ok-soft:#1D3326;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#12151B; --paper:#1A1E26; --ink:#E5E8EE; --muted:#9AA2B1; --rule:#2C323D; --code-bg:#232834;
+  --t0:#737D91; --t1:#7F97C8; --t2:#95ABDB; --t3:#AFC1EA; --t4:#CBD8F7; --t-soft:#222B3D;
+  --accent:#E2A84B; --accent-soft:#3A2D17; --ok:#6CC08C; --ok-soft:#1D3326;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:15.5px/1.8 var(--sans);padding-inline:20px;padding-block:0 96px}
+.wrap{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:180px minmax(0,1fr);gap:56px}
+nav.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 32px);align-self:start;padding-top:56px;font-size:13.5px}
+nav.toc p{font:600 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+nav.toc a{color:var(--muted);text-decoration:none;border-left:2px solid var(--rule);padding-left:10px;display:block}
+nav.toc a:hover,nav.toc a:focus-visible{color:var(--ink);border-color:var(--ink)}
+main{min-width:0;max-width:780px}
+header{padding-block:56px 36px;border-bottom:1px solid var(--rule)}
+.eyebrow,.kicker{font:600 11.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.kicker{display:block;margin-bottom:12px;font-size:11px}
+h1{font:900 clamp(32px,5vw,46px)/1.2 var(--serif);margin:14px 0;text-wrap:balance}
+.lede{color:var(--muted);margin:0;max-width:40em}
+.ramp{display:flex;gap:3px;margin-top:22px;height:6px;max-width:320px}
+.ramp i{flex:1;border-radius:1px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.chip{font:500 12px/1 var(--mono);padding:7px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--paper);color:var(--muted)}
+.chip b{color:var(--ok);font-weight:600}
+h2{font:900 25px/1.35 var(--serif);margin:0 0 8px;text-wrap:balance}
+h3{font:700 16.5px/1.5 var(--sans);margin:30px 0 8px}
+section{padding-block:48px;border-bottom:1px solid var(--rule)}
+p{margin:10px 0}
+.sub{color:var(--muted);margin-top:0}
+code{font:.86em var(--mono);background:var(--code-bg);padding:1px 5px;border-radius:3px}
+pre{font:12.8px/1.7 var(--mono);background:var(--code-bg);padding:16px 18px;border-radius:6px;overflow-x:auto;margin:14px 0}
+pre code{background:none;padding:0;font-size:inherit}
+pre .c{color:var(--muted)}
+ul{padding-left:1.2em;margin:10px 0} li{margin:4px 0}
+a{color:var(--t2)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* 分层架构 */
+.layers{display:grid;gap:6px;margin-top:20px}
+.layer{display:grid;grid-template-columns:96px minmax(0,1fr) minmax(0,1.3fr);gap:16px;align-items:baseline;background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:12px 16px}
+.layer b{font:700 14.5px/1.4 var(--sans)}
+.layer code{font-size:12px}
+.layer span{color:var(--muted);font-size:14px}
+.layer.det{background:var(--ok-soft);border-color:transparent}
+.layer.det b{color:var(--ok)}
+
+/* 原理 */
+.principles{list-style:none;margin:18px 0 0;padding:0;counter-reset:p}
+.principles li{padding:16px 0;border-top:1px solid var(--rule);margin:0;display:grid;gap:4px}
+.principles b{font-weight:700;font-size:16px}
+.principles span{color:var(--muted);font-size:14.5px}
+.principles em{font:500 12px/1.6 var(--mono);font-style:normal;color:var(--t2)}
+
+/* 运行流程 */
+.flow{list-style:none;margin:20px 0 0;padding:0;display:grid}
+.flow li{display:grid;grid-template-columns:92px minmax(0,1fr);gap:18px;margin:0}
+.flow .when{font:600 12px/1.5 var(--mono);color:var(--muted);padding-top:14px;text-align:right}
+.flow .what{border-left:2px solid var(--rule);padding:12px 0 14px 20px;position:relative}
+.flow .what::before{content:"";position:absolute;left:-6px;top:19px;width:10px;height:10px;border-radius:50%;background:var(--paper);border:2px solid var(--t2)}
+.flow .what b{display:block;font-size:15.5px}
+.flow .what p{margin:2px 0 6px;color:var(--muted);font-size:14.5px}
+.cost{display:inline-block;font:500 11.5px/1 var(--mono);padding:4px 8px;border-radius:3px}
+.cost.zero{background:var(--ok-soft);color:var(--ok)}
+.cost.model{background:var(--accent-soft);color:var(--accent)}
+
+/* 级别 */
+.tiers{display:grid;gap:12px;margin-top:20px}
+.tier{background:var(--paper);border:1px solid var(--rule);border-radius:6px;display:grid;grid-template-columns:92px minmax(0,1fr);overflow:hidden}
+.tier .lv{padding:16px 0 16px 18px;border-left:5px solid var(--c)}
+.tier .lv b{display:block;font:600 22px/1 var(--mono);color:var(--c)}
+.tier .lv span{font-size:13px;color:var(--muted)}
+.tier .bd{padding:14px 18px 16px}
+.tier .when{font-weight:500;margin:0 0 6px}
+.tier .steps{font-size:14px;color:var(--muted);margin:0}
+.tier .gate{display:inline-block;margin-top:8px;font:500 11.5px/1 var(--mono);padding:4px 8px;border-radius:3px;background:var(--t-soft);color:var(--t3)}
+.tier .gate.ask{background:var(--accent-soft);color:var(--accent)}
+
+/* 表格 */
+.tbl{overflow-x:auto;margin:16px 0;border:1px solid var(--rule);border-radius:6px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:600px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font:600 11px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--ground)}
+td.n{font-weight:700;white-space:nowrap}
+td code{white-space:nowrap}
+
+/* 消耗条 */
+.bars{display:grid;gap:10px;margin:18px 0 6px;font-variant-numeric:tabular-nums}
+.bar{display:grid;grid-template-columns:minmax(0,15em) minmax(0,1fr) 3.4em;gap:12px;align-items:center;font-size:14px}
+.bar .track{height:12px;background:var(--t-soft);border-radius:2px;overflow:hidden}
+.bar .track i{display:block;height:100%;background:var(--t1)}
+.bar.now .track i{background:var(--accent)}
+.bar.now .lbl{font-weight:700}
+.bar .v{font:600 13px var(--mono);text-align:right}
+.note{font-size:13px;color:var(--muted)}
+
+/* 知识库阶梯 */
+.ladder{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:18px}
+.rung{background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;display:grid;gap:6px;align-content:start}
+.rung .k{font:600 11px/1 var(--mono);letter-spacing:.1em;color:var(--muted)}
+.rung code{font-size:12px;white-space:normal}
+.rung span{font-size:13.5px;color:var(--muted)}
+.rung .out{font:600 12.5px/1.4 var(--mono);color:var(--ok)}
+
+/* 上手步骤 */
+.start{list-style:none;margin:18px 0 0;padding:0;display:grid;gap:10px;counter-reset:s}
+.start li{counter-increment:s;display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;margin:0;background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:14px 16px}
+.start li::before{content:counter(s);font:600 18px/1.3 var(--mono);color:var(--t2)}
+.start b{display:block}
+.start span{color:var(--muted);font-size:14.5px}
+
+/* 示例对话 */
+.ex{display:grid;gap:8px;margin-top:16px}
+.ex div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;padding:10px 14px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;font-size:14px}
+.ex q{quotes:none;font-weight:500}
+.ex span{color:var(--muted)}
+.ex span code{color:var(--t3)}
+
+/* 问答 */
+dl.faq{margin:16px 0 0}
+dl.faq dt{font-weight:700;margin-top:18px}
+dl.faq dd{margin:4px 0 0;color:var(--muted);font-size:14.5px}
+
+@media (max-width:900px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:0}
+  nav.toc{display:none}
+}
+@media (max-width:620px){
+  .layer{grid-template-columns:minmax(0,1fr);gap:2px}
+  .ladder{grid-template-columns:minmax(0,1fr)}
+  .flow li{grid-template-columns:minmax(0,1fr);gap:0}
+  .flow .when{text-align:left;padding:10px 0 0 22px}
+  .ex div{grid-template-columns:minmax(0,1fr);gap:2px}
+  .bar{grid-template-columns:minmax(0,1fr) 3.4em}
+  .bar .track{grid-column:1 / -1;grid-row:2}
+  .tier{grid-template-columns:72px minmax(0,1fr)}
+}
+</style>
+
+<style>
+.ladder.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.rung ol{margin:4px 0 0;padding-left:1.2em;font-size:13.5px;color:var(--muted)}
+.rung ol li{margin:3px 0}
+.rung b{font-size:15px}
+td.ok{font:500 12.5px/1.5 var(--mono);color:var(--ok)}
+@media (max-width:620px){.ladder.two{grid-template-columns:minmax(0,1fr)}}
+</style>
+
+<div class="wrap">
+<nav class="toc" aria-label="目录">
+  <p>目录</p>
+  <ol>
+    <li><a href="#parts">装哪些东西</a></li>
+    <li><a href="#prereq">准备</a></li>
+    <li><a href="#install">安装插件</a></li>
+    <li><a href="#config">个人配置</a></li>
+    <li><a href="#project">在项目里启用</a></li>
+    <li><a href="#check">检查是否接好</a></li>
+    <li><a href="#update">更新与卸载</a></li>
+    <li><a href="#faq">常见问题</a></li>
+  </ol>
+</nav>
+
+<main>
+<header>
+  <span class="eyebrow">Claude Code 插件 · dispatch 0.5.0</span>
+  <h1>dispatch 接入指南</h1>
+  <p class="lede">在另一台电脑上装好 dispatch，或者交给另一个人使用：安装插件，接上知识库和文档站，再在项目里启用。插件本身不含任何个人路径，个人的东西都放在各自电脑的配置文件里。</p>
+  <div class="ramp" aria-hidden="true"><i style="background:var(--t0)"></i><i style="background:var(--t1)"></i><i style="background:var(--t2)"></i><i style="background:var(--t3)"></i><i style="background:var(--t4)"></i></div>
+  <div class="chips">
+    <span class="chip">约 10 分钟</span>
+    <span class="chip">需要 git、python3</span>
+    <span class="chip">知识库、文档站可选</span>
+  </div>
+</header>
+
+<section id="parts">
+  <span class="kicker">装哪些东西</span>
+  <h2>三样东西，分放三处</h2>
+  <p class="sub">只有插件是必装的。知识库和文档站不配置，相关规则就不会注入会话，也不占上下文。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>内容</th><th>放在哪</th><th>怎么来</th></tr></thead>
+    <tbody>
+      <tr><td class="n">插件</td><td>GitHub 仓库 <code>Lhanman/claude-dispatch</code></td><td>用插件市场安装，每台电脑一次</td></tr>
+      <tr><td class="n">个人配置</td><td><code>~/.claude/dispatch/config</code></td><td>知识库和文档站的路径、敏感词；每台电脑各写一份</td></tr>
+      <tr><td class="n">项目配置</td><td>各项目的 <code>CLAUDE.md</code></td><td>在项目里执行 <code>/dispatch:setup</code> 生成：验证命令、知识库对应目录</td></tr>
+    </tbody>
+  </table></div>
+  <p>开发机（插件源码所在的电脑）用的是软链方式：<code>~/.claude/skills/dispatch</code> 指向源码目录，改完执行 <code>/reload-plugins</code> 就生效。其他电脑都用插件市场安装。同一台电脑上两种方式只能选一种，否则插件会加载两次。</p>
+</section>
+
+<section id="prereq">
+  <span class="kicker">准备</span>
+  <h2>先确认这几样</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>依赖</th><th>用途</th><th>检查方法</th></tr></thead>
+    <tbody>
+      <tr><td class="n">Claude Code</td><td>支持插件的版本</td><td><code>claude plugin --help</code> 能列出 install、marketplace</td></tr>
+      <tr><td class="n">git + SSH</td><td>从 GitHub 安装插件；发布文档站</td><td><code>ssh -T git@github.com</code> 回复 Hi 用户名</td></tr>
+      <tr><td class="n">python3</td><td>hook 解析、知识库检索、文档站发布</td><td><code>python3 --version</code>；没有时知识库和文档站功能不启用</td></tr>
+      <tr><td class="n">OpenSpec（可选）</td><td>L3 以上的规格流程</td><td><code>openspec --version</code>；安装：<code>npm i -g @fission-ai/openspec</code></td></tr>
+    </tbody>
+  </table></div>
+  <p>插件仓库如果是私有的，别人要先被加为仓库协作者，才能装得上。</p>
+</section>
+
+<section id="install">
+  <span class="kicker">安装插件</span>
+  <h2>两条命令</h2>
+<pre><code>claude plugin marketplace add git@github.com:Lhanman/claude-dispatch.git
+claude plugin install dispatch@claude-dispatch
+
+<span class="c"># 确认：状态为 loaded，版本与仓库一致</span>
+claude plugin list
+claude plugin details dispatch   <span class="c"># 顺便看每个会话的常驻 token 开销</span></code></pre>
+  <p>装完后<strong>新开一个会话</strong>，路由规则在会话开始时才注入。</p>
+</section>
+
+<section id="config">
+  <span class="kicker">个人配置</span>
+  <h2>接上知识库和文档站</h2>
+  <p class="sub">最省事的方式是在任意项目里执行 <code>/dispatch:setup</code>，它会问你知识库在哪，再替你写配置。下面是手动配置的方法。</p>
+  <div class="ladder two">
+    <div class="rung"><span class="k">A · 你自己的另一台电脑</span><b>把两个仓库克隆下来，复制配置</b>
+      <ol>
+        <li>克隆知识库：<code>git clone git@github.com:Lhanman/lhan_doc.git ~/workbench/lhan_doc</code></li>
+        <li>克隆文档站：<code>git clone git@github.com:Lhanman/lhanman.github.io.git ~/workbench/lhanman.github.io</code></li>
+        <li>从开发机复制 <code>~/.claude/dispatch/config</code>，路径不同就改掉</li>
+      </ol>
+    </div>
+    <div class="rung"><span class="k">B · 已有自己知识库的其他人</span><b>把插件指向他自己的目录，不搬数据</b>
+      <ol>
+        <li><code>kb_dir</code> 指向他自己的 Markdown 笔记目录，例如 Obsidian 库</li>
+        <li>不需要改原有笔记：没有 frontmatter 的笔记，用一级标题和第一段当摘要</li>
+        <li>文档站可选：自建一个 <code>&lt;用户名&gt;.github.io</code> 仓库，再填 <code>pages_*</code> 这几项</li>
+      </ol>
+    </div>
+  </div>
+  <h3>配置文件示例</h3>
+<pre><code><span class="c"># ~/.claude/dispatch/config（每台电脑一份，不进插件仓库）</span>
+
+<span class="c"># 知识库：按目录组织的 Markdown 笔记</span>
+kb_dir=~/workbench/lhan_doc
+kb_exclude=copilot                      <span class="c"># 不参与检索的顶层目录，逗号分隔</span>
+
+<span class="c"># 文档站：生成的 HTML 自动发布到这里（公开）</span>
+pages_repo=~/workbench/lhanman.github.io
+pages_url=https://lhanman.github.io
+pages_title=Lhanman 的文档
+pages_deny=公司名,内部项目名             <span class="c"># 发布前拦截的敏感词</span></code></pre>
+  <ul>
+    <li>文档站仓库第一次发布时，会自动生成 <code>.github/</code> 下的部署流程。要到仓库的 Settings → Pages → Source 选 <strong>GitHub Actions</strong>，线上网址是英文的 <code>/p/&lt;slug&gt;/</code>。</li>
+    <li>GitHub Pages 的站点是公开的，即使仓库是私有的也一样。<code>pages_deny</code> 填上自己的公司名和内部项目名，命中就不发布。</li>
+    <li>知识库只有你自己能看到，不需要这层把关；dispatch 往知识库里写笔记之前，都会先给你看。</li>
+  </ul>
+</section>
+
+<section id="project">
+  <span class="kicker">在项目里启用</span>
+  <h2>每个项目执行一次 <code>/dispatch:setup</code></h2>
+  <ol class="start">
+    <li><div><b>探测构建方式</b><span>读取 package.json、Gradle、Makefile、CI 配置等，只读，不执行构建。</span></div></li>
+    <li><div><b>拟定验证矩阵</b><span>L0 到 L3 以上每一级各一条能直接执行的命令，给你确认。</span></div></li>
+    <li><div><b>检查 git 和 OpenSpec</b><span>不是 git 仓库时提醒你，但不会替你初始化；没有 OpenSpec 时，L3 的方案会写到 <code>docs/plans/</code>。</span></div></li>
+    <li><div><b>确定知识库目录</b><span>这个项目的笔记放在知识库的哪个目录：已有对应目录就复用，没有就用项目名。</span></div></li>
+  </ol>
+  <p>确认后写进项目的 CLAUDE.md，只新增或替换下面两节，不动文件里的其他内容：</p>
+<pre><code>## dispatch 验证矩阵
+
+验证命令一律通过 `dispatch-verify &lt;命令&gt;` 执行。
+
+| 级别 | 命令 |
+|---|---|
+| L0 | …… |
+| L1 | …… |
+| L2 | …… |
+| L3 以上 | …… |
+
+## dispatch 知识库
+
+目录：&lt;项目目录&gt;/</code></pre>
+  <p>不执行 setup 也能用：没有验证矩阵时，会根据构建文件推断验证命令。</p>
+</section>
+
+<section id="check">
+  <span class="kicker">检查是否接好</span>
+  <h2>在新会话里逐项试一下</h2>
+  <p class="sub"><code>dispatch-*</code> 这几个命令只在 Claude Code 的会话里可用，插件启用期间会自动加进会话的 PATH；在普通终端里找不到它们，直接让 Claude 执行就行。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>试什么</th><th>怎么试</th><th>正常结果</th></tr></thead>
+    <tbody>
+      <tr><td class="n">路由规则</td><td>提一个开发需求</td><td class="ok">回复第一行是 〔L2 · 依据〕 这样的判定</td></tr>
+      <tr><td class="n">手动级别</td><td>消息里写 <code>#L1</code></td><td class="ok">判定行是 〔L1 · 用户指定〕；overrides.log 多一行</td></tr>
+      <tr><td class="n">验证脚本</td><td><code>dispatch-verify echo ok</code></td><td class="ok">✔ 通过 · 退出码 0</td></tr>
+      <tr><td class="n">知识库</td><td><code>dispatch-kb path</code>，再 <code>dispatch-kb search &lt;词&gt;</code></td><td class="ok">打印知识库目录；每篇笔记一行</td></tr>
+      <tr><td class="n">文档站</td><td><code>dispatch-pages url</code>，再 <code>dispatch-pages list</code></td><td class="ok">打印站点网址；每篇文档一行</td></tr>
+      <tr><td class="n">脑暴</td><td>说「脑暴一下……」</td><td class="ok">发散出 8–12 个想法，再归类对比、推荐方向</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="update">
+  <span class="kicker">更新与卸载</span>
+  <h2>开发机推送，其他电脑拉取</h2>
+<pre><code><span class="c"># 开发机：改完源码后</span>
+git -C ~/workbench/claude-dispatch commit -am "说明这次改了什么"
+git -C ~/workbench/claude-dispatch push
+
+<span class="c"># 其他电脑：拉取并更新，然后在会话里执行 /reload-plugins</span>
+claude plugin marketplace update claude-dispatch
+claude plugin update dispatch@claude-dispatch
+
+<span class="c"># 卸载（~/.claude/dispatch/ 里的配置和日志会保留）</span>
+claude plugin uninstall dispatch@claude-dispatch</code></pre>
+  <p>版本号写在插件仓库的 <code>.claude-plugin/plugin.json</code> 里。改了功能就升一下版本号，其他电脑用 <code>claude plugin list</code> 就能看出装的是不是最新版。</p>
+</section>
+
+<section id="faq">
+  <span class="kicker">常见问题</span>
+  <h2>装不上或不生效时</h2>
+  <dl class="faq">
+    <dt>装不上：Repository not found？</dt>
+    <dd>SSH 没通，或者没有这个私有仓库的权限。先执行 <code>ssh -T git@github.com</code>，再确认自己已被加为仓库协作者。</dd>
+    <dt>装好了，但回复里没有判定行？</dt>
+    <dd>规则只在新会话、<code>/clear</code>、<code>/compact</code> 之后注入，已经开着的会话不会生效。另外，问答、调研、脑暴类请求本来就不写判定行。</dd>
+    <dt>同一个插件加载了两次？</dt>
+    <dd>同一台电脑上既有 <code>~/.claude/skills/dispatch</code> 软链，又从插件市场装了一份。两种方式只保留一种。</dd>
+    <dt>知识库或文档站的规则没出现？</dt>
+    <dd>执行 <code>dispatch-kb path</code> 或 <code>dispatch-pages url</code>，看报错。常见原因：配置文件里的路径不存在、目录不是 git 仓库，或者这台电脑没有 python3。</dd>
+    <dt>文档站发布失败？</dt>
+    <dd>退出码 3：敏感检查没通过，按提示修改内容或放行。退出码 4：已提交到本地但推送失败，检查 SSH。推送成功但网站没更新：确认仓库的 Pages 发布来源选的是 GitHub Actions。</dd>
+    <dt>和别的流程插件冲突？</dt>
+    <dd>不要同时启用另一套「每个任务都强制走流程」的插件，例如 superpowers。两套路由规则会互相冲突，还会重复占用上下文。</dd>
+  </dl>
+  <p class="note">配套文档：<a href="https://lhanman.github.io/p/dispatch-manual/">dispatch 分级调度手册</a>（方案、原理和日常用法），<a href="https://lhanman.github.io/p/grill-openspec/">grill-me 与 OpenSpec 手册</a>（L3 流程）。</p>
+</section>
+</main>
+</div>
+</body>
+</html>

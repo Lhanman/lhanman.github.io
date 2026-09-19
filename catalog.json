@@ -32,6 +32,22 @@
       "path": "文档/claude-dispatch/grill-me 与 OpenSpec 手册.html"
     },
     {
+      "slug": "dispatch-setup",
+      "title": "dispatch 接入指南",
+      "description": "dispatch 接入指南：在另一台电脑或给其他人装插件，接上知识库和文档站，在项目里启用、检查和更新",
+      "tags": [
+        "Claude Code",
+        "dispatch",
+        "安装",
+        "接入",
+        "手册"
+      ],
+      "project": "claude-dispatch",
+      "created": "2026-09-19",
+      "updated": "2026-09-19",
+      "path": "文档/claude-dispatch/dispatch 接入指南.html"
+    },
+    {
       "slug": "dispatch-manual",
       "title": "dispatch 分级调度手册",
       "description": "dispatch 插件手册：分层方案、七条核心原理、运行过程、五个级别、模型与消耗、知识库、文档站、脑暴和上手步骤",
