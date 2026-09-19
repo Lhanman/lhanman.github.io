@@ -15,7 +15,7 @@
 ### claude-dispatch
 
 - [grill-me 与 OpenSpec 手册](%E6%96%87%E6%A1%A3/claude-dispatch/grill-me%20%E4%B8%8E%20OpenSpec%20%E6%89%8B%E5%86%8C.html) · 2026-09-19 — grill-me 需求拷问与 OpenSpec 规格驱动开发的使用手册：安装位置、命令、流程和两者的配合
-- [dispatch 分级调度手册](%E6%96%87%E6%A1%A3/claude-dispatch/dispatch%20%E5%88%86%E7%BA%A7%E8%B0%83%E5%BA%A6%E6%89%8B%E5%86%8C.html) · 2026-09-19 — dispatch 插件手册：分层方案、七条核心原理、运行过程、五个级别、模型与消耗、知识库、文档站和上手步骤
+- [dispatch 分级调度手册](%E6%96%87%E6%A1%A3/claude-dispatch/dispatch%20%E5%88%86%E7%BA%A7%E8%B0%83%E5%BA%A6%E6%89%8B%E5%86%8C.html) · 2026-09-19 — dispatch 插件手册：分层方案、七条核心原理、运行过程、五个级别、模型与消耗、知识库、文档站、脑暴和上手步骤
 - [分级调度方案](%E6%96%87%E6%A1%A3/claude-dispatch/%E5%88%86%E7%BA%A7%E8%B0%83%E5%BA%A6%E6%96%B9%E6%A1%88.html) · 2026-09-19 — dispatch 的设计决策记录：L0–L4 定级、路由规则、子 agent 编制、成本对比，以及业界方案调研与取舍
 
 ### 其他
