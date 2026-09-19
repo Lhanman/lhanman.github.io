@@ -13,7 +13,8 @@
       ],
       "project": "",
       "created": "2026-09-19",
-      "updated": "2026-09-19"
+      "updated": "2026-09-19",
+      "path": "文档/其他/小说 AI 改编评估.html"
     },
     {
       "slug": "grill-openspec",
@@ -27,7 +28,8 @@
       ],
       "project": "claude-dispatch",
       "created": "2026-09-19",
-      "updated": "2026-09-19"
+      "updated": "2026-09-19",
+      "path": "文档/claude-dispatch/grill-me 与 OpenSpec 手册.html"
     },
     {
       "slug": "dispatch-manual",
@@ -41,7 +43,8 @@
       ],
       "project": "claude-dispatch",
       "created": "2026-09-19",
-      "updated": "2026-09-19"
+      "updated": "2026-09-19",
+      "path": "文档/claude-dispatch/dispatch 分级调度手册.html"
     },
     {
       "slug": "dispatch-design",
@@ -55,7 +58,8 @@
       ],
       "project": "claude-dispatch",
       "created": "2026-09-19",
-      "updated": "2026-09-19"
+      "updated": "2026-09-19",
+      "path": "文档/claude-dispatch/分级调度方案.html"
     }
   ]
 }
