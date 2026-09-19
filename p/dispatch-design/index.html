@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="dispatch 的设计决策记录：L0–L4 定级、路由规则、子 agent 编制、成本对比，以及业界方案调研与取舍">
+<link rel="index" href="../../">
+<title>分级调度方案</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+:root{
+  --ground:#F3F4F6; --paper:#FFFFFF; --ink:#161A21; --muted:#5B6372; --rule:#DADDE3; --code-bg:#E9EBEF;
+  --t0:#8E97AA; --t1:#6680B3; --t2:#4865AA; --t3:#2E4893; --t4:#1B2D6A;
+  --t-soft:#E4E8F2;
+  --accent:#A86A12; --accent-soft:#F6EBD8;
+  --ok:#2C7A4F;
+  --serif:"Noto Serif SC","Songti SC",serif;
+  --sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#12151B; --paper:#1A1E26; --ink:#E5E8EE; --muted:#9AA2B1; --rule:#2C323D; --code-bg:#232834;
+    --t0:#737D91; --t1:#7F97C8; --t2:#95ABDB; --t3:#AFC1EA; --t4:#CBD8F7; --t-soft:#222B3D;
+    --accent:#E2A84B; --accent-soft:#3A2D17; --ok:#6CC08C;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#12151B; --paper:#1A1E26; --ink:#E5E8EE; --muted:#9AA2B1; --rule:#2C323D; --code-bg:#232834;
+  --t0:#737D91; --t1:#7F97C8; --t2:#95ABDB; --t3:#AFC1EA; --t4:#CBD8F7; --t-soft:#222B3D;
+  --accent:#E2A84B; --accent-soft:#3A2D17; --ok:#6CC08C;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:15.5px/1.8 var(--sans);padding-inline:20px;padding-block:0 96px}
+.wrap{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:190px minmax(0,1fr);gap:56px}
+nav.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 32px);align-self:start;padding-top:56px;font-size:13.5px}
+nav.toc p{font:600 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+nav.toc a{color:var(--muted);text-decoration:none;border-left:2px solid var(--rule);padding-left:10px;display:block}
+nav.toc a:hover,nav.toc a:focus-visible{color:var(--ink);border-color:var(--ink)}
+main{min-width:0;max-width:760px}
+header{padding-block:56px 32px;border-bottom:1px solid var(--rule)}
+.eyebrow{font:600 11.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1{font:900 clamp(32px,5vw,46px)/1.2 var(--serif);margin:14px 0 14px;text-wrap:balance}
+.lede{color:var(--muted);margin:0;max-width:40em}
+.ramp{display:flex;gap:3px;margin-top:22px;height:6px;max-width:320px}
+.ramp i{flex:1;border-radius:1px}
+h2{font:900 25px/1.35 var(--serif);margin:0 0 8px;text-wrap:balance}
+h3{font:700 16.5px/1.5 var(--sans);margin:28px 0 8px}
+section{padding-block:48px;border-bottom:1px solid var(--rule)}
+.kicker{font:600 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:block}
+p{margin:10px 0}
+.sub{color:var(--muted);margin-top:0}
+code{font:0.86em var(--mono);background:var(--code-bg);padding:1px 5px;border-radius:3px}
+pre{font:12.8px/1.7 var(--mono);background:var(--code-bg);padding:16px 18px;border-radius:6px;overflow-x:auto;margin:14px 0}
+pre code{background:none;padding:0;font-size:inherit}
+pre .c{color:var(--muted)}
+ul{padding-left:1.2em;margin:10px 0} li{margin:4px 0}
+a{color:var(--t2)}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.src{font-size:12.5px;color:var(--muted)}
+.src a{color:var(--muted)}
+
+/* principles */
+.principles{display:grid;gap:0;margin:18px 0 0;padding:0;list-style:none}
+.principles li{display:grid;grid-template-columns:minmax(0,1fr);padding:14px 0;border-top:1px solid var(--rule);margin:0}
+.principles b{font-weight:700}
+.principles span{color:var(--muted);font-size:14.5px}
+.principles em{font-style:normal;font:500 12px var(--mono);color:var(--t2);white-space:nowrap}
+
+/* tables */
+.tbl{overflow-x:auto;margin:16px 0;border:1px solid var(--rule);border-radius:6px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:640px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font:600 11px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--ground)}
+td.n{font-weight:700;white-space:nowrap}
+.hl{background:var(--accent-soft)}
+
+/* tiers */
+.tiers{display:grid;gap:14px;margin-top:20px}
+.tier{background:var(--paper);border:1px solid var(--rule);border-radius:6px;display:grid;grid-template-columns:86px minmax(0,1fr);overflow:hidden}
+.tier .lv{padding:16px 0 16px 18px;border-left:5px solid var(--c)}
+.tier .lv b{display:block;font:600 22px/1 var(--mono);color:var(--c)}
+.tier .lv span{font-size:13px;color:var(--muted)}
+.tier .bd{padding:14px 18px 16px}
+.tier .when{font-weight:500}
+.tier dl{display:grid;grid-template-columns:64px minmax(0,1fr);gap:4px 12px;margin:10px 0 0;font-size:14px}
+.tier dt{font:600 11px/1.9 var(--mono);color:var(--muted);letter-spacing:.06em}
+.tier dd{margin:0}
+.tier code{font-size:12.5px}
+
+/* flow */
+.router{background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:18px 20px;margin:16px 0}
+.router ol{margin:0;padding-left:1.3em}
+.router li{margin:6px 0}
+.verdict{display:inline-block;font:600 13px var(--mono);background:var(--t-soft);color:var(--t3);padding:4px 10px;border-radius:4px;margin:6px 0}
+.trig{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+.trig > div{background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:14px 18px}
+.trig h4{margin:0 0 6px;font:700 14.5px var(--sans)}
+.trig ul{margin:0;font-size:14px}
+.up h4{color:var(--t3)} .down h4{color:var(--ok)}
+
+/* agents */
+.agents{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0}
+.agent{background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:14px 18px}
+.agent h4{margin:0;font:600 14.5px var(--mono);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.agent .m{font:600 11px/1.9 var(--mono);color:var(--muted);letter-spacing:.04em}
+.agent p{font-size:14px;color:var(--muted);margin:6px 0 0}
+
+/* decided */
+.pick{font-weight:600}
+.was{color:var(--muted);font-size:13px}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar{display:block;height:6px;border-radius:1px;background:var(--t2);margin-top:6px}
+
+@media (max-width:880px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:0}
+  nav.toc{display:none}
+  .trig,.agents{grid-template-columns:minmax(0,1fr)}
+  .tier{grid-template-columns:minmax(0,1fr)}
+  .tier .lv{padding:12px 18px 0;border-left:0;border-top:5px solid var(--c)}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<div class="wrap">
+  <nav class="toc" aria-label="目录">
+    <p>目录</p>
+    <ol>
+      <li><a href="#status">现在的状态</a></li>
+      <li><a href="#tiers">五级分流</a></li>
+      <li><a href="#router">路由与升降级</a></li>
+      <li><a href="#agents">子 agent 与模型</a></li>
+      <li><a href="#cost">消耗对比</a></li>
+      <li><a href="#verify">验证</a></li>
+      <li><a href="#layout">插件文件</a></li>
+      <li><a href="#decided">已定的决策</a></li>
+      <li><a href="#next">接下来</a></li>
+      <li><a href="#principles">附：业界共识</a></li>
+      <li><a href="#survey">附：框架对比</a></li>
+      <li><a href="#verdict">附：谁最好</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header>
+      <div class="eyebrow">v0.2 · 已落地为插件 dispatch · 通用版</div>
+      <h1>分级调度方案</h1>
+      <p class="lede">先判断任务有多复杂，再决定走多重的流程：小事直接做，大事才请出提问、规格文档和子 agent。方案与技术栈无关，已经做成全局插件，所有会话都生效。这一版按 Pro 订阅重新设计了模型分配，目标是少耗 token。</p>
+      <div class="ramp" aria-hidden="true"><i style="background:var(--t0)"></i><i style="background:var(--t1)"></i><i style="background:var(--t2)"></i><i style="background:var(--t3)"></i><i style="background:var(--t4)"></i></div>
+    </header>
+
+    <section id="status">
+      <span class="kicker">现在的状态</span>
+      <h2>已经装好，新开会话就生效</h2>
+      <div class="tbl"><table>
+        <tbody>
+          <tr><td class="n">插件位置</td><td><code>~/workbench/claude-dispatch</code>，软链到 <code>~/.claude/skills/dispatch</code>，改动后执行 <code>/reload-plugins</code> 即可生效</td></tr>
+          <tr><td class="n">校验</td><td><code>claude plugin validate --strict</code> 全部通过（市场清单、插件清单、skills、agents）</td></tr>
+          <tr><td class="n">常驻开销</td><td>每个会话约 1.7k token：路由规则约 1.1k，各 skill 和 agent 的一行描述约 0.6k。skill 正文只在调用时加载</td></tr>
+          <tr><td class="n">已清理</td><td>卸载了 superpowers、greptile、engineering-skills；删除了重复的独立 grill-me 和 grilling</td></tr>
+          <tr><td class="n">需要你做的</td><td>主会话的模型和强度由你自己设置（你选的是 Opus 5 xhigh）；在要用的项目里执行一次 <code>/dispatch:setup</code></td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="tiers">
+      <span class="kicker">方案核心</span>
+      <h2>五级分流</h2>
+      <p class="sub">级别按<strong>风险最高的那个信号</strong>来定，不按平均值：只要碰到公共接口或数据模型，至少就是 L2。问答、调研、写文档这类非开发请求不定级，也不写判定行。</p>
+      <div class="tiers">
+        <div class="tier" style="--c:var(--t0)"><div class="lv"><b>L0</b><span>直做</span></div><div class="bd">
+          <div class="when">一句话能说清的改动：改错字、改配置值、重命名</div>
+          <dl><dt>流程</dt><dd>直接改，不规划，不提问，不写判定行</dd>
+          <dt>产物</dt><dd>无</dd>
+          <dt>验证</dt><dd>验证矩阵的 L0：只检查改动所在的部分</dd></dl></div></div>
+        <div class="tier" style="--c:var(--t1)"><div class="lv"><b>L1</b><span>快修</span></div><div class="bd">
+          <div class="when">位置明确的 bug 或小功能，不超过 3 个文件，不碰公共接口</div>
+          <dl><dt>流程</dt><dd>先写三行意图：<strong>目标 / 不做什么 / 验收标准</strong>。修 bug 先写能复现的测试；原因不明时才加载系统化调试</dd>
+          <dt>产物</dt><dd>不产生文件</dd>
+          <dt>子 agent</dt><dd>一般不派</dd>
+          <dt>验证</dt><dd>受影响部分的测试和编译</dd></dl></div></div>
+        <div class="tier" style="--c:var(--t2)"><div class="lv"><b>L2</b><span>标准</span></div><div class="bd">
+          <div class="when">跨模块、需求有歧义、引入新依赖，或碰到公共接口、数据模型、并发、删除</div>
+          <dl><dt>流程</dt><dd>范围不清先派 scout → 有未决问题则提问最多 1 轮 → Plan 模式出方案 → 测试先行地实现 → 碰到上述高风险项时派 reviewer</dd>
+          <dt>产物</dt><dd>方案只写在对话里</dd>
+          <dt>子 agent</dt><dd>scout（Haiku，按需）；reviewer（Sonnet，按需）</dd>
+          <dt>验证</dt><dd>全部测试 + 静态检查</dd></dl></div></div>
+        <div class="tier" style="--c:var(--t3)"><div class="lv"><b>L3</b><span>特性</span></div><div class="bd">
+          <div class="when">一个会话做不完；改公共接口、持久化格式或数据迁移；新增一块完整能力</div>
+          <dl><dt>流程</dt><dd>先征得你同意 → <code>/dispatch:grill-me</code> 问到底 → <code>/opsx:propose</code> → 你审阅规格 → <code>/clear</code> → <code>/opsx:apply</code> 按任务组执行，组与组之间 <code>/clear</code> → reviewer 终审一次 → <code>/opsx:verify</code> → <code>/opsx:archive</code></dd>
+          <dt>产物</dt><dd><code>openspec/changes/&lt;name&gt;/</code>，归档后并入主规格。项目没有 OpenSpec 时，方案写到 <code>docs/plans/</code></dd>
+          <dt>子 agent</dt><dd>机械性的任务组交给 builder（Sonnet）；需要判断的留在主会话；终审用 reviewer 并指定 Opus</dd>
+          <dt>验证</dt><dd>完整构建，包含发布前步骤</dd></dl></div></div>
+        <div class="tier" style="--c:var(--t4)"><div class="lv"><b>L4</b><span>史诗</span></div><div class="bd">
+          <div class="when">新子系统或大改造，要先做架构决策</div>
+          <dl><dt>流程</dt><dd><code>/opsx:explore</code> 先定决策 → 拆成多个 L3，逐个按 L3 走。只有真正独立的部分才并行，最多 3 路，需要 git worktree</dd>
+          <dt>产物</dt><dd>多个 change + 决策记录</dd>
+          <dt>验证</dt><dd>每个 change 都按 L3 标准验证</dd></dl></div></div>
+      </div>
+    </section>
+
+    <section id="router">
+      <span class="kicker">机制</span>
+      <h2>路由、升级与降级</h2>
+      <div class="router">
+        <ol>
+          <li><strong>会话开始时</strong>：<code>SessionStart</code> hook 把路由规则（<code>router/ROUTER.md</code>，37 行）注入上下文。<code>/clear</code> 和压缩之后会重新注入。</li>
+          <li><strong>判定</strong>：L1 起，回复第一行写判定结果和依据，例如：<br><span class="verdict">〔L2 · 新增依赖 + 跨两个模块〕</span></li>
+          <li><strong>手动指定</strong>：在消息里写 <code>#L0</code>–<code>#L4</code>，<code>UserPromptSubmit</code> hook 识别后按你指定的级别走。没有标记时 hook 不输出任何内容，不占上下文。两个 hook 都是本地脚本，不调用模型。</li>
+          <li><strong>征求同意</strong>：L0–L2 判定后直接执行；L3 以上先得到你的确认。</li>
+          <li><strong>执行中重新判断</strong>：出现下面任意一个信号，就调整级别，并说明原因。</li>
+        </ol>
+      </div>
+      <div class="trig">
+        <div class="up"><h4>↑ 升级信号</h4><ul>
+          <li>实际改动的文件数超过预估的 2 倍</li>
+          <li>出现架构决策</li>
+          <li>同一个问题修了 2 轮还没好：先转系统化调试，仍不行就清空上下文重写提示</li>
+          <li>碰到公共接口、序列化格式或数据迁移</li>
+          <li>一个会话做不完</li>
+        </ul><p class="src">升级时，已经写好的三行意图和问答结论带入下一级，不重做。</p></div>
+        <div class="down"><h4>↓ 降级信号</h4><ul>
+          <li>提问问不出新的未决问题</li>
+          <li>拆出来的任务不到 3 项</li>
+          <li>摸清现状后发现只需要改 1 个文件</li>
+        </ul></div>
+      </div>
+      <p class="src">每次手动指定级别，hook 都会在 <code>~/.claude/dispatch/overrides.log</code> 记一行（时间、级别、目录）。它反映自动判定哪里不准，是以后修订规则的依据。</p>
+    </section>
+
+    <section id="agents">
+      <span class="kicker">编制</span>
+      <h2>子 agent 与模型</h2>
+      <p class="sub">原则：只有在能节省主会话上下文、或需要独立判断时，才派子 agent。每个 agent 的定义里都规定了回传格式和长度上限（30–40 行）。</p>
+      <div class="agents">
+        <div class="agent"><h4>主会话 <span class="m">由你设置 · 你选的是 Opus 5 xhigh</span></h4><p>负责判定级别、规划、需要判断的实现和最终把关。它占总消耗的大头，是调整消耗最有效的地方。</p></div>
+        <div class="agent"><h4>dispatch:scout <span class="m">Haiku 4.5 · 只读 · 最多 12 轮</span></h4><p>要读 5 个以上文件或进入不熟悉的区域时用。不加载 CLAUDE.md，启动开销小。只回传结论和"文件:行号"列表。</p></div>
+        <div class="agent"><h4>dispatch:reviewer <span class="m">Sonnet 5 · 只读 · L3 终审指定 Opus 5</span></h4><p>全新上下文，只看改动差异，只报正确性问题和遗漏的需求。没发现问题就直接说通过。</p></div>
+        <div class="agent"><h4>dispatch:builder <span class="m">Sonnet 5 · 可编辑</span></h4><p>只接规格明确的机械性任务组，或 L4 的并行分支。遇到歧义或越界就停下来回报，不自行决定。</p></div>
+      </div>
+      <p class="src">和 v0.1 相比：验证不再用子 agent，改成脚本（见"验证"一节）；reviewer 从"L2 以上每次都过"改成按风险触发；builder 从 L3 默认使用改成只接机械性任务。</p>
+      <p class="src">Claude Code 内置的 Explore、Plan 等 agent 默认继承主模型。主会话用 Opus 时，建议在设置的 <code>env</code> 里加 <code>CLAUDE_CODE_SUBAGENT_MODEL=sonnet</code> 兜底；本插件的 agent 在各自文件里写明了模型，优先级更高，不受影响。</p>
+    </section>
+
+    <section id="cost">
+      <span class="kicker">消耗</span>
+      <h2>各模型方案的消耗对比</h2>
+      <p class="sub">按一个月 60 个 L1、25 个 L2、6 个 L3 估算，用 API 价格作为额度权重。Pro 订阅的额度怎么按模型折算，官方没有公布，所以美元数只用来比较各方案的相对高低，不是实际扣费。没有计入缓存；计入后各方案的比例基本不变。</p>
+      <div class="tbl"><table>
+        <thead><tr><th>方案</th><th>主会话</th><th>子 agent</th><th>每个 L1</th><th>每个 L2</th><th>每个 L3</th><th>月合计</th><th>相对</th></tr></thead>
+        <tbody>
+          <tr><td class="n">原来的设置</td><td>Fable 5.1 xhigh</td><td>全部继承 Fable</td><td class="num">$2.62</td><td class="num">$9.04</td><td class="num">$36.11</td><td class="num">$600</td><td class="num">100%<i class="bar" style="width:100%"></i></td></tr>
+          <tr><td class="n">v0.1 的推荐</td><td>Opus 5 high</td><td>四个角色，reviewer 用 Opus</td><td class="num">$1.00</td><td class="num">$2.98</td><td class="num">$9.18</td><td class="num">$190</td><td class="num">32%<i class="bar" style="width:32%"></i></td></tr>
+          <tr class="hl"><td class="n">你选定的</td><td>Opus 5 xhigh</td><td>本页的编制</td><td class="num">$1.15</td><td class="num">$2.41</td><td class="num">$6.83</td><td class="num">$170</td><td class="num">28%<i class="bar" style="width:28%"></i></td></tr>
+          <tr><td class="n">均衡</td><td>Opus 5 medium</td><td>本页的编制，builder 常用</td><td class="num">$0.86</td><td class="num">$2.02</td><td class="num">$6.40</td><td class="num">$141</td><td class="num">23%<i class="bar" style="width:23%"></i></td></tr>
+          <tr><td class="n">省额度</td><td>Sonnet 5，L3 规划用 Opus</td><td>本页的编制，不用 builder</td><td class="num">$0.42</td><td class="num">$1.03</td><td class="num">$3.18</td><td class="num">$70</td><td class="num">12%<i class="bar" style="width:12%"></i></td></tr>
+          <tr><td class="n">极省</td><td>Sonnet 5 medium</td><td>不用子 agent</td><td class="num">$0.40</td><td class="num">$0.79</td><td class="num">$2.21</td><td class="num">$57</td><td class="num">9%<i class="bar" style="width:9%"></i></td></tr>
+        </tbody>
+      </table></div>
+      <h3>从数字里能看出什么</h3>
+      <ul>
+        <li>主会话是消耗的大头：v0.1 的推荐里约占七成；你选定的方案里约占九成，170 美元中约 155 美元。额度不够用时，先调主会话的模型或强度，子 agent 已经没多少可省的了。</li>
+        <li>Pro 订阅的官方默认模型是 Sonnet 5。主会话用 Sonnet 时，L3 规划前可以切到 <code>/model opusplan</code>：规划用 Opus，执行用 Sonnet。</li>
+        <li>"极省"只比"省额度"再少 3 个百分点，却失去独立审查和上下文隔离，不划算。</li>
+        <li>这些数字没有计入返工。弱模型做需要判断的任务，返工的轮次可能把省下的钱花回去，所以 builder 只接机械性任务。</li>
+      </ul>
+    </section>
+
+    <section id="verify">
+      <span class="kicker">验证</span>
+      <h2>一个脚本，加上每个项目自己的验证矩阵</h2>
+      <p><code>dispatch-verify &lt;命令&gt;</code> 执行验证命令，把完整日志写入临时文件，只回显退出码、报错行和末尾几行：通过时 8 行，失败时 40 行。构建和测试的长输出不进入上下文，这一步也不消耗模型额度。插件启用期间，这个命令自动在 PATH 里。</p>
+      <p>用哪些命令验证，每个项目不一样，所以不放在插件里。在项目里执行 <code>/dispatch:setup</code>，它会探测构建方式，拟出下面这张表，给你确认后写进项目的 CLAUDE.md：</p>
+      <div class="tbl"><table>
+        <thead><tr><th>级别</th><th>目的</th></tr></thead>
+        <tbody>
+          <tr><td class="n">L0</td><td>最快的检查：只编译或只做类型检查改动所在的部分</td></tr>
+          <tr><td class="n">L1</td><td>受影响部分的单元测试 + 编译</td></tr>
+          <tr><td class="n">L2</td><td>全部测试 + 静态检查</td></tr>
+          <tr><td class="n">L3 以上</td><td>完整构建，包含打包、链接等发布前步骤</td></tr>
+        </tbody>
+      </table></div>
+      <p class="src">setup 还会检查两件事：项目是不是 git 仓库（不是的话，reviewer 拿不到改动差异，L4 用不了 worktree；它只建议初始化，不会替你执行）；OpenSpec 是否就绪（没有的话，L3 退回到把方案写进 <code>docs/plans/</code>）。不执行 setup 也能用，路由规则会从构建文件推断验证命令。</p>
+    </section>
+
+    <section id="layout">
+      <span class="kicker">落地</span>
+      <h2>插件文件</h2>
+<pre><code>~/workbench/claude-dispatch/          <span class="c"># git 仓库（已 init，尚未提交）</span>
+├── .claude-plugin/
+│   ├── plugin.json                   <span class="c"># dispatch 0.2.0</span>
+│   └── marketplace.json              <span class="c"># 以后在别的机器上可通过插件市场安装</span>
+├── router/ROUTER.md                  <span class="c"># 路由规则，会话开始时注入</span>
+├── hooks/
+│   ├── hooks.json                    <span class="c"># SessionStart + UserPromptSubmit</span>
+│   └── prompt-submit.sh              <span class="c"># 识别 #L0–#L4，记录人工覆盖</span>
+├── bin/dispatch-verify               <span class="c"># 验证脚本，自动加入 PATH</span>
+├── agents/                           <span class="c"># scout、reviewer、builder</span>
+├── skills/
+│   ├── setup/                        <span class="c"># /dispatch:setup，只能手动调用</span>
+│   ├── grill-me/  grilling/          <span class="c"># 来自 Matt Pocock</span>
+│   ├── test-driven-development/      <span class="c"># 来自 superpowers，改为 L2 起触发</span>
+│   └── systematic-debugging/         <span class="c"># 来自 superpowers，改为原因不明时触发</span>
+├── README.md  LICENSE  THIRD_PARTY_NOTICES.md
+
+每个项目（由 /dispatch:setup 写入）
+└── CLAUDE.md                         <span class="c"># 「dispatch 验证矩阵」一节</span></code></pre>
+    </section>
+
+    <section id="decided">
+      <span class="kicker">记录</span>
+      <h2>已定的决策</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>问题</th><th>结论</th></tr></thead>
+        <tbody>
+          <tr><td class="n">谁来判定级别</td><td><span class="pick">混合</span>：AI 自动判定，L3 以上先问你；随时可用 <code>#L</code> 标记覆盖</td></tr>
+          <tr><td class="n">规则放在哪一层</td><td><span class="pick">全局插件</span>，与技术栈无关；项目特有的验证命令放在各项目的 CLAUDE.md</td></tr>
+          <tr><td class="n">主会话模型</td><td><span class="pick">Opus 5 xhigh</span>，由你自己设置，插件不改全局设置 <span class="was">（v0.1 推荐 Opus 5 high）</span></td></tr>
+          <tr><td class="n">子 agent 模型</td><td><span class="pick">省额度的编制</span>：scout 用 Haiku，reviewer 和 builder 用 Sonnet，L3 终审用 Opus，验证用脚本 <span class="was">（v0.1 是四个角色，reviewer 全程 Opus）</span></td></tr>
+          <tr><td class="n">OpenSpec 从哪一级用</td><td><span class="pick">L3 起</span></td></tr>
+          <tr><td class="n">路由器怎么实现</td><td><span class="pick">规则 + 本地脚本 hook</span>，不调用模型</td></tr>
+          <tr><td class="n">已装的插件</td><td><span class="pick">三个全部卸载</span>，TDD 和系统化调试并入本插件</td></tr>
+          <tr><td class="n">kmp-video-player 初始化 git</td><td><span class="pick">暂不</span></td></tr>
+          <tr><td class="n">L2 允许问多少</td><td><span class="pick">最多 1 轮</span></td></tr>
+          <tr><td class="n">grill-with-docs</td><td><span class="pick">暂不装</span></td></tr>
+          <tr><td class="n">先装哪个版本</td><td><span class="pick">插件结构按完整版，agent 编制按最小版</span>：为省额度精简后，编制正好是最小版的规模</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="next">
+      <span class="kicker">接下来</span>
+      <h2>先用起来，再根据记录修订</h2>
+      <p>方案是拼出来的，还没有经过真实任务验证。常见的风险是规则执行走样：级别判错，或者该升级时没升级。建议用 1–2 周、积累约 20 个任务后看三件事：</p>
+      <ul>
+        <li><code>overrides.log</code> 里你手动改级别的次数和方向：总是往上改，说明判定偏轻；总是往下改，说明偏重。</li>
+        <li>用 <code>/usage</code> 对比任务前后的额度变化，校准上面的消耗估算。</li>
+        <li>哪一级用起来别扭，哪个子 agent 几乎没被派出过。</li>
+      </ul>
+      <p class="src">留到以后的：一个手动命令，读取覆盖记录并给出规则修订建议；用 <code>claude plugin eval</code> 做一组"提示 → 期望级别"的回归测试。两者都要等有了真实数据再做。</p>
+    </section>
+
+    <section id="principles">
+      <span class="kicker">附录 · 调研结论</span>
+      <h2>业界共识：八条原则</h2>
+      <p class="sub">这些原则来自 Anthropic 的工程博客、Claude Code 官方文档，以及 superpowers、BMAD、Kiro 等框架的实践和社区反馈。</p>
+      <ol class="principles">
+        <li><div><b>先从简单做起，有明确收益再加复杂度。</b> <span>能用固定流程解决的，就不要上 agent；能一个 agent 做完的，就不要拆成多个。</span> <em>Anthropic · Building Effective Agents</em></div></li>
+        <li><div><b>"一句话能说清改动，就跳过规划。"</b> <span>这是官方给出的最清晰的分级线。方案不确定、要改多个文件、代码不熟悉时，才需要先规划。</span> <em>Claude Code Best Practices</em></div></li>
+        <li><div><b>把工作量预算写进提示词。</b> <span>Anthropic 的研究系统把规则写死在提示词里：简单任务 1 个 agent、3–10 次工具调用；对比类 2–4 个子 agent；复杂任务 10 个以上。不写的话，模型会在简单问题上过度投入。</span> <em>Multi-agent Research System</em></div></li>
+        <li><div><b>多 agent 很贵，而且大多数编码任务并行不起来。</b> <span>单 agent 的 token 消耗约为普通对话的 4 倍，多 agent 约为 15 倍。官方原话是"大多数编码任务"不适合多 agent，因为可并行的部分有限。子 agent 最大的价值是<strong>隔离上下文</strong>，不是提速。</span> <em>同上</em></div></li>
+        <li><div><b>强模型编排，便宜模型干活。</b> <span>Opus 做主导、Sonnet 做子 agent，比单独用 Opus 在内部评测上高 90%。Aider 把"想方案"和"改代码"分给两个模型，Claude Code 的 opusplan 模式也是同样的思路。但是<strong>轮数比单价更重要</strong>：需要判断的任务交给小模型，反复试错的轮次多了，总成本反而更高。</span> <em>Anthropic · Aider · superpowers</em></div></li>
+        <li><div><b>只保留一个路由器。</b> <span>superpowers 的规则是"哪怕只有 1% 可能适用也要调用技能"，结果被普遍批评为小任务过度设计。社区还明确警告：两套路由规则同时运行会互相打架。</span> <em>superpowers #1501 · dev.to 三派对比</em></div></li>
+        <li><div><b>流程要能升级，也要能降级。</b> <span>BMAD 在执行中发现任务比预想的大时会自动升级，并且已经写好的文档继续复用。反过来，发现任务很小就退回简单流程：这一点所有框架都没做到，是本方案要补上的。</span> <em>BMAD v6 · 本方案</em></div></li>
+        <li><div><b>结果要验证，不能只信 AI 说"做完了"。</b> <span>每个非简单任务都要有能跑的检查。审查交给一个全新上下文的 reviewer，并且只让它指出正确性问题和遗漏的需求，否则它会推着你过度设计。</span> <em>Claude Code Best Practices</em></div></li>
+      </ol>
+      <p class="src">另外两条常用的上下文管理原则：无关任务之间用 <code>/clear</code>；同一个问题纠正两次还没好，就清空上下文重写提示词。CLAUDE.md 控制在 200 行以内。</p>
+    </section>
+
+    <section id="survey">
+      <span class="kicker">附录 · 横向对比</span>
+      <h2>各框架如何决定"走多重的流程"</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>框架</th><th>怎么定深度</th><th>档位</th><th>按任务选模型</th><th>值得借鉴</th><th>短板</th></tr></thead>
+        <tbody>
+          <tr><td class="n">superpowers</td><td>1% 规则，强制触发</td><td>实际只有 1 档</td><td>机械活用便宜模型</td><td>每个任务独立上下文 + 双重审查</td><td>小任务开销巨大</td></tr>
+          <tr><td class="n">Matt Pocock</td><td>人按情境选择，有一张路由表</td><td>约 4 档</td><td>—</td><td>以"是否跨会话"作为走规格的分界线；grilling 做成通用积木</td><td>没有自动判断</td></tr>
+          <tr><td class="n">OpenSpec</td><td>用户自己选命令</td><td>2 档（ff / continue）</td><td>—</td><td>只记录增量的规格，归档后形成持续更新的文档</td><td>改一行也会生成 4 个文件</td></tr>
+          <tr><td class="n">spec-kit</td><td>固定流水线</td><td>1 档</td><td>—</td><td>项目级原则文件（constitution）</td><td>冗长，小任务慢约 10 倍</td></tr>
+          <tr><td class="n">Kiro</td><td>用户选模式</td><td>3–4 档</td><td>—</td><td>修 bug 时先列出"哪些行为不能变"</td><td>绑定它自己的 IDE</td></tr>
+          <tr class="hl"><td class="n">BMAD v6</td><td>按需求条数，<strong>执行中自动升级</strong></td><td>3 条轨道</td><td>按角色</td><td>升级时已有文档继续复用</td><td>要先拆完需求才能定档，仪式感重</td></tr>
+          <tr><td class="n">Roo Orchestrator</td><td>编排 agent 判断是否拆分</td><td>2 档</td><td>按模式</td><td>子任务只把摘要回传给主任务</td><td>每次拆分都要人工审批</td></tr>
+          <tr><td class="n">Cline / Aider / Cursor</td><td>人手动切换模式</td><td>2 档</td><td>规划和执行分开配模型</td><td>简单直观</td><td>全靠手动</td></tr>
+          <tr class="hl"><td class="n">oh-my-openagent</td><td>意图识别 + 命令关键词</td><td>约 5 档</td><td><strong>按任务类别映射到模型</strong></td><td>多一层类别，换模型不用改流程</td><td>概念多，频繁改名</td></tr>
+          <tr><td class="n">wshobson/agents</td><td>每个 agent 写死</td><td>—</td><td>4 档固定</td><td>成本可控</td><td>180+ 个 agent，挑选困难</td></tr>
+        </tbody>
+      </table></div>
+      <p class="src">几点说明：BMAD 的档位阈值来自非官方的镜像文档；oh-my-openagent 近期改过名；Cursor Router 和 Codex 自动选模型的信息只有二手来源，可能还只是提案。</p>
+    </section>
+
+    <section id="verdict">
+      <span class="kicker">附录 · 调研结论</span>
+      <h2>按你的场景，谁最好</h2>
+      <p class="sub">这些框架都没有公开可比的评测，唯一有硬数据的是 Anthropic 的研究，而它讲的是通用原则，不是某个具体框架。所以下面的排名是按<strong>你的场景</strong>给的：个人开发、Claude Code、Pro 订阅。</p>
+      <div class="tbl"><table>
+        <thead><tr><th>排名</th><th>方案</th><th>理由</th></tr></thead>
+        <tbody>
+          <tr class="hl"><td class="n">1</td><td class="n">Pocock skills + OpenSpec</td><td>最轻、可以自由组合，和你已经装好的东西完全一致。缺点是没有自动判断复杂度，要靠你自己决定用哪个</td></tr>
+          <tr><td class="n">2</td><td class="n">superpowers</td><td>纪律最强：强制写测试、每个任务单独开子 agent 并审查两遍、完成前必须验证。缺点是所有任务都走全套流程，没有快速通道，小任务明显过度设计</td></tr>
+          <tr><td class="n">3</td><td class="n">BMAD v6</td><td>分级思想最成熟，执行中发现任务变大会自动升级。缺点是要先拆完需求才能定档，仪式感重，更适合团队</td></tr>
+          <tr><td class="n">4</td><td class="n">oh-my-openagent</td><td>按任务类别配模型的设计最好，但它属于 OpenCode 生态，搬到 Claude Code 要自己重写</td></tr>
+          <tr><td class="n">—</td><td class="n">spec-kit / Kiro</td><td>spec-kit 流程太重；Kiro 要绑定它自己的 IDE。都不适合你</td></tr>
+        </tbody>
+      </table></div>
+      <h3>各单项做得最好的</h3>
+      <div class="tbl"><table>
+        <tbody>
+          <tr><td class="n">流程纪律</td><td>superpowers</td></tr>
+          <tr><td class="n">分级与自动升级</td><td>BMAD</td></tr>
+          <tr><td class="n">按任务配模型</td><td>oh-my-openagent</td></tr>
+          <tr><td class="n">轻量、可组合</td><td>Matt Pocock</td></tr>
+          <tr><td class="n">持续维护的需求文档</td><td>OpenSpec</td></tr>
+        </tbody>
+      </table></div>
+      <h3>本方案的定位</h3>
+      <p>以 Pocock + OpenSpec 为底，加上 BMAD 的自动升级、oh-my-openagent 的按类别选模型、superpowers 的审查环节，再补上各家都没有的<strong>降级机制</strong>。</p>
+      <p>它是纸面上的最优，还没有经过真实任务验证，验证办法见"接下来"一节。</p>
+    </section>
+  </main>
+</div>
+</body>
+</html>
