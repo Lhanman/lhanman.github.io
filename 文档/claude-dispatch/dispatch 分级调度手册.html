@@ -321,7 +321,7 @@ source: dispatch
   <div class="ladder">
     <div class="rung"><span class="k">触发</span><code>PostToolUse · Artifact</code><span>Artifact 页面发布后，hook 给出带文件路径和 slug 的发布命令；已发布过的页面按更新处理</span><span class="out">没配置文档站时不输出</span></div>
     <div class="rung"><span class="k">把关</span><code>dispatch-pages publish</code><span>先查本机路径、邮箱、密钥、敏感词和 Artifact 专属能力，命中就停下给你看</span><span class="out">退出码 3，未发布</span></div>
-    <div class="rung"><span class="k">上线</span><code>文档/&lt;项目&gt;/&lt;标题&gt;.html</code><span>补全页面外壳，按项目分目录、用中文标题命名，更新目录页和 README，提交并推送</span><span class="out">约 1 分钟后生效</span></div>
+    <div class="rung"><span class="k">上线</span><code>/p/&lt;slug&gt;/</code><span>仓库里按项目分目录、用中文标题存放（<code>文档/&lt;项目&gt;/&lt;标题&gt;.html</code>），推送后由 GitHub Actions 部署成英文网址</span><span class="out">约 1 分钟后生效</span></div>
   </div>
   <p><strong>站点是公开的。</strong>GitHub Pages 即使用私有仓库发布，页面也谁都能打开，所以工作项目的内部内容不发布。拦截哪些词写在 <code>~/.claude/dispatch/config</code> 的 <code>pages_deny</code> 里，随时可以增删；确认无妨的内容，可以用 <code>--allow</code> 放行。</p>
 <pre><code>dispatch-pages publish page.html --slug my-page --desc "一句话摘要" --tags 标签1,标签2 --project 项目
@@ -390,7 +390,7 @@ dispatch-pages list · check · remove · rebuild</code></pre>
       <tr><td><code>~/workbench/claude-dispatch/</code></td><td>插件源码，通过 <code>~/.claude/skills/dispatch</code> 软链加载；改完执行 <code>/reload-plugins</code></td></tr>
       <tr><td><code>router/ROUTER.md</code> · <code>KB.md</code></td><td>定级和流程规则、知识库规则，想调整行为就改这两个文件</td></tr>
       <tr><td><code>~/.claude/dispatch/config</code></td><td>本机配置：知识库（<code>kb_dir</code>、<code>kb_exclude</code>）和文档站（<code>pages_repo</code>、<code>pages_url</code>、<code>pages_title</code>、<code>pages_deny</code>）</td></tr>
-      <tr><td><code>~/workbench/lhanman.github.io/</code></td><td>文档站仓库：<code>文档/&lt;项目&gt;/&lt;标题&gt;.html</code> 是各篇文档，没有项目的放在 <code>文档/其他/</code>；<code>index.html</code>、<code>README.md</code>、<code>catalog.json</code> 自动生成</td></tr>
+      <tr><td><code>~/workbench/lhanman.github.io/</code></td><td>文档站仓库：<code>文档/&lt;项目&gt;/&lt;标题&gt;.html</code> 是各篇文档，没有项目的放在 <code>文档/其他/</code>；线上网址是英文的 <code>/p/&lt;slug&gt;/</code>，由 <code>.github/</code> 里的部署流程生成；<code>index.html</code>、<code>README.md</code>、<code>catalog.json</code> 自动生成</td></tr>
       <tr><td><code>~/.claude/dispatch/overrides.log</code></td><td>每次手动指定级别的记录：时间、级别、目录</td></tr>
       <tr><td><code>$TMPDIR/dispatch-verify/</code></td><td>验证命令的完整日志</td></tr>
       <tr><td>项目 <code>CLAUDE.md</code></td><td>「dispatch 验证矩阵」和「dispatch 知识库」两节，由 setup 写入</td></tr>
