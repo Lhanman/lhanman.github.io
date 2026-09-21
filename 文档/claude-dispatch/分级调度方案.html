@@ -246,6 +246,7 @@ td.n{font-weight:700;white-space:nowrap}
         <div class="agent"><h4>dispatch:builder <span class="m">Sonnet 5 · 可编辑</span></h4><p>只接规格明确的机械性任务组，或 L4 的并行分支。遇到歧义或越界就停下来回报，不自行决定。</p></div>
       </div>
       <p class="src">和 v0.1 相比：验证不再用子 agent，改成脚本（见"验证"一节）；reviewer 从"L2 以上每次都过"改成按风险触发；builder 从 L3 默认使用改成只接机械性任务。</p>
+      <p class="src"><b>v0.5 起的修订：</b>reviewer 的触发改回"L2 一律审一次"。按风险触发要靠主会话在实现完之后自己判断有没有命中风险信号，判定偏松就会漏审；而 L2 本身就是因为出现风险信号才判上来的，一律审一次更简单，也不容易漏。L3 同时从"只终审一次"改成每个任务组做完各审一次，把问题挡在任务组之间，不让它累积到终审才暴露。怎么写委托、怎么处理审回的意见，收进了新的 <code>skills/code-review/</code>（改写自 superpowers 的 requesting-code-review 和 receiving-code-review，合并为一个中文 skill，派的是本插件的 reviewer）。</p>
       <p class="src">Claude Code 内置的 Explore、Plan 等 agent 默认继承主模型。主会话用 Opus 时，建议在设置的 <code>env</code> 里加 <code>CLAUDE_CODE_SUBAGENT_MODEL=sonnet</code> 兜底；本插件的 agent 在各自文件里写明了模型，优先级更高，不受影响。</p>
     </section>
 

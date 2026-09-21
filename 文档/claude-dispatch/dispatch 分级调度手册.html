@@ -251,8 +251,8 @@ dl.faq dd{margin:4px 0 0;color:var(--muted);font-size:14.5px}
   <div class="tiers">
     <div class="tier" style="--c:var(--t0)"><div class="lv"><b>L0</b><span>直做</span></div><div class="bd"><p class="when">一句话说得清的改动：错字、配置值、重命名。</p><p class="steps">直接改 → 最小验证</p><span class="gate">直接执行 · 无判定行</span></div></div>
     <div class="tier" style="--c:var(--t1)"><div class="lv"><b>L1</b><span>快修</span></div><div class="bd"><p class="when">位置明确的 bug 或小功能，不超过 3 个文件，不碰公共接口。</p><p class="steps">三行意图（目标 / 不做什么 / 验收）→ 修 bug 先写复现测试 → 改 → 验证。原因不明时转 systematic-debugging。</p><span class="gate">判定后直接执行</span></div></div>
-    <div class="tier" style="--c:var(--t2)"><div class="lv"><b>L2</b><span>标准</span></div><div class="bd"><p class="when">跨模块、需求有歧义、新依赖，或碰到公共接口、数据模型、并发、删除。</p><p class="steps">查知识库 → 范围不清派 scout → grilling 最多一轮 → Plan 模式出方案 → 测试先行实现 → 碰到高风险项时派 reviewer。</p><span class="gate">判定后直接执行</span></div></div>
-    <div class="tier" style="--c:var(--t3)"><div class="lv"><b>L3</b><span>特性</span></div><div class="bd"><p class="when">一个会话做不完；改公共接口、持久化格式或做数据迁移；新增一块完整能力。</p><p class="steps">grill-me → OpenSpec 提案 → 你审规格 → 按任务组执行（组间 <code>/clear</code>）→ reviewer 终审（Opus）→ 核对规格 → 归档 → 沉淀笔记。没有 OpenSpec 时，方案写到 <code>docs/plans/</code>。</p><span class="gate ask">先征得你同意</span></div></div>
+    <div class="tier" style="--c:var(--t2)"><div class="lv"><b>L2</b><span>标准</span></div><div class="bd"><p class="when">跨模块、需求有歧义、新依赖，或碰到公共接口、数据模型、并发、删除。</p><p class="steps">查知识库 → 范围不清派 scout → grilling 最多一轮 → Plan 模式出方案 → 测试先行实现 → 验证通过后派 reviewer 审一次。</p><span class="gate">判定后直接执行</span></div></div>
+    <div class="tier" style="--c:var(--t3)"><div class="lv"><b>L3</b><span>特性</span></div><div class="bd"><p class="when">一个会话做不完；改公共接口、持久化格式或做数据迁移；新增一块完整能力。</p><p class="steps">grill-me → OpenSpec 提案 → 你审规格 → 按任务组执行，每组做完审一次（组间 <code>/clear</code>）→ reviewer 终审（Opus）→ 核对规格 → 归档 → 沉淀笔记。没有 OpenSpec 时，方案写到 <code>docs/plans/</code>。</p><span class="gate ask">先征得你同意</span></div></div>
     <div class="tier" style="--c:var(--t4)"><div class="lv"><b>L4</b><span>史诗</span></div><div class="bd"><p class="when">新子系统或大改造，要先做架构决策。</p><p class="steps"><code>/opsx:explore</code> 定决策 → 拆成多个 L3 逐个走。只有真正独立的部分才并行，最多 3 路，用 git worktree 隔离。</p><span class="gate ask">先征得你同意</span></div></div>
   </div>
 </section>
@@ -266,7 +266,7 @@ dl.faq dd{margin:4px 0 0;color:var(--muted);font-size:14.5px}
     <tbody>
       <tr><td class="n">主会话</td><td>你的设置（当前 Opus 5 xhigh）</td><td>所有任务</td><td>负责定级和所有需要判断的决策</td></tr>
       <tr><td class="n">scout</td><td>Haiku 4.5</td><td>要读 5 个以上文件，或进入不熟悉的区域</td><td>只读，不加载 CLAUDE.md，最多 12 轮，回报 ≤ 40 行</td></tr>
-      <tr><td class="n">reviewer</td><td>Sonnet 5；L3 终审指定 Opus 5</td><td>L2 碰到高风险项；L3 交付前一次</td><td>只看改动差异，只报正确性问题和遗漏的需求，≤ 40 行</td></tr>
+      <tr><td class="n">reviewer</td><td>Sonnet 5；L3 终审指定 Opus 5</td><td>L2 验证通过后一次；L3 每个任务组一次、交付前终审一次</td><td>只看改动差异，只报正确性问题和遗漏的需求，≤ 40 行</td></tr>
       <tr><td class="n">builder</td><td>Sonnet 5</td><td>规格明确的机械性任务组、L4 并行分支</td><td>遇到歧义就停下回报，≤ 30 行</td></tr>
       <tr><td class="n">验证</td><td>不用模型</td><td>每次声称完成之前</td><td><code>dispatch-verify</code> 脚本</td></tr>
     </tbody>
@@ -355,7 +355,7 @@ dispatch-pages list · check · remove · rebuild</code></pre>
 /opsx:propose &lt;变更名&gt;          <span class="c"># 生成提案、规格、设计、任务清单</span>
 <span class="c"># 你审阅规格，满意后</span>
 /clear
-/opsx:apply                     <span class="c"># 按任务组执行，组与组之间 /clear；机械性任务组可交给 builder</span>
+/opsx:apply                     <span class="c"># 按任务组执行，每组做完派 reviewer 审一次，组间 /clear；机械性任务组可交给 builder</span>
 <span class="c"># reviewer 以 Opus 终审一次</span>
 /opsx:verify                    <span class="c"># 核对实现是否符合规格</span>
 /opsx:archive                   <span class="c"># 归档</span>
@@ -381,7 +381,7 @@ dispatch-pages list · check · remove · rebuild</code></pre>
       <tr><td><code>claude plugin details dispatch</code></td><td>查看插件的常驻 token 开销</td></tr>
     </tbody>
   </table></div>
-  <p>另有两个 skill 会在需要时由规则自动调用：<code>test-driven-development</code>（L2 以上）和 <code>systematic-debugging</code>（原因不明，或修过一次没好）。</p>
+  <p>另有三个 skill 会在需要时由规则自动调用：<code>test-driven-development</code>（L2 以上）、<code>code-review</code>（L2 起派审查、处理审回的意见）和 <code>systematic-debugging</code>（原因不明，或修过一次没好）。</p>
 
   <h3>文件都在哪</h3>
   <div class="tbl"><table>
