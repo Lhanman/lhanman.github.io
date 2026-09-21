@@ -16,6 +16,21 @@
       "path": "文档/claude-dispatch/dispatch 分级调度手册.html"
     },
     {
+      "slug": "dispatch-design",
+      "title": "分级调度方案",
+      "description": "dispatch 的设计决策记录：L0–L4 定级、路由规则、子 agent 编制、审查触发的修订、成本对比，以及业界方案调研与取舍",
+      "tags": [
+        "dispatch",
+        "ClaudeCode",
+        "设计决策",
+        "选型"
+      ],
+      "project": "claude-dispatch",
+      "created": "2026-09-19",
+      "updated": "2026-09-22",
+      "path": "文档/claude-dispatch/分级调度方案.html"
+    },
+    {
       "slug": "novel-ai-adaptation",
       "title": "小说 AI 改编评估",
       "description": "输入书名，产出章节高光与概述、章节漫画、多角色有声剧：国内与海外模型方案的成本对比、可行性、实现方案与风险",
@@ -61,21 +76,6 @@
       "created": "2026-09-19",
       "updated": "2026-09-19",
       "path": "文档/claude-dispatch/dispatch 接入指南.html"
-    },
-    {
-      "slug": "dispatch-design",
-      "title": "分级调度方案",
-      "description": "dispatch 的设计决策记录：L0–L4 定级、路由规则、子 agent 编制、成本对比，以及业界方案调研与取舍",
-      "tags": [
-        "Claude Code",
-        "dispatch",
-        "方案",
-        "调研"
-      ],
-      "project": "claude-dispatch",
-      "created": "2026-09-19",
-      "updated": "2026-09-19",
-      "path": "文档/claude-dispatch/分级调度方案.html"
     }
   ]
 }
