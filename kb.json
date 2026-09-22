@@ -1,0 +1,190 @@
+{
+  "notes": [
+    {
+      "slug": "note-f6c1c4",
+      "title": "自研A股日线回测引擎的几个关键口径",
+      "summary": "A股日线回测：持仓存真实价、除权日按复权因子折股数；先卖后买、开盘涨停作废；账平不代表引擎对",
+      "type": "方案",
+      "project": "ashare-quant",
+      "tags": [
+        "回测引擎",
+        "复权记账",
+        "除权除息",
+        "broker_sim",
+        "Context",
+        "分层取数"
+      ],
+      "created": "2026-09-23",
+      "updated": "2026-09-23",
+      "path": "知识库/个人项目/ashare-quant/自研A股日线回测引擎的几个关键口径.html",
+      "src": "个人项目/ashare-quant/自研A股日线回测引擎的几个关键口径.md",
+      "hash": "f6c1c48bef3a7149e2351c1bd16f8ae1b18ddb34",
+      "links": [
+        "note-32c264",
+        "note-a087d7"
+      ],
+      "text": "自研A股日线回测引擎的几个关键口径 A股日线回测：持仓存真实价、除权日按复权因子折股数；先卖后买、开盘涨停作废；账平不代表引擎对 回测引擎 复权记账 除权除息 broker_sim Context 分层取数 ashare-quant 方案 结论 背景 方案 持仓记账与除权折算 撮合规则（broker_sim） 分层取数与性能 持仓最高价重算 回测结果的诊断：示例策略亏 99.84% 决策记录 相关 结论 持仓记真实价和真实股数 ，和券商 App 对得上，另存一个记账基准复权因子 base_adj_factor ；和行情比价一律先用 cost_at(ctx) 折到 as_of 口径。除权除息日开盘前，股数按因子倍数放大后向下取整、成本价同倍摊薄，零头按除权参考价折现金，挂单股数一并放大。漏掉这一步，10 送 10 会让账面凭空少一半。 撮合 ：先卖后买（卖出资金当日可用）；用未加滑点的开盘价判涨跌停，再加滑点、再夹回 [跌停价, 涨停价]；买单只在 T+1 有效，卖单遇跌停或停牌一直顺延到成交；资金不足时按可用资金下调数量。 性能靠分层取数 ：Universe / Selector 面对全市场，只用 Context.panel() 宽表做向量化；Signal / ExitRule 只面对约 30 只候选和最多 5 只持仓，才逐只 bars() 。这条约定由「每日 bars() 次数上"
+    },
+    {
+      "slug": "note-a087d7",
+      "title": "A股免费数据源实测与数据层决策",
+      "summary": "A股日线免费源实测：东财封IP弃用，Baostock主新浪备，北交所靠新浪，涨跌停自算，复权以as_of为基准",
+      "type": "方案",
+      "project": "ashare-quant",
+      "tags": [
+        "Baostock",
+        "AKShare",
+        "新浪快照",
+        "涨跌停价",
+        "复权因子",
+        "未来函数"
+      ],
+      "created": "2026-09-23",
+      "updated": "2026-09-23",
+      "path": "知识库/个人项目/ashare-quant/A股免费数据源实测与数据层决策.html",
+      "src": "个人项目/ashare-quant/A股免费数据源实测与数据层决策.md",
+      "hash": "a087d7c808fefb55146c9e6b9875058afe94c400",
+      "links": [
+        "note-f6c1c4"
+      ],
+      "text": "A股免费数据源实测与数据层决策 A股日线免费源实测：东财封IP弃用，Baostock主新浪备，北交所靠新浪，涨跌停自算，复权以as_of为基准 Baostock AKShare 新浪快照 涨跌停价 复权因子 未来函数 ashare-quant 方案 结论 背景 方案 数据源分工 各源实测要点 涨跌停规则 复权与未来函数 缺数三层兜底 实测规模（2026-09-20 首次回填） 决策记录 相关 结论 弃用两个源 ：东财接口（AKShare 的 _em 系列）从家用 IP 请求约 8 次就被封 IP，45 分钟以上都没恢复；通达信协议（pytdx、mootdx）从 2026-09 起行情类请求全部返回空。 沪深以 Baostock 为主 ： 每天都有 preclose 、 tradestatus 、 isST ，停牌日有行，已退市股票也能拉到； query_daily_history_k_AStock(日期) 一次请求拉全市场，约 1 分钟； 缺点：全量逐只回填 5807 只要 7 小时 46 分；当日数据约 17:30 以后才有；不含北交所。 北交所和兜底靠新浪 ： 个股日线用 920 新代码能拿到全部历史和后复权因子； 全市场快照和 Baostock 逐只对比完全一致，但拉一次 IP 就被封 5–60 分钟，只能一天拉一次。 历史涨跌停价没有免费来源 ：按\"板块 × ST × 日期"
+    },
+    {
+      "slug": "note-32c264",
+      "title": "A股回测引擎体检方法与查出的缺陷",
+      "summary": "回测体检五法（独立记账、截断对照、已知答案、逐笔核对、成本敏感性）查出除权、强平、半分钱、零股四处缺陷",
+      "type": "踩坑",
+      "project": "ashare-quant",
+      "tags": [
+        "回测体检",
+        "broker_sim",
+        "除权除息",
+        "未来函数",
+        "四舍五入",
+        "申报数量"
+      ],
+      "created": "2026-09-23",
+      "updated": "2026-09-23",
+      "path": "知识库/个人项目/ashare-quant/A股回测引擎体检方法与查出的缺陷.html",
+      "src": "个人项目/ashare-quant/A股回测引擎体检方法与查出的缺陷.md",
+      "hash": "32c264f90f8aaeb3ab6653d3cb5091f2961dc456",
+      "links": [
+        "note-a087d7",
+        "note-f6c1c4"
+      ],
+      "text": "A股回测引擎体检方法与查出的缺陷 回测体检五法（独立记账、截断对照、已知答案、逐笔核对、成本敏感性）查出除权、强平、半分钱、零股四处缺陷 回测体检 broker_sim 除权除息 未来函数 四舍五入 申报数量 ashare-quant 踩坑 结论 现象 根因 解决 如何避免：五项体检 相关 结论 测试全过、账能自洽，不等于回测对 。跨交易日的状态变化最容易漏测，比如除权、停牌、期末强制平仓。回测引擎改动之后，要在真实数据上做一次端到端体检。 五项体检各管一类错 ： 独立记账重放：账算得对不对； 截断对照：有没有未来函数； 已知答案考题加换源对照：规则和数据本身对不对； 逐笔成交核对：成交是否可行、流动性够不够； 成本敏感性：结论对成交假设的依赖有多大。 查出四处缺陷 ： 除权日股数不折算：送转后净值腰斩，分红被记成亏损； 停牌期间除权后，强平价没有折算：这是修第一处时带出的回归，单日虚增 148%； 浮点数在\"半分钱\"时舍错，差 1 分钱； 部分卖出带零股：交易所不收这样的委托。 修复后全市场复查，四项全部归零 。示例策略 momentum_swing 亏 99.84% 属实：零成本也亏 99.76%，成本只占亏损的约两成。 验证脚本本身要先验证 ：先在已知有问题的结果上跑一遍，能原样查出已知问题，才说明它可信。 现象 除权记账 ：10 送 10 当天，总资产从 998,804 掉"
+    },
+    {
+      "slug": "note-2ecc84",
+      "title": "后端架构",
+      "summary": "Kotlin + Ktor Server — RESTful API",
+      "type": "",
+      "project": "博客",
+      "tags": [],
+      "created": "2026-09-22",
+      "updated": "2026-09-22",
+      "path": "知识库/个人项目/博客/01 - 后端架构.html",
+      "src": "个人项目/博客/01 - 后端架构.md",
+      "hash": "2ecc8463e323a201239ce2750f60a86b8fc96529",
+      "links": [],
+      "text": "后端架构 Kotlin + Ktor Server — RESTful API  博客  技术栈 启动流程 目录结构 核心文件 安全机制 环境变量配置 认证流程 已知问题 技术栈 Kotlin + Ktor Server — RESTful API PostgreSQL — 数据库 Exposed ORM — 数据库访问（DSL 参数化查询，防 SQL 注入） JWT (HS256) — 身份认证，有效期 7 天 BCrypt (cost=10) — 密码加密 Flyway — 数据库迁移 HikariCP — 连接池 启动流程 // Application.kt fun Application.module() { DatabaseFactory.init(dbUrl, dbUser, dbPassword) // 1. 初始化数据库连接池 configurePlugins() // 2. CORS, ContentNegotiation(JSON), StatusPages configureAuth() // 3. JWT 认证配置 routing { // 4. 注册路由 postRoutes(postRepository) tagRoutes(tagRepository) authRoutes(userRepository) commentRoutes(commentRe"
+    },
+    {
+      "slug": "note-205fd1",
+      "title": "前端架构",
+      "summary": "Kotlin Multiplatform — 跨平台代码共享",
+      "type": "",
+      "project": "博客",
+      "tags": [],
+      "created": "2026-09-22",
+      "updated": "2026-09-22",
+      "path": "知识库/个人项目/博客/02 - 前端架构.html",
+      "src": "个人项目/博客/02 - 前端架构.md",
+      "hash": "205fd16b966578ddb3f57efa4bbcdddf40620a52",
+      "links": [],
+      "text": "前端架构 Kotlin Multiplatform — 跨平台代码共享  博客  技术栈 目录结构 MVVM 数据流 跨平台适配：expect/actual 机制 页面列表 核心文件 API 地址配置 Desktop 支持说明 前端编译注意事项 技术栈 Kotlin Multiplatform — 跨平台代码共享 Compose Multiplatform — 声明式 UI Ktor Client — 网络请求（OkHttp / Darwin / JS / CIO 引擎） Coil 3 — 图片加载 Navigation Compose — 路由导航 Multiplatform Settings — 本地存储（Token 持久化） kotlinx-coroutines-swing — Desktop 主线程调度器（解决 Dispatchers.Main 缺失） 目录结构 frontend/composeApp/src/ ├── commonMain/kotlin/ # 跨平台共享 UI / 状态 / 数据访问 │ └── com/personalblog/app/ │ ├── ui/ │ │ ├── screen/ # 页面 │ │ ├── viewmodel/ # ViewModel │ │ ├── components/ # 可复用组件 │ │ ├── navigation/ "
+    },
+    {
+      "slug": "dispatch",
+      "title": "dispatch 分级调度使用速查",
+      "summary": "dispatch 插件日常用法：L0–L4 自动定级、#L 手动定级、setup 接入、脑暴、审查环节、知识库检索与沉淀、HTML 发布到文档站",
+      "type": "指南",
+      "project": "claude-dispatch",
+      "tags": [
+        "Claude Code",
+        "dispatch",
+        "分级调度",
+        "OpenSpec",
+        "知识库",
+        "文档站"
+      ],
+      "created": "2026-09-19",
+      "updated": "2026-09-22",
+      "path": "知识库/个人项目/claude-dispatch/dispatch 分级调度使用速查.html",
+      "src": "个人项目/claude-dispatch/dispatch 分级调度使用速查.md",
+      "hash": "9c5a1f364c6cafe0b529295955ba099d245be6d3",
+      "links": [],
+      "text": "dispatch 分级调度使用速查 dispatch 插件日常用法：L0–L4 自动定级、#L 手动定级、setup 接入、脑暴、审查环节、知识库检索与沉淀、HTML 发布到文档站 Claude Code dispatch 分级调度 OpenSpec 知识库 文档站 claude-dispatch 指南 结论 步骤 级别与流程 命令 子 agent 与模型 检索知识库（省上下文） 文档站 常见问题 相关 结论 平时直接说需求。开发类请求会自动定级 L0–L4，回复第一行写 〔L2 · 依据〕 ；L3 以上先征得你同意。问答、调研类请求不定级。 想指定级别，就在消息里写 #L0 – #L4 。指定的级别是下限：要升级时会先停下问你，回复 #L3 这样的标记确认。每次指定和确认都会记入 ~/.claude/dispatch/overrides.log ，用来修订定级规则。 要脑暴时说「脑暴一下……」或执行 /dispatch:brainstorm 。 新项目先执行一次 /dispatch:setup ：把验证命令和知识库目录写进项目 CLAUDE.md。 验证一律用 dispatch-verify <命令> ；查知识库用 dispatch-kb search ；沉淀笔记用 /dispatch:note ，写之前会先给你确认。 生成的 HTML 文档会自动发布到公开文档站 https:/"
+    },
+    {
+      "slug": "markdown",
+      "title": "Markdown 语法总结",
+      "summary": "日期：2026-03-20 标签：#技术笔记 #Markdown",
+      "type": "",
+      "project": "技术笔记",
+      "tags": [],
+      "created": "2026-03-31",
+      "updated": "2026-03-31",
+      "path": "知识库/技术笔记/Markdown 语法总结.html",
+      "src": "技术笔记/Markdown 语法总结.md",
+      "hash": "c41972d99d0bcf8dd837091383c9278425e7dc0b",
+      "links": [],
+      "text": "Markdown 语法总结 日期：2026-03-20 标签：#技术笔记 #Markdown  技术笔记  1. 标题 2. 文本样式 3. 列表 4. 链接与图片 5. 引用 6. 代码块 7. 表格 8. 分隔线 9. 脚注 10. Obsidian 专属语法 日期：2026-03-20 标签：#技术笔记 #Markdown 1. 标题 # 一级标题 ## 二级标题 ### 三级标题 #### 四级标题 2. 文本样式 语法 效果 **粗体** 粗体 *斜体* 斜体 ~~删除线~~ 删除线 ==高亮== ==高亮== `行内代码` 行内代码 3. 列表 无序列表： 项目一 项目二 子项目 有序列表： 第一步 第二步 第三步 任务列表： 已完成 未完成 4. 链接与图片 [链接文字](https://example.com) ![图片描述](image.png) [[Obsidian 内部链接]] 5. 引用 这是一段引用文字。 可以多行书写。 6. 代码块 使用三个反引号包裹，并指定语言： def hello(): print(\"Hello, World!\") 7. 表格 | 列1 | 列2 | 列3 | |-----|-----|-----| | A | B | C | 8. 分隔线 使用三个或以上的 --- 、 *** 或 ___ ： 9. 脚注 这是一段带脚注的文字[^1"
+    },
+    {
+      "slug": "note-cbd676",
+      "title": "开发指南",
+      "summary": "项目包含三个 Gradle 子项目：",
+      "type": "",
+      "project": "博客",
+      "tags": [],
+      "created": "2026-03-29",
+      "updated": "2026-03-29",
+      "path": "知识库/个人项目/博客/06 - 开发指南.html",
+      "src": "个人项目/博客/06 - 开发指南.md",
+      "hash": "cbd6765e278855b0ed6be5331d7eb39041c215b8",
+      "links": [],
+      "text": "开发指南 项目包含三个 Gradle 子项目：  博客  Gradle 项目结构 常用构建命令 后端 前端 全量 桌面端开发说明 依赖仓库配置 依赖版本管理 修改共享数据模型 添加新 API 端点 数据库迁移 跨平台开发 常见编译问题 Yarn Lock 更新 macOS/iOS 依赖下载失败 Desktop 启动崩溃 性能优化配置 Gradle 项目结构 项目包含三个 Gradle 子项目： 项目名 物理路径 说明 :backend backend/ 后端服务 :shared shared/ 共享模块 :composeApp frontend/composeApp/ 前端应用 注意：虽然前端代码在 frontend/composeApp/ 目录，但 Gradle 项目名是 :composeApp ，所有命令都用 :composeApp 而不是 :frontend:composeApp 。 常用构建命令 后端 ./gradlew :backend:run # 本地运行（默认端口 9191） ./gradlew :backend:build # 构建 JAR ./gradlew :backend:test # 运行测试 前端 # Web 开发模式（访问 http://localhost:8080，接口默认走 http://localhost:9191） ./gradlew :comp"
+    },
+    {
+      "slug": "note-26818f",
+      "title": "数据库设计",
+      "summary": "使用 Flyway 管理，迁移文件位于 backend/src/main/resources/db/migration/",
+      "type": "",
+      "project": "博客",
+      "tags": [],
+      "created": "2026-03-29",
+      "updated": "2026-03-29",
+      "path": "知识库/个人项目/博客/03 - 数据库设计.html",
+      "src": "个人项目/博客/03 - 数据库设计.md",
+      "hash": "26818f7ea783c84ba10d2b6be6ffaa4ae956344d",
+      "links": [],
+      "text": "数据库设计 使用 Flyway 管理，迁移文件位于 backend/src/main/resources/db/migration/  博客  表结构 users — 用户表 posts — 文章表 tags — 标签表 post_tags — 文章标签关联表（多对多） comments — 评论表 索引 数据库迁移 注意事项 表结构 users — 用户表 users ( id BIGSERIAL PRIMARY KEY, username VARCHAR(100) UNIQUE, email VARCHAR(255) UNIQUE, password_hash VARCHAR(255), -- BCrypt 加密 role VARCHAR(20), -- USER / ADMIN created_at TIMESTAMPTZ ) posts — 文章表 posts ( id BIGSERIAL PRIMARY KEY, title VARCHAR(500), slug VARCHAR(500) UNIQUE, -- URL 友好标识 summary TEXT, content TEXT, cover_image_url TEXT, published BOOLEAN, -- 草稿/发布状态 author_id BIGINT → users(id), created_at TIM"
+    },
+    {
+      "slug": "note-08a4b6",
+      "title": "部署指南",
+      "summary": "前端： http://localhost",
+      "type": "",
+      "project": "博客",
+      "tags": [],
+      "created": "2026-03-29",
+      "updated": "2026-03-29",
+      "path": "知识库/个人项目/博客/07 - 部署指南.html",
+      "src": "个人项目/博客/07 - 部署指南.md",
+      "hash": "08a4b6f697044008715b00673e163946e0e2b9d3",
+      "links": [],
+      "text": "部署指南 前端： http://localhost  博客  本地开发环境 Docker 部署（推荐生产环境） 1. 构建前端静态文件 2. 配置环境变量 3. 启动所有服务 4. 访问地址 常用 Docker 命令 服务架构 环境变量说明 手动部署 生产环境注意事项 本地开发环境 ./start-dev.sh # 启动 PostgreSQL + 后端 + Web 前端 ./stop-dev.sh # 停止所有服务 ./status.sh # 查看运行状态 Docker 部署（推荐生产环境） 1. 构建前端静态文件 ./gradlew :composeApp:wasmJsBrowserDistribution 2. 配置环境变量 cp .env.example .env # 编辑 .env，修改数据库密码和 JWT Secret 3. 启动所有服务 docker compose up -d 4. 访问地址 前端： http://localhost 后端 API： http://localhost/api/v1（Nginx 反向代理） 直接访问后端： http://localhost:8080 常用 Docker 命令 docker compose logs -f # 查看日志 docker compose down # 停止服务 docker compose ps # 查看服务状态"
+    }
+  ]
+}

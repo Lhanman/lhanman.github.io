@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>自研A股日线回测引擎的几个关键口径 · Lhanman 的知识库</title>
+<meta name="description" content="A股日线回测：持仓存真实价、除权日按复权因子折股数；先卖后买、开盘涨停作废；账平不代表引擎对">
+<link rel="index" href="../../index.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;800;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+:root{--ground:#F3F4F6;--paper:#FFFFFF;--ink:#161A21;--muted:#5B6372;--rule:#DADDE3;--chip:#E4E8F2;--chip-ink:#2E4893;--accent:#4865AA;--mark:#FDF2C7;
+--serif:"Noto Serif SC","Songti SC",serif;--sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;--mono:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root{--ground:#12151B;--paper:#1A1E26;--ink:#E5E8EE;--muted:#9AA2B1;--rule:#2C323D;--chip:#222B3D;--chip-ink:#AFC1EA;--accent:#95ABDB;--mark:#4A421F}}
+*{box-sizing:border-box}
+html{color-scheme:light dark}
+body{margin:0;background:var(--ground);color:var(--ink);font:15.5px/1.75 var(--sans);padding-inline:20px;padding-block:0 80px}
+a{color:var(--accent)}
+.eyebrow{font:600 11.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.chip{font:500 12px/1 var(--mono);padding:4px 8px;border-radius:3px;background:var(--chip);color:var(--chip-ink)}
+.kb-private{color:var(--muted);font-style:normal;opacity:.75}
+
+main{max-width:820px;margin:0 auto}
+.crumb{padding-block:28px 0;font:500 12.5px/1.6 var(--mono);color:var(--muted)}
+.crumb a{color:var(--muted);text-decoration:none}
+.crumb a:hover{color:var(--accent)}
+header.note{padding-block:14px 22px;border-bottom:1px solid var(--rule)}
+header.note h1{font:900 clamp(26px,4.4vw,38px)/1.25 var(--serif);margin:6px 0 10px;text-wrap:balance}
+header.note .summary{margin:0 0 14px;color:var(--muted)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font:500 12px/1.4 var(--mono);color:var(--muted)}
+.toc{margin:22px 0 0;padding:14px 16px;background:var(--paper);border:1px solid var(--rule);border-radius:8px}
+.toc p{margin:0 0 8px;font:600 11.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.toc li.l3{padding-left:16px;font-size:14px}
+.toc a{color:var(--ink);text-decoration:none}
+.toc a:hover{color:var(--accent)}
+article{padding-block:8px 24px}
+article h2{font:800 22px/1.4 var(--serif);margin:32px 0 10px;padding-top:6px;border-top:1px solid var(--rule)}
+article h3{font:700 17.5px/1.5 var(--sans);margin:22px 0 8px}
+article h4{font:700 15.5px/1.5 var(--sans);margin:18px 0 6px;color:var(--muted)}
+article p{margin:10px 0}
+article ul,article ol{margin:10px 0;padding-left:22px}
+article li{margin:4px 0}
+article li.task{list-style:none;margin-left:-18px}
+article blockquote{margin:14px 0;padding:2px 14px;border-left:3px solid var(--rule);color:var(--muted)}
+article code{font:13.5px/1.6 var(--mono);background:var(--chip);color:var(--chip-ink);padding:1px 5px;border-radius:3px}
+article pre{margin:14px 0;padding:14px 16px;background:var(--paper);border:1px solid var(--rule);border-radius:8px;overflow:auto}
+article pre code{background:none;color:var(--ink);padding:0;font-size:13px;line-height:1.7}
+article hr{border:0;border-top:1px solid var(--rule);margin:26px 0}
+article img{max-width:100%;border-radius:6px}
+.kb-table{overflow-x:auto;margin:14px 0}
+article table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--paper)}
+article th,article td{border:1px solid var(--rule);padding:7px 10px;text-align:left;vertical-align:top}
+article th{background:var(--chip);color:var(--chip-ink);font-weight:600;white-space:nowrap}
+footer.note{border-top:1px solid var(--rule);padding-top:20px;display:grid;gap:18px}
+footer.note section{display:grid;gap:6px}
+footer.note h2{font:600 11.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0}
+footer.note ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+footer.note a{text-decoration:none}
+footer.note a:hover{text-decoration:underline}
+.back{display:flex;flex-wrap:wrap;gap:14px;font:500 13px/1.6 var(--mono)}
+.stamp{color:var(--muted);font-size:12.5px;margin:0}
+@media (max-width:640px){article th{white-space:normal}}
+</style>
+</head>
+<body>
+<main>
+<nav class="crumb"><a href="../../index.html">Lhanman 的知识库</a> / <span>ashare-quant</span></nav>
+<header class="note">
+<span class="eyebrow">知识库笔记</span>
+<h1>自研A股日线回测引擎的几个关键口径</h1>
+<p class="summary">A股日线回测：持仓存真实价、除权日按复权因子折股数；先卖后买、开盘涨停作废；账平不代表引擎对</p>
+<div class="meta"><span class="chip">方案</span><span>ashare-quant</span><span>更新于 2026-09-23</span><span class="chip">回测引擎</span><span class="chip">复权记账</span><span class="chip">除权除息</span><span class="chip">broker_sim</span><span class="chip">Context</span><span class="chip">分层取数</span></div>
+</header>
+<nav class="toc"><p>本篇目录</p><ol><li class="l2"><a href="#结论">结论</a></li><li class="l2"><a href="#背景">背景</a></li><li class="l2"><a href="#方案">方案</a></li><li class="l3"><a href="#持仓记账与除权折算">持仓记账与除权折算</a></li><li class="l3"><a href="#撮合规则-broker_sim">撮合规则（broker_sim）</a></li><li class="l3"><a href="#分层取数与性能">分层取数与性能</a></li><li class="l3"><a href="#持仓最高价重算">持仓最高价重算</a></li><li class="l3"><a href="#回测结果的诊断-示例策略亏-99-84">回测结果的诊断：示例策略亏 99.84%</a></li><li class="l2"><a href="#决策记录">决策记录</a></li><li class="l2"><a href="#相关">相关</a></li></ol></nav>
+<article>
+<h2 id="结论">结论</h2>
+<ul><li><strong>持仓记真实价和真实股数</strong>，和券商 App 对得上，另存一个记账基准复权因子 <code>base_adj_factor</code>；和行情比价一律先用 <code>cost_at(ctx)</code> 折到 as_of 口径。除权除息日开盘前，股数按因子倍数放大后向下取整、成本价同倍摊薄，零头按除权参考价折现金，挂单股数一并放大。漏掉这一步，10 送 10 会让账面凭空少一半。</li><li><strong>撮合</strong>：先卖后买（卖出资金当日可用）；用未加滑点的开盘价判涨跌停，再加滑点、再夹回 [跌停价, 涨停价]；买单只在 T+1 有效，卖单遇跌停或停牌一直顺延到成交；资金不足时按可用资金下调数量。</li><li><strong>性能靠分层取数</strong>：Universe / Selector 面对全市场，只用 <code>Context.panel()</code> 宽表做向量化；Signal / ExitRule 只面对约 30 只候选和最多 5 只持仓，才逐只 <code>bars()</code>。这条约定由「每日 <code>bars()</code> 次数上限」和「Universe / Selector 一次都不许调 <code>bars()</code>」两组测试守住。</li><li><strong>「持仓以来最高价」每次重算</strong>，不存进 <code>Position</code>：回测、实盘、重跑的结果天然一致。</li><li><strong>账平不代表引擎对</strong>：除权缺陷存在期间，「现金 + 市值 = 总资产」「买入 − 卖出 + 费用 = 初始 − 期末」全程成立。估值错误要靠专门的除权用例和净值曲线的单日异常跳变去抓。</li></ul>
+<h2 id="背景">背景</h2>
+<p>ashare-quant 是 A 股中短线信号助手：日线级别，收盘后出信号，人工下单。回测、收盘批处理、盘中监控三个引擎共用同一套策略组件和策略 YAML，所以回测里定下的记账口径，就是以后实盘持仓账本的口径。</p>
+<p>回测引擎自己写一个轻量的日线事件循环，不用 backtrader 等通用框架：A 股规则（T+1、涨跌停、最小申报数量、分段印花税）在通用框架里要大量打补丁，而且只有自己写才能让三个引擎共用组件接口。本地数据是 2018 年以来的沪深京全市场，5807 只股票，其中 242 只已退市。</p>
+<h2 id="方案">方案</h2>
+<h3 id="持仓记账与除权折算">持仓记账与除权折算</h3>
+<ul><li><code>Position</code> 存真实成交均价 <code>cost_price</code>、真实股数 <code>qty</code>，外加记账基准因子 <code>base_adj_factor</code>（建仓时取建仓日的后复权因子）。</li><li>比价：<code>cost_at(ctx) = cost_price × base_adj_factor ÷ as_of 当天因子</code>。方向写反的话，20 元建仓、10 送 10 之后会算出 40 元，止损线被抬到现价的 4 倍。反过来，直接拿 <code>cost_price</code> 和复权价相减，跨一次 10 送 10 会算出 −49% 的假亏损。</li><li>除权除息：引擎每天的第 0 步 <code>_ex_rights</code> 先折算持仓和前一日的挂单，折算记录写进结果目录的 <code>adjustments.parquet</code>；逐笔盈亏配对 <code>realized_trades</code> 也要按这份记录放大之前买入的股数、摊薄买入价。</li><li>这样做等价于分红免税再投资，分红收益略偏乐观（年化约 0.4%），在报告的局限一节写明。</li><li>已知限制：缩股时挂单折算后不足 1 股会保底为 1 股，A 股几乎没有缩股，影响可以忽略。</li><li>每日信号（M6）开加仓之前要先定两件事（见 <code>src/aq/portfolio/position.py:71</code> 的 <code>buy</code>）：券商遇到现金分红时是否摊薄成本价、摊薄多少，要连同对账方式一起定；加仓会把 <code>init_qty</code> 抬到新的总量，分批止盈已经走过的档位会再触发一次，该重置还是累计是产品决定。</li></ul>
+<h3 id="撮合规则-broker_sim">撮合规则（broker_sim）</h3>
+<ul><li>滑点默认 0.1%；买入价 = 开盘价 × (1 + 滑点)，卖出价 = 开盘价 × (1 − 滑点)。成交价和费用用十进制算术四舍五入到分（<code>aq.portfolio.money</code>），不用浮点数加内置 <code>round</code>，否则会在&quot;半分钱&quot;时舍错（b349ac7 修正）。</li><li>开盘涨停：买单 <code>rejected_limit_up</code>，信号作废。开盘跌停：卖单 <code>deferred</code>，顺延并计数。停牌：买单 <code>expired</code>，卖单顺延到复牌。</li><li>最小申报数量：主板、创业板 100 股起、按 100 股递增；科创板 200 股起、按 1 股递增；北交所 100 股起、按 1 股递增。卖出同样要合规：清仓连零股一起卖；部分卖出主板、创业板取整到 100 股（可连全部零股一起卖），科创板 ≥200 股、北交所 ≥100 股，余额不足起始数量只能一次卖完，取整后为 0 记 <code>rejected_lot</code>（b349ac7 修正，原先部分卖出也能带零股）。</li><li>费用：佣金 0.025%、单笔最低 5 元；印花税只在卖出时收，2023-08-28 之前 0.1%、之后 0.05%；过户费 0.001%。费率按生效日期分段配置。</li><li>退市持仓按最后有效收盘价强平，期末持仓按最后一天收盘价强平，两者单独标记，不算策略的卖出信号。强平价要按&quot;那天的因子 ÷ 当日因子&quot;折算到当日复权口径，因为停牌期间可能除过权、股数已放大（b349ac7 修正）。</li><li>未成交的订单保留状态和原因，回测明细能直接回答「这只股当时为什么没被买」。</li></ul>
+<h3 id="分层取数与性能">分层取数与性能</h3>
+<ul><li>全市场逐只调 <code>bars()</code> 约 5807 × 2100 ≈ 1200 万次，约 40 分钟，不可用。分层之后，固定测试数据上每天约 73 次 <code>bars()</code>（除权修复前约 68 次），上限卡在 80；把 Selector 改成逐只取数会明显越线（修复前实测约 94 次），测试失败。</li><li>唯一的接口改动是给 <code>panel()</code> 加了 <code>is_st</code> 字段：按 ST 剔除原本要逐只 <code>meta()</code>，全市场约 388 毫秒/交易日，跑满区间要多花约 13 分钟。</li><li>真实全市场实测：修复除权之前，空闲机器上 2079 个交易日纯回测 4 分 35 秒（2026-09-21）。除权修复让每天的 <code>bars()</code> 次数多了约 7%，固定测试数据上耗时多约 10%，空闲时估计在 5 分钟上下，要在机器空闲时用 <code>uv run pytest -m slow</code> 复测。机器繁忙时（另有回测并行）修复前后都要 8～9 分钟，这时测出的数不能用来判断性能。</li><li>另有一条 import 静态检查，守的是「组件只能通过 <code>Context</code> 取数据、不许直接读库或联网」，和分层取数是两条规矩。</li></ul>
+<h3 id="持仓最高价重算">持仓最高价重算</h3>
+<ul><li>移动止盈、ATR 止损要用「持仓以来最高价」：每次从 <code>bars()</code> 取建仓日至 as_of 的复权最高价。同一天内被几条规则各问一遍时，按 <code>Context</code> 实例缓存，不会串到别的交易日。</li><li>回看上限是 500 个交易日（<code>HOLD_LOOKBACK</code>）：持仓超过约两年时，更早的高点看不到。每日信号（M6）录入长期持仓时要注意。</li></ul>
+<h3 id="回测结果的诊断-示例策略亏-99-84">回测结果的诊断：示例策略亏 99.84%</h3>
+<p>示例策略 <code>momentum_swing</code> 只是接线样例，参数没有调过。2018-03-01 至 2026-09-21 全市场实测：总收益 −99.84%，年化 −54.32%，胜率 44.4%，平仓 1301 笔，年化换手 6404%；沪深 300 同期 +12.1%。</p>
+<p>按每笔实际执行的退出动作归类（资金按买入成本算，收益含费用）：</p>
+<div class="kb-table"><table><thead><tr><th>退出方式</th><th>笔数</th><th>资金占比</th><th>资金加权收益</th><th>合计盈亏</th></tr></thead><tbody><tr><td>止损（清仓）</td><td>421</td><td>41%</td><td>−12.5%</td><td>−193 万</td></tr><tr><td>移动止盈（清仓）</td><td>522</td><td>44%</td><td>−1.5%</td><td>−25 万</td></tr><tr><td>分批止盈（减仓 30%/50%）</td><td>317</td><td>9%</td><td>+25.4%</td><td>+89 万</td></tr><tr><td>到期（清仓）</td><td>41</td><td>7%</td><td>+11.5%</td><td>+29 万</td></tr></tbody></table></div>
+<p>逐笔简单平均是 +3.6%，但总账亏掉 99.8 万：分批止盈每次只卖赢家的一小份，止损却整仓砍掉输家，赢的钱少、亏的钱多。要改这个策略，先动退出规则的配比和止损宽度，而不是选股；这件事排在里程碑 M4「策略打磨」。</p>
+<p>除权缺陷对这次结果的影响：2018-04-17 持仓 300715 送转（复权因子 ×1.81），修复前当日净值假跌 13.2%，修复后 −3.8%；之后两三年，修复后的账户一直高出一到两成。最终两者都接近亏光（−99.85% 对 −99.84%），亏损主要来自策略本身。</p>
+<p>诊断时依次看：逐笔平均和资金加权收益是否背离 → 按退出规则拆资金占比 → 对账等式 → 净值曲线的单日异常跳变。对账等式只能排除「钱记丢了」，排除不了「股数或价格算错了」。</p>
+<h2 id="决策记录">决策记录</h2>
+<ul><li><strong>复权记账，不模拟分红明细</strong>：M1 已有复权因子，不用扩数据层；中短线持仓分红影响年化约 0.4%。</li><li><strong>持仓存真实价，不存复权价</strong>：账本要和券商对账、要人工录入；复权基准随 as_of 滑动，今天存下的复权价过几天就变了意思。</li><li><strong>分层取数，不给 <code>Context</code> 加指标缓存或拆类型</strong>：M1 刚验收的 <code>Context</code> 不动，未来函数的防护面不扩大；代价是分层只是约定，靠测试守。</li><li><strong>最高价重算，不做持久化状态</strong>：可变状态在账本丢失或补跑历史时重建不出来。</li><li><strong>结果写独立目录，不进主 DuckDB</strong>：回测信号和实盘信号彻底隔离，免得拿回测信号去推送。</li><li><strong>除权缺陷的发现</strong>：M2 第一次终审（2026-09-21）没有发现；另一次独立终审发现，在 M2 归档之后补修（f788cdf，2026-09-23）。跨交易日的状态变化（除权、顺延）是最容易漏测的地方。</li></ul>
+<h2 id="相关">相关</h2>
+<ul><li>代码：<code>src/aq/portfolio/position.py:100</code>（<code>apply_ex_rights</code>）、<code>src/aq/portfolio/position.py:123</code>（<code>cost_at</code>）、<code>src/aq/portfolio/account.py:42</code>、<code>src/aq/engine/backtest.py:190</code>（<code>_ex_rights</code>）、<code>src/aq/engine/broker_sim.py:145</code>（<code>match</code>）、<code>src/aq/components/util.py:66</code>（<code>high_since_open</code>）、<code>src/aq/report/metrics.py:105</code>（<code>realized_trades</code>）</li><li>测试：<code>tests/engine/test_broker_sim.py</code>、<code>tests/engine/test_ex_rights.py</code>、<code>tests/engine/test_performance.py</code>、<code>tests/components/test_data_access.py</code></li><li>设计方案：<code>docs/specs/2026-09-19-A股量化信号助手-设计方案.md</code> 第 7.3 节</li><li>OpenSpec：<code>m2-backtest</code>（归档于 <code>openspec/changes/archive/2026-09-22-m2-backtest</code>）；主规格 <code>portfolio-model</code>、<code>broker-sim</code>、<code>backtest-engine</code>、<code>strategy-components</code></li><li>提交：ffbe2c9（引擎与组件）、90b904e（取数静态检查）、49bf595（归档）、f788cdf（除权折算修复）、b349ac7（强平价折算、半分钱舍入、零股卖出）</li><li>笔记：<a class="kb-link" href="../note-a087d7/">A股免费数据源实测与数据层决策</a>（M1 数据层：数据源、涨跌停规则、复权与未来函数）、<a class="kb-link" href="../note-32c264/">A股回测引擎体检方法与查出的缺陷</a>（五项体检方法与查出的四处缺陷）</li></ul>
+</article>
+<footer class="note">
+<section><h2>被引用</h2><ul><li><a href="../note-a087d7/">A股免费数据源实测与数据层决策</a></li><li><a href="../note-32c264/">A股回测引擎体检方法与查出的缺陷</a></li></ul></section>
+<div class="back"><a href="../../index.html">← 全部文档和笔记</a><a href="../../graph/">知识图谱</a></div>
+<p class="stamp">这篇笔记由 dispatch 从个人知识库同步，更新于 2026-09-23。</p>
+</footer>
+</main>
+</body>
+</html>

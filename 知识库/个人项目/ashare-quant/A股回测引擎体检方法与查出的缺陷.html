@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A股回测引擎体检方法与查出的缺陷 · Lhanman 的知识库</title>
+<meta name="description" content="回测体检五法（独立记账、截断对照、已知答案、逐笔核对、成本敏感性）查出除权、强平、半分钱、零股四处缺陷">
+<link rel="index" href="../../index.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;800;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+:root{--ground:#F3F4F6;--paper:#FFFFFF;--ink:#161A21;--muted:#5B6372;--rule:#DADDE3;--chip:#E4E8F2;--chip-ink:#2E4893;--accent:#4865AA;--mark:#FDF2C7;
+--serif:"Noto Serif SC","Songti SC",serif;--sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;--mono:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root{--ground:#12151B;--paper:#1A1E26;--ink:#E5E8EE;--muted:#9AA2B1;--rule:#2C323D;--chip:#222B3D;--chip-ink:#AFC1EA;--accent:#95ABDB;--mark:#4A421F}}
+*{box-sizing:border-box}
+html{color-scheme:light dark}
+body{margin:0;background:var(--ground);color:var(--ink);font:15.5px/1.75 var(--sans);padding-inline:20px;padding-block:0 80px}
+a{color:var(--accent)}
+.eyebrow{font:600 11.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.chip{font:500 12px/1 var(--mono);padding:4px 8px;border-radius:3px;background:var(--chip);color:var(--chip-ink)}
+.kb-private{color:var(--muted);font-style:normal;opacity:.75}
+
+main{max-width:820px;margin:0 auto}
+.crumb{padding-block:28px 0;font:500 12.5px/1.6 var(--mono);color:var(--muted)}
+.crumb a{color:var(--muted);text-decoration:none}
+.crumb a:hover{color:var(--accent)}
+header.note{padding-block:14px 22px;border-bottom:1px solid var(--rule)}
+header.note h1{font:900 clamp(26px,4.4vw,38px)/1.25 var(--serif);margin:6px 0 10px;text-wrap:balance}
+header.note .summary{margin:0 0 14px;color:var(--muted)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font:500 12px/1.4 var(--mono);color:var(--muted)}
+.toc{margin:22px 0 0;padding:14px 16px;background:var(--paper);border:1px solid var(--rule);border-radius:8px}
+.toc p{margin:0 0 8px;font:600 11.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.toc li.l3{padding-left:16px;font-size:14px}
+.toc a{color:var(--ink);text-decoration:none}
+.toc a:hover{color:var(--accent)}
+article{padding-block:8px 24px}
+article h2{font:800 22px/1.4 var(--serif);margin:32px 0 10px;padding-top:6px;border-top:1px solid var(--rule)}
+article h3{font:700 17.5px/1.5 var(--sans);margin:22px 0 8px}
+article h4{font:700 15.5px/1.5 var(--sans);margin:18px 0 6px;color:var(--muted)}
+article p{margin:10px 0}
+article ul,article ol{margin:10px 0;padding-left:22px}
+article li{margin:4px 0}
+article li.task{list-style:none;margin-left:-18px}
+article blockquote{margin:14px 0;padding:2px 14px;border-left:3px solid var(--rule);color:var(--muted)}
+article code{font:13.5px/1.6 var(--mono);background:var(--chip);color:var(--chip-ink);padding:1px 5px;border-radius:3px}
+article pre{margin:14px 0;padding:14px 16px;background:var(--paper);border:1px solid var(--rule);border-radius:8px;overflow:auto}
+article pre code{background:none;color:var(--ink);padding:0;font-size:13px;line-height:1.7}
+article hr{border:0;border-top:1px solid var(--rule);margin:26px 0}
+article img{max-width:100%;border-radius:6px}
+.kb-table{overflow-x:auto;margin:14px 0}
+article table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--paper)}
+article th,article td{border:1px solid var(--rule);padding:7px 10px;text-align:left;vertical-align:top}
+article th{background:var(--chip);color:var(--chip-ink);font-weight:600;white-space:nowrap}
+footer.note{border-top:1px solid var(--rule);padding-top:20px;display:grid;gap:18px}
+footer.note section{display:grid;gap:6px}
+footer.note h2{font:600 11.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0}
+footer.note ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+footer.note a{text-decoration:none}
+footer.note a:hover{text-decoration:underline}
+.back{display:flex;flex-wrap:wrap;gap:14px;font:500 13px/1.6 var(--mono)}
+.stamp{color:var(--muted);font-size:12.5px;margin:0}
+@media (max-width:640px){article th{white-space:normal}}
+</style>
+</head>
+<body>
+<main>
+<nav class="crumb"><a href="../../index.html">Lhanman 的知识库</a> / <span>ashare-quant</span></nav>
+<header class="note">
+<span class="eyebrow">知识库笔记</span>
+<h1>A股回测引擎体检方法与查出的缺陷</h1>
+<p class="summary">回测体检五法（独立记账、截断对照、已知答案、逐笔核对、成本敏感性）查出除权、强平、半分钱、零股四处缺陷</p>
+<div class="meta"><span class="chip">踩坑</span><span>ashare-quant</span><span>更新于 2026-09-23</span><span class="chip">回测体检</span><span class="chip">broker_sim</span><span class="chip">除权除息</span><span class="chip">未来函数</span><span class="chip">四舍五入</span><span class="chip">申报数量</span></div>
+</header>
+<nav class="toc"><p>本篇目录</p><ol><li class="l2"><a href="#结论">结论</a></li><li class="l2"><a href="#现象">现象</a></li><li class="l2"><a href="#根因">根因</a></li><li class="l2"><a href="#解决">解决</a></li><li class="l2"><a href="#如何避免-五项体检">如何避免：五项体检</a></li><li class="l2"><a href="#相关">相关</a></li></ol></nav>
+<article>
+<h2 id="结论">结论</h2>
+<ul><li><strong>测试全过、账能自洽，不等于回测对</strong>。跨交易日的状态变化最容易漏测，比如除权、停牌、期末强制平仓。回测引擎改动之后，要在真实数据上做一次端到端体检。</li><li><strong>五项体检各管一类错</strong>：
+<ul><li>独立记账重放：账算得对不对；</li><li>截断对照：有没有未来函数；</li><li>已知答案考题加换源对照：规则和数据本身对不对；</li><li>逐笔成交核对：成交是否可行、流动性够不够；</li><li>成本敏感性：结论对成交假设的依赖有多大。</li></ul></li><li><strong>查出四处缺陷</strong>：
+<ul><li>除权日股数不折算：送转后净值腰斩，分红被记成亏损；</li><li>停牌期间除权后，强平价没有折算：这是修第一处时带出的回归，单日虚增 148%；</li><li>浮点数在&quot;半分钱&quot;时舍错，差 1 分钱；</li><li>部分卖出带零股：交易所不收这样的委托。</li></ul></li><li><strong>修复后全市场复查，四项全部归零</strong>。示例策略 momentum_swing 亏 99.84% 属实：零成本也亏 99.76%，成本只占亏损的约两成。</li><li><strong>验证脚本本身要先验证</strong>：先在已知有问题的结果上跑一遍，能原样查出已知问题，才说明它可信。</li></ul>
+<h2 id="现象">现象</h2>
+<ol><li><strong>除权记账</strong>：10 送 10 当天，总资产从 998,804 掉到 524,304，卖出只卖了应卖股数的一半。真实数据里，2018-04-17 300715 送转当天，账户单日假跌 13%（实际应为 −3.8%），此后几年净值一直被低估 10%～17%。</li><li><strong>停牌强平</strong>：300586 在停牌期间（2018-05-24）送转，复权因子 ×2.53。期末按 39.91 元 × 60,270 股平仓，正确价格应为 15.76 元，总资产在一个停牌日从 98.4 万跳到 243.6 万。本地数据里，停牌日发生除权的共 156 次，涉及 153 只股票。</li><li><strong>半分钱</strong>：全市场回测里 52 笔费用、18 笔成交价差 1 分。例如 45.00 × 1.001 算成 45.04，印花税 68.595 算成 68.59。</li><li><strong>零股</strong>：298 笔部分卖出（占全部卖出的 22.9%）带零股。例如持有 7700 股，分批止盈卖 2310 股。</li></ol>
+<h2 id="根因">根因</h2>
+<ol><li>估值用的是 as_of 当天的真实价，而持仓股数是真实股数，除权日从不调整。设计方案写了&quot;按复权因子记账&quot;，但引擎没有落地这一步；报告按股数先进先出配对，也没把除权算进去。</li><li>修第 1 处之后，停牌日也会按因子折算股数，但 <code>ContextQuotes.last_valid_close</code> 仍然返回停牌前的原始收盘价，平仓价和股数不在同一个口径上。修第 1 处之前，两边都没折算，结果碰巧是对的。</li><li>用二进制浮点数相乘再调内置 <code>round</code>。45.045 在电脑里存成 45.044999…，于是舍成了 45.04。</li><li>设计方案里&quot;卖出可以卖零股&quot;本意是让送转产生的零股能卖掉，实现时却变成了&quot;任意数量都能卖&quot;。交易所的规定是：余额不足一个申报单位的部分，只能一次性卖出。</li></ol>
+<h2 id="解决">解决</h2>
+<ol><li><p><code>Position.apply_ex_rights</code>、<code>Account.apply_ex_rights</code>：每个除权除息日开盘前，股数按因子倍数放大后向下取整，成本价按同一倍数摊薄，零头按当日昨收折成现金；前一日的挂单股数同倍放大。折算记录写入结果目录的 <code>adjustments.parquet</code>，报告配对买卖时也先按这些记录折算。提交 f788cdf。</p></li><li><p>强平价改为 <code>收盘价 × 那天的因子 ÷ 当日因子</code>。提交 b349ac7。</p></li><li><p>新增 <code>aq.portfolio.money</code>（<code>dec</code>、<code>cents</code>）：成交价、费用、成交金额、现金一律用十进制计算、四舍五入到分。提交 b349ac7。</p></li><li><p><code>_sell_lot</code>：</p>
+<ul><li>清仓时连零股一起卖；</li><li>部分卖出时，主板、创业板取整到 100 股，也可以连同全部零股一起卖；</li><li>科创板不少于 200 股，北交所不少于 100 股；余额不足起始数量时只能一次卖完；</li><li>取整后为 0 的订单记为 <code>rejected_lot</code>。</li></ul>
+<p>提交 b349ac7。</p></li></ol>
+<h2 id="如何避免-五项体检">如何避免：五项体检</h2>
+<ol><li><strong>独立记账重放</strong>：不 import 引擎代码，只用成交明细、除权记录和原始行情，逐日重建现金、持仓和总资产，再和回测的净值表逐日对比。2080 个交易日，最大误差 0.00 元。</li><li><strong>截断对照（未来函数）</strong>：同一个策略分别跑到 X 和跑完整区间，比较 X 之前的净值、成交、信号、持仓、除权五张表，必须逐行逐列一样（X 当天因为期末强平，本来就不同）。实测 X 取 2019-06-28 和 2022-12-30，4 万多行完全一致。再把比较范围扩到 X 当天，确认脚本确实能报出差异，证明比对不是空比。同参数跑两次，结果逐字节一致。</li><li><strong>已知答案考题</strong>：
+<ul><li>买入持有，逐项和手算对照：600519（13 次分红）、002594（2025-07-29 因子 ×3.04）、600335（停牌 124 天，其间除息）全部一分不差；</li><li>空股票池、信号永不触发：净值全程等于初始资金；</li><li>寒武纪 688256：2020-07-21 按 208.21 元买入 4703 股，2026-05-08 转增 ×1.4912 后变为 7013 股，2026-09-22 按 1121 元卖出，期末 7,876,291.96 元（+687.6%），12 项和手算全部一致；</li><li>朴素复权涨幅 +702.9%，和回测结果的差额来自 2% 的剩余现金和费用；</li><li>另从新浪下载寒武纪日线，和本地 Baostock 数据对照：1501 天开高低收、成交量逐日相同。</li></ul></li><li><strong>逐笔成交核对</strong>：核对每笔成交是否发生在停牌日、开盘涨停时有没有买、开盘跌停时有没有卖、是否违反 T+1、股数是否符合申报单位、是否在信号的次日成交，以及成交价是否等于&quot;开盘价 ± 滑点&quot;。流动性：成交股数占当日成交量，中位数 0.0016%，最大 0.25%。集合竞价的成交量本地没有数据，这一点核对不了。</li><li><strong>成本敏感性</strong>：零成本、滑点 0.1%、0.3%、0.5% 各跑一次，结果分别是 −99.76%、−99.84%、−99.86%、−99.86%。滑点有两处设置：引擎配置里的滑点决定成交价，Sizer 参数里的滑点只用来估算股数。</li></ol>
+<ul><li><strong>其他发现</strong>：全市场回测的内存峰值为 3.4～4.3 GB，部署到 Mac mini 时要留意。</li><li><strong>回归测试</strong>：<code>tests/engine/test_ex_rights.py</code>、<code>tests/engine/test_broker_sim.py</code> 里带&quot;体检发现&quot;注释的用例。</li></ul>
+<h2 id="相关">相关</h2>
+<ul><li><p>验证脚本（在 <code>data/audit/</code>，不进 git）：</p>
+<ul><li><code>known-answer/buy_hold.py</code>：买入持有 + 独立手算；加 <code>--nothing</code> 跑&quot;什么都不做&quot;；</li><li><code>cambricon/verify.py</code>：寒武纪三重验证，包括新浪换源对照；</li><li><code>after-fix/recheck.py</code>：逐笔核对费用、成交价、零股，以及现金对账。</li></ul>
+<p>截断对照和完整记账重放的脚本当时放在临时目录，没有保留。</p></li><li><p>代码：<code>src/aq/engine/broker_sim.py</code>（<code>_sell_lot</code>、<code>ContextQuotes.last_valid_close</code>）、<code>src/aq/portfolio/money.py</code>、<code>src/aq/portfolio/position.py</code>（<code>apply_ex_rights</code>）、<code>src/aq/engine/backtest.py</code>（<code>_ex_rights</code>）、<code>src/aq/report/metrics.py</code>（<code>realized_trades</code>）</p></li><li><p>规格：<code>openspec/specs/broker-sim</code>、<code>portfolio-model</code>、<code>backtest-engine</code>、<code>backtest-report</code>；设计方案第 7.2、7.3 节</p></li><li><p>提交：f788cdf（除权记账）、b349ac7（强平价、半分钱、零股）</p></li><li><p>相关笔记：<a class="kb-link" href="../note-f6c1c4/">自研A股日线回测引擎的几个关键口径</a>、<a class="kb-link" href="../note-a087d7/">A股免费数据源实测与数据层决策</a></p></li></ul>
+</article>
+<footer class="note">
+<section><h2>被引用</h2><ul><li><a href="../note-f6c1c4/">自研A股日线回测引擎的几个关键口径</a></li></ul></section>
+<div class="back"><a href="../../index.html">← 全部文档和笔记</a><a href="../../graph/">知识图谱</a></div>
+<p class="stamp">这篇笔记由 dispatch 从个人知识库同步，更新于 2026-09-23。</p>
+</footer>
+</main>
+</body>
+</html>

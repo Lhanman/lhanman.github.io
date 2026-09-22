@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A股免费数据源实测与数据层决策 · Lhanman 的知识库</title>
+<meta name="description" content="A股日线免费源实测：东财封IP弃用，Baostock主新浪备，北交所靠新浪，涨跌停自算，复权以as_of为基准">
+<link rel="index" href="../../index.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;800;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+:root{--ground:#F3F4F6;--paper:#FFFFFF;--ink:#161A21;--muted:#5B6372;--rule:#DADDE3;--chip:#E4E8F2;--chip-ink:#2E4893;--accent:#4865AA;--mark:#FDF2C7;
+--serif:"Noto Serif SC","Songti SC",serif;--sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;--mono:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root{--ground:#12151B;--paper:#1A1E26;--ink:#E5E8EE;--muted:#9AA2B1;--rule:#2C323D;--chip:#222B3D;--chip-ink:#AFC1EA;--accent:#95ABDB;--mark:#4A421F}}
+*{box-sizing:border-box}
+html{color-scheme:light dark}
+body{margin:0;background:var(--ground);color:var(--ink);font:15.5px/1.75 var(--sans);padding-inline:20px;padding-block:0 80px}
+a{color:var(--accent)}
+.eyebrow{font:600 11.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.chip{font:500 12px/1 var(--mono);padding:4px 8px;border-radius:3px;background:var(--chip);color:var(--chip-ink)}
+.kb-private{color:var(--muted);font-style:normal;opacity:.75}
+
+main{max-width:820px;margin:0 auto}
+.crumb{padding-block:28px 0;font:500 12.5px/1.6 var(--mono);color:var(--muted)}
+.crumb a{color:var(--muted);text-decoration:none}
+.crumb a:hover{color:var(--accent)}
+header.note{padding-block:14px 22px;border-bottom:1px solid var(--rule)}
+header.note h1{font:900 clamp(26px,4.4vw,38px)/1.25 var(--serif);margin:6px 0 10px;text-wrap:balance}
+header.note .summary{margin:0 0 14px;color:var(--muted)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font:500 12px/1.4 var(--mono);color:var(--muted)}
+.toc{margin:22px 0 0;padding:14px 16px;background:var(--paper);border:1px solid var(--rule);border-radius:8px}
+.toc p{margin:0 0 8px;font:600 11.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.toc li.l3{padding-left:16px;font-size:14px}
+.toc a{color:var(--ink);text-decoration:none}
+.toc a:hover{color:var(--accent)}
+article{padding-block:8px 24px}
+article h2{font:800 22px/1.4 var(--serif);margin:32px 0 10px;padding-top:6px;border-top:1px solid var(--rule)}
+article h3{font:700 17.5px/1.5 var(--sans);margin:22px 0 8px}
+article h4{font:700 15.5px/1.5 var(--sans);margin:18px 0 6px;color:var(--muted)}
+article p{margin:10px 0}
+article ul,article ol{margin:10px 0;padding-left:22px}
+article li{margin:4px 0}
+article li.task{list-style:none;margin-left:-18px}
+article blockquote{margin:14px 0;padding:2px 14px;border-left:3px solid var(--rule);color:var(--muted)}
+article code{font:13.5px/1.6 var(--mono);background:var(--chip);color:var(--chip-ink);padding:1px 5px;border-radius:3px}
+article pre{margin:14px 0;padding:14px 16px;background:var(--paper);border:1px solid var(--rule);border-radius:8px;overflow:auto}
+article pre code{background:none;color:var(--ink);padding:0;font-size:13px;line-height:1.7}
+article hr{border:0;border-top:1px solid var(--rule);margin:26px 0}
+article img{max-width:100%;border-radius:6px}
+.kb-table{overflow-x:auto;margin:14px 0}
+article table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--paper)}
+article th,article td{border:1px solid var(--rule);padding:7px 10px;text-align:left;vertical-align:top}
+article th{background:var(--chip);color:var(--chip-ink);font-weight:600;white-space:nowrap}
+footer.note{border-top:1px solid var(--rule);padding-top:20px;display:grid;gap:18px}
+footer.note section{display:grid;gap:6px}
+footer.note h2{font:600 11.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0}
+footer.note ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+footer.note a{text-decoration:none}
+footer.note a:hover{text-decoration:underline}
+.back{display:flex;flex-wrap:wrap;gap:14px;font:500 13px/1.6 var(--mono)}
+.stamp{color:var(--muted);font-size:12.5px;margin:0}
+@media (max-width:640px){article th{white-space:normal}}
+</style>
+</head>
+<body>
+<main>
+<nav class="crumb"><a href="../../index.html">Lhanman 的知识库</a> / <span>ashare-quant</span></nav>
+<header class="note">
+<span class="eyebrow">知识库笔记</span>
+<h1>A股免费数据源实测与数据层决策</h1>
+<p class="summary">A股日线免费源实测：东财封IP弃用，Baostock主新浪备，北交所靠新浪，涨跌停自算，复权以as_of为基准</p>
+<div class="meta"><span class="chip">方案</span><span>ashare-quant</span><span>更新于 2026-09-23</span><span class="chip">Baostock</span><span class="chip">AKShare</span><span class="chip">新浪快照</span><span class="chip">涨跌停价</span><span class="chip">复权因子</span><span class="chip">未来函数</span></div>
+</header>
+<nav class="toc"><p>本篇目录</p><ol><li class="l2"><a href="#结论">结论</a></li><li class="l2"><a href="#背景">背景</a></li><li class="l2"><a href="#方案">方案</a></li><li class="l3"><a href="#数据源分工">数据源分工</a></li><li class="l3"><a href="#各源实测要点">各源实测要点</a></li><li class="l3"><a href="#涨跌停规则">涨跌停规则</a></li><li class="l3"><a href="#复权与未来函数">复权与未来函数</a></li><li class="l3"><a href="#缺数三层兜底">缺数三层兜底</a></li><li class="l3"><a href="#实测规模-2026-09-20-首次回填">实测规模（2026-09-20 首次回填）</a></li><li class="l2"><a href="#决策记录">决策记录</a></li><li class="l2"><a href="#相关">相关</a></li></ol></nav>
+<article>
+<h2 id="结论">结论</h2>
+<ul><li><strong>弃用两个源</strong>：东财接口（AKShare 的 <code>_em</code> 系列）从家用 IP 请求约 8 次就被封 IP，45 分钟以上都没恢复；通达信协议（pytdx、mootdx）从 2026-09 起行情类请求全部返回空。</li><li><strong>沪深以 Baostock 为主</strong>：
+<ul><li>每天都有 <code>preclose</code>、<code>tradestatus</code>、<code>isST</code>，停牌日有行，已退市股票也能拉到；</li><li><code>query_daily_history_k_AStock(日期)</code> 一次请求拉全市场，约 1 分钟；</li><li>缺点：全量逐只回填 5807 只要 7 小时 46 分；当日数据约 17:30 以后才有；不含北交所。</li></ul></li><li><strong>北交所和兜底靠新浪</strong>：
+<ul><li>个股日线用 920 新代码能拿到全部历史和后复权因子；</li><li>全市场快照和 Baostock 逐只对比完全一致，但拉一次 IP 就被封 5–60 分钟，只能一天拉一次。</li></ul></li><li><strong>历史涨跌停价没有免费来源</strong>：按&quot;板块 × ST × 日期段&quot;自己算；主板 ST 从 2026-07-06 起由 5% 改为 10%；北交所取整方向和沪深不同；规则覆盖不到的 124 个特殊日子进例外清单。</li><li><strong>复权与未来函数</strong>：价格存&quot;不复权价 + 后复权累计因子&quot;，取数时以 as_of 为基准换算，用截断等价测试证明没有未来函数。付费升级首选 Tushare Pro：2000 积分，一年 200 元。</li></ul>
+<h2 id="背景">背景</h2>
+<p>ashare-quant 是跑在 Mac mini 上的 A 股中短线信号助手，人工下单。M1 数据层的要求：</p>
+<ul><li>沪深京全市场日线，从 2018-01-01 开始，每天增量更新；</li><li>只用免费数据源，无人值守运行；</li><li>回测、收盘批处理、盘中监控三个引擎共用一份本地数据。</li></ul>
+<h2 id="方案">方案</h2>
+<h3 id="数据源分工">数据源分工</h3>
+<div class="kb-table"><table><thead><tr><th>用途</th><th>沪深</th><th>北交所</th><th>指数</th></tr></thead><tbody><tr><td>历史回填</td><td>Baostock 逐只拉</td><td>新浪个股日线 <code>stock_zh_a_daily</code> 逐只拉</td><td>Baostock；北证50 用中证指数官网</td></tr><tr><td>每日增量</td><td>Baostock 按日期拉全市场</td><td>新浪快照；失败时用新浪个股日线逐只补</td><td>同上</td></tr><tr><td>备用与比对</td><td>新浪快照（一天一次）</td><td>—</td><td>—</td></tr><tr><td>复权因子</td><td>回填用 <code>backAdjustFactor</code>（不用 <code>adjustFactor</code>，有异常值）</td><td>回填用新浪 <code>hfq-factor</code></td><td>—</td></tr><tr><td>行业</td><td>Baostock 证监会口径</td><td>巨潮证监会 2012 口径</td><td>—</td></tr><tr><td>股票列表</td><td>Baostock <code>query_stock_basic</code>（含退市日期）</td><td>北交所官网 <code>stock_info_bj_name_code</code></td><td>—</td></tr></tbody></table></div>
+<ul><li><strong>沪深按天整体切换数据源</strong>，不按股票混用。</li><li><strong>每行记录 <code>source</code></strong>，覆盖优先级从高到低：<code>manual</code> &gt; <code>baostock</code>、<code>sina_daily</code>、<code>csindex</code> &gt; <code>sina_snapshot</code> &gt; <code>filled</code>。</li><li><strong>两个源的后复权因子绝对值不同</strong>（600519：新浪 8.88，Baostock 7.67）。同一只股票只用一个源的因子，取数时只用比值，所以互不影响。</li></ul>
+<h3 id="各源实测要点">各源实测要点</h3>
+<ul><li><strong>单位不统一，入库时统一成股和元</strong>：东财的成交量是手；新浪和 Baostock 是股；腾讯深市 000 开头的是手、其余是股；中证指数的成交额是亿元。</li><li><strong>Baostock 的坑</strong>：
+<ul><li>退市当天有时会给一行全部为空的占位行，要丢掉；</li><li>复权因子的记录日期有时比真正的除权日晚几天，偶尔还会在没有除权的日子跳一下，要按数据里的除权日对齐；</li><li>按日期拉取时，非交易日返回 0 行；返回行数不到在市股票数的 90% 时，当作还没发布完；</li><li>匿名会话是共享的，别的进程 <code>logout()</code> 会把正在跑的会话一起登出；</li><li>行业只写&quot;证监会行业分类&quot;，看不出是 2012 版还是 2024 协会版。</li></ul></li><li><strong>新浪快照的坑</strong>：
+<ul><li>没有日期字段，要按交易日历推算；</li><li>深市停牌股的最新价显示为 0.00，要用昨收代替；</li><li>不含 CDR（689 开头）；</li><li>同一字段有时给字符串、有时给数值，原始文件只能按文本存；</li><li>限流时返回 HTTP 456，只封快照这一个域名。</li></ul></li><li><strong>新浪个股日线</strong>：没有昨收，停牌日也没有行。北交所的昨收按&quot;前收盘价 × 前一日因子 ÷ 当日因子&quot;推出，停牌行按交易日历补。</li><li><strong>北交所历史 ST 状态</strong>：拿不到带日期的来源，存空值、按非 ST 处理；此后每天按快照里的名称前缀记录。</li><li><strong>巨潮</strong>：会偶发 HTTP 500。取不到时，用北交所官网列表里的行业名称，加上 Baostock 的&quot;代码 + 名称&quot;对照表补出代码。</li></ul>
+<h3 id="涨跌停规则">涨跌停规则</h3>
+<div class="kb-table"><table><thead><tr><th>板块</th><th>日期段</th><th>普通股</th><th>ST</th></tr></thead><tbody><tr><td>沪深主板</td><td>2026-07-06 之前 / 起</td><td>10%</td><td>5% / 10%</td></tr><tr><td>创业板</td><td>2020-08-24 之前 / 起</td><td>10% / 20%</td><td>5%（实际没有 ST）/ 20%</td></tr><tr><td>科创板</td><td>全部</td><td>20%</td><td>20%</td></tr><tr><td>北交所</td><td>全部</td><td>30%</td><td>30%</td></tr></tbody></table></div>
+<ul><li><strong>公式与取整</strong>：涨跌停价 = 昨收 × (1 ± 比例)，用十进制算术。沪深四舍五入，447 个涨跌停日实测全部吻合；北交所涨停向下取、跌停向上取，493 个涨停日和 4 个跌停日实测全部吻合。</li><li><strong>新股</strong>：
+<ul><li>注册制新股上市前 5 日不设限（主板 2023-04-10 起，创业板 2020-08-24 起，科创板全部）；</li><li>北交所首日不设限；</li><li>注册制之前的主板、创业板新股，首日按发行价 +44% / −36% 计算。</li></ul></li><li><strong>例外清单（124 个日子）</strong>：退市整理期首日 101 个、恢复上市或重组上市首日 8 个、长期停牌复牌后昨收异常 8 个、退市整理期昨收不连续 4 个、换股合并 3 个。</li></ul>
+<h3 id="复权与未来函数">复权与未来函数</h3>
+<ul><li><code>Context.bars()</code> 的价格换算：<code>价格 × 当日因子 ÷ as_of 当天因子</code>，所以 as_of 当天的复权价等于真实价；成交量反向换算，送转前后才可比。</li><li>不用&quot;最新因子前复权&quot;：as_of 之后的分红送转会改写历史价格的绝对值，是一种隐蔽的未来函数。</li><li>增量写入时自己推导因子：<code>f(t) = f(t−1) × close(t−1) ÷ preclose(t)</code>，不依赖 18:00 才入库的官方因子。</li><li><strong>截断等价测试</strong>：<code>Context</code> 的全部方法在&quot;完整数据&quot;和&quot;截断到 as_of 的数据&quot;上返回值必须完全相同。终审用了 8 个刁钻的 as_of（除权当天、停牌中、退市当天、上市前）× 5 个方法做全量比较。</li><li><code>meta()</code> 不返回股票名称：当前名称可能带着 as_of 之后才加上的 <code>*ST</code>。行业只存当前分类，这是已知的近似。</li></ul>
+<h3 id="缺数三层兜底">缺数三层兜底</h3>
+<ol><li><strong>主源超时重试</strong>：失败的单独记下来，事后重拉。</li><li><strong>备用源</strong>：Baostock 某天故障时，用当天的快照生成沪深数据，<code>source</code> 记为 <code>sina_snapshot</code>；主源恢复后重拉，覆盖掉快照的数据。</li><li><strong>人工修正</strong>：<code>data/overrides/*.csv</code> 里的修正优先级最高，但只在文件里还有这条记录时生效；删掉后重拉，就还原为数据源的原始值。</li></ol>
+<h3 id="实测规模-2026-09-20-首次回填">实测规模（2026-09-20 首次回填）</h3>
+<ul><li><strong>日线</strong>：977 万行，其中 Baostock 952 万、新浪 26 万、补出来的停牌行 146 行；另有指数日线 1.4 万行；磁盘占用 248 MB；全量校验 10 秒，0 个 error。</li><li><strong>股票数</strong>：主板 3395 只（已退市 199）、创业板 1447 只（已退市 40）、科创板 621 只（已退市 3）、北交所 344 只。</li></ul>
+<h2 id="决策记录">决策记录</h2>
+<ul><li><strong>主备调换</strong>：原设计以 AKShare 为主，因为东财封 IP 改成以 Baostock 为主。Tushare 需要付费，暂不采用。</li><li><strong>收北交所</strong>：接受历史 ST 状态未知、系统上线前摘牌的北交所股票拿不到。</li><li><strong>收已退市股</strong>：沪深 2018 年以来的 242 只退市股都在，幸存者偏差比原来估计的小。</li><li><strong>收盘批处理改到 18:00</strong>：Baostock 大约 17:30 才入库，所以 18:00 开始跑；到 20:30 还没数据，就用快照兜底。</li><li><strong>不用通达信，也不做浏览器抓取</strong>：前者是非官方协议、已经失效；后者慢、容易坏，还绕不开封 IP。</li><li><strong>存储</strong>：行情用 Parquet 按年分区，增量写入时整年重写、原子替换；DuckDB 只存运行记录。股票代码统一用 6 位纯数字。</li></ul>
+<h2 id="相关">相关</h2>
+<ul><li>规格与实测记录：<code>openspec/changes/archive/2026-09-22-m1-data-layer/</code>（design.md 的&quot;实现中的其他发现&quot;&quot;首次全量回填实测&quot;两节）</li><li>主规格：<code>openspec/specs/market-data-sources</code>、<code>market-data-store</code>、<code>limit-price-rules</code>、<code>data-update</code>、<code>data-context</code>、<code>data-validation</code>、<code>data-cli</code></li><li>代码：<code>src/aq/data/sources/</code>、<code>src/aq/data/limits.py</code>、<code>src/aq/data/limit_exceptions.csv</code>、<code>src/aq/data/update.py</code>、<code>src/aq/data/market_data.py</code>、<code>src/aq/checks/data_checks.py</code></li><li>提交：02acc44（规格）、b65a1fe…e885c59（实现）、680aaf5（验收）、b2bd806、1acd7d8（修复）、a715a83（归档）</li><li>设计方案：<code>docs/specs/2026-09-19-A股量化信号助手-设计方案.md</code> 第 6 节</li><li>相关笔记：<a class="kb-link" href="../note-f6c1c4/">自研A股日线回测引擎的几个关键口径</a></li></ul>
+</article>
+<footer class="note">
+<section><h2>被引用</h2><ul><li><a href="../note-f6c1c4/">自研A股日线回测引擎的几个关键口径</a></li><li><a href="../note-32c264/">A股回测引擎体检方法与查出的缺陷</a></li></ul></section><section><h2>相关笔记</h2><ul><li><a href="../note-32c264/">A股回测引擎体检方法与查出的缺陷</a><span class="stamp"> · 回测体检、broker_sim、除权除息</span></li></ul></section>
+<div class="back"><a href="../../index.html">← 全部文档和笔记</a><a href="../../graph/">知识图谱</a></div>
+<p class="stamp">这篇笔记由 dispatch 从个人知识库同步，更新于 2026-09-23。</p>
+</footer>
+</main>
+</body>
+</html>

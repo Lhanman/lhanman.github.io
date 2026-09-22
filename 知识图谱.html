@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>知识图谱 · Lhanman 的知识库</title>
+<meta name="description" content="10 篇公开笔记之间的链接和共同标签">
+<link rel="index" href="../index.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;800;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+:root{--ground:#F3F4F6;--paper:#FFFFFF;--ink:#161A21;--muted:#5B6372;--rule:#DADDE3;--chip:#E4E8F2;--chip-ink:#2E4893;--accent:#4865AA;--mark:#FDF2C7;
+--serif:"Noto Serif SC","Songti SC",serif;--sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;--mono:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root{--ground:#12151B;--paper:#1A1E26;--ink:#E5E8EE;--muted:#9AA2B1;--rule:#2C323D;--chip:#222B3D;--chip-ink:#AFC1EA;--accent:#95ABDB;--mark:#4A421F}}
+*{box-sizing:border-box}
+html{color-scheme:light dark}
+body{margin:0;background:var(--ground);color:var(--ink);font:15.5px/1.75 var(--sans);padding-inline:20px;padding-block:0 80px}
+a{color:var(--accent)}
+.eyebrow{font:600 11.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.chip{font:500 12px/1 var(--mono);padding:4px 8px;border-radius:3px;background:var(--chip);color:var(--chip-ink)}
+.kb-private{color:var(--muted);font-style:normal;opacity:.75}
+
+main{max-width:1080px;margin:0 auto}
+header.graph{padding-block:40px 18px}
+header.graph h1{font:900 clamp(26px,4.4vw,38px)/1.2 var(--serif);margin:10px 0 8px}
+header.graph p{margin:0;color:var(--muted)}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:18px 0 10px}
+#q{flex:1 1 220px;font:15px var(--sans);padding:9px 12px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);color:var(--ink)}
+.bar label{font:500 12.5px/1 var(--mono);color:var(--muted);display:flex;gap:6px;align-items:center}
+#stage{position:relative;height:min(68vh,620px);background:var(--paper);border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+#stage svg{width:100%;height:100%;display:block;touch-action:none}
+.node circle,.node rect{stroke:var(--paper);stroke-width:1.5}
+.node text{font:12px var(--sans);fill:var(--ink);pointer-events:none}
+.node.tag text{fill:var(--muted);font-family:var(--mono);font-size:11px}
+.node.project text{font-weight:700}
+.node{cursor:pointer}
+.edge{stroke:var(--rule)}
+.edge.tag{stroke-dasharray:3 3}
+.edge.project{stroke-dasharray:1 4}
+.dim{opacity:.12}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 0;font:500 12px/1.4 var(--mono);color:var(--muted)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:baseline}
+.fallback{margin-top:26px}
+.fallback h2{font:700 16px/1.5 var(--sans);margin:18px 0 6px}
+.fallback ul{margin:0;padding-left:20px}
+.back{margin-top:26px;font:500 13px/1.6 var(--mono)}
+</style>
+</head>
+<body>
+<main>
+<header class="graph">
+<span class="eyebrow">知识图谱 · 10 篇笔记</span>
+<h1>笔记之间的关系</h1>
+<p>实线是笔记之间的链接，虚线连到共同的标签和所属项目。点笔记进入正文，点标签或项目只看它的邻居。</p>
+</header>
+<div class="bar" id="bar">
+<input id="q" type="search" placeholder="高亮标题、标签或项目" aria-label="在图谱里搜索">
+<label><input type="checkbox" id="tags" checked> 标签节点</label>
+<label><input type="checkbox" id="projects" checked> 项目节点</label>
+</div>
+<div id="stage"></div>
+<div class="legend" id="legend"></div>
+<div class="fallback" id="fallback">
+<p>图谱需要 JavaScript。下面按共同标签列出同样的关系：</p>
+<h2>博客</h2><ul><li><a href="../kb/note-2ecc84/">后端架构</a></li><li><a href="../kb/note-205fd1/">前端架构</a></li><li><a href="../kb/note-cbd676/">开发指南</a></li><li><a href="../kb/note-26818f/">数据库设计</a></li><li><a href="../kb/note-08a4b6/">部署指南</a></li></ul><h2>ashare-quant</h2><ul><li><a href="../kb/note-f6c1c4/">自研A股日线回测引擎的几个关键口径</a></li><li><a href="../kb/note-a087d7/">A股免费数据源实测与数据层决策</a></li><li><a href="../kb/note-32c264/">A股回测引擎体检方法与查出的缺陷</a></li></ul><h2>#broker_sim</h2><ul><li><a href="../kb/note-f6c1c4/">自研A股日线回测引擎的几个关键口径</a></li><li><a href="../kb/note-32c264/">A股回测引擎体检方法与查出的缺陷</a></li></ul><h2>#未来函数</h2><ul><li><a href="../kb/note-a087d7/">A股免费数据源实测与数据层决策</a></li><li><a href="../kb/note-32c264/">A股回测引擎体检方法与查出的缺陷</a></li></ul><h2>#除权除息</h2><ul><li><a href="../kb/note-f6c1c4/">自研A股日线回测引擎的几个关键口径</a></li><li><a href="../kb/note-32c264/">A股回测引擎体检方法与查出的缺陷</a></li></ul>
+</div>
+<p class="back"><a href="../index.html">← 全部文档和笔记</a></p>
+</main>
+<script id="graph-data" type="application/json">{"nodes": [{"id": "note-f6c1c4", "kind": "note", "title": "自研A股日线回测引擎的几个关键口径", "project": "ashare-quant", "type": "方案", "url": "../kb/note-f6c1c4/", "tags": ["除权除息", "broker_sim"]}, {"id": "note-a087d7", "kind": "note", "title": "A股免费数据源实测与数据层决策", "project": "ashare-quant", "type": "方案", "url": "../kb/note-a087d7/", "tags": ["未来函数"]}, {"id": "note-32c264", "kind": "note", "title": "A股回测引擎体检方法与查出的缺陷", "project": "ashare-quant", "type": "踩坑", "url": "../kb/note-32c264/", "tags": ["broker_sim", "除权除息", "未来函数"]}, {"id": "note-2ecc84", "kind": "note", "title": "后端架构", "project": "博客", "type": "", "url": "../kb/note-2ecc84/", "tags": []}, {"id": "note-205fd1", "kind": "note", "title": "前端架构", "project": "博客", "type": "", "url": "../kb/note-205fd1/", "tags": []}, {"id": "dispatch", "kind": "note", "title": "dispatch 分级调度使用速查", "project": "claude-dispatch", "type": "指南", "url": "../kb/dispatch/", "tags": []}, {"id": "markdown", "kind": "note", "title": "Markdown 语法总结", "project": "技术笔记", "type": "", "url": "../kb/markdown/", "tags": []}, {"id": "note-cbd676", "kind": "note", "title": "开发指南", "project": "博客", "type": "", "url": "../kb/note-cbd676/", "tags": []}, {"id": "note-26818f", "kind": "note", "title": "数据库设计", "project": "博客", "type": "", "url": "../kb/note-26818f/", "tags": []}, {"id": "note-08a4b6", "kind": "note", "title": "部署指南", "project": "博客", "type": "", "url": "../kb/note-08a4b6/", "tags": []}, {"id": "tag:broker_sim", "kind": "tag", "title": "broker_sim"}, {"id": "tag:未来函数", "kind": "tag", "title": "未来函数"}, {"id": "tag:除权除息", "kind": "tag", "title": "除权除息"}, {"id": "project:ashare-quant", "kind": "project", "title": "ashare-quant", "project": "ashare-quant"}, {"id": "project:博客", "kind": "project", "title": "博客", "project": "博客"}], "edges": [{"source": "note-f6c1c4", "target": "note-32c264", "kind": "link"}, {"source": "note-f6c1c4", "target": "note-a087d7", "kind": "link"}, {"source": "note-f6c1c4", "target": "tag:broker_sim", "kind": "tag"}, {"source": "note-f6c1c4", "target": "tag:除权除息", "kind": "tag"}, {"source": "note-f6c1c4", "target": "project:ashare-quant", "kind": "project"}, {"source": "note-a087d7", "target": "note-f6c1c4", "kind": "link"}, {"source": "note-a087d7", "target": "tag:未来函数", "kind": "tag"}, {"source": "note-a087d7", "target": "project:ashare-quant", "kind": "project"}, {"source": "note-32c264", "target": "note-a087d7", "kind": "link"}, {"source": "note-32c264", "target": "note-f6c1c4", "kind": "link"}, {"source": "note-32c264", "target": "tag:broker_sim", "kind": "tag"}, {"source": "note-32c264", "target": "tag:未来函数", "kind": "tag"}, {"source": "note-32c264", "target": "tag:除权除息", "kind": "tag"}, {"source": "note-32c264", "target": "project:ashare-quant", "kind": "project"}, {"source": "note-2ecc84", "target": "project:博客", "kind": "project"}, {"source": "note-205fd1", "target": "project:博客", "kind": "project"}, {"source": "note-cbd676", "target": "project:博客", "kind": "project"}, {"source": "note-26818f", "target": "project:博客", "kind": "project"}, {"source": "note-08a4b6", "target": "project:博客", "kind": "project"}]}</script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" crossorigin="anonymous"></script>
+<script>
+const DATA=JSON.parse(document.getElementById('graph-data').textContent);
+const stage=document.getElementById('stage'),fallback=document.getElementById('fallback');
+if(!window.d3||!DATA.nodes.length){stage.hidden=true;document.getElementById('bar').hidden=true;}
+else{
+fallback.hidden=true;
+const palette=['#4865AA','#2E8B7A','#A8603D','#7A4FA3','#3E7CB1','#8A6D1F','#B0526B','#4F7A28'];
+const projects=[...new Set(DATA.nodes.filter(n=>n.kind==='note').map(n=>n.project||'其他'))];
+const color=p=>palette[projects.indexOf(p||'其他')%palette.length];
+const legend=document.getElementById('legend');
+legend.innerHTML=projects.map(p=>`<span><i style="background:${color(p)}"></i>${p}</span>`).join('')+'<span><i style="background:#9AA2B1"></i>标签</span>';
+const nodes=DATA.nodes.map(n=>({...n})),index=new Map(nodes.map(n=>[n.id,n]));
+const links=DATA.edges.filter(e=>index.has(e.source)&&index.has(e.target)).map(e=>({...e}));
+const degree=new Map();for(const l of links){degree.set(l.source,(degree.get(l.source)||0)+1);degree.set(l.target,(degree.get(l.target)||0)+1);}
+const radius=n=>n.kind==='tag'?4.5:n.kind==='project'?8:5+Math.min(7,(degree.get(n.id)||0)*1.4);
+const svg=d3.select('#stage').append('svg'),root=svg.append('g');
+const box=()=>[stage.clientWidth,stage.clientHeight];
+const [w0,h0]=box();
+const edge=root.append('g').selectAll('line').data(links).join('line').attr('class',d=>'edge '+d.kind).attr('stroke-width',d=>d.kind==='link'?1.6:1);
+const node=root.append('g').selectAll('g').data(nodes).join('g').attr('class',d=>'node '+d.kind);
+node.each(function(d){const g=d3.select(this);
+  if(d.kind==='tag'){g.append('rect').attr('width',9).attr('height',9).attr('x',-4.5).attr('y',-4.5).attr('transform','rotate(45)').attr('fill','#9AA2B1');}
+  else if(d.kind==='project'){g.append('rect').attr('width',15).attr('height',15).attr('x',-7.5).attr('y',-7.5).attr('rx',3).attr('fill',color(d.project));}
+  else{g.append('circle').attr('r',radius(d)).attr('fill',color(d.project));}
+  g.append('text').attr('x',radius(d)+5).attr('dy','0.34em').text(d.kind==='tag'?'#'+d.title:d.title);});
+node.append('title').text(d=>d.kind==='tag'?`标签：${d.title}`:d.kind==='project'?`项目：${d.title}`:`${d.title}${d.type?' · '+d.type:''}`);
+node.on('click',(ev,d)=>{if(d.kind==='note'){location.href=d.url;}else{highlight(d.id);}});
+const sim=d3.forceSimulation(nodes)
+  .force('link',d3.forceLink(links).id(d=>d.id).distance(d=>d.kind==='link'?95:d.kind==='project'?110:70).strength(d=>d.kind==='link'?0.7:0.35))
+  .force('charge',d3.forceManyBody().strength(-260))
+  .force('center',d3.forceCenter(w0/2,h0/2))
+  .force('collide',d3.forceCollide().radius(d=>radius(d)+16))
+  .on('tick',()=>{edge.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+    node.attr('transform',d=>`translate(${d.x},${d.y})`);});
+svg.call(d3.zoom().scaleExtent([0.3,3]).on('zoom',ev=>{root.attr('transform',ev.transform);
+  node.selectAll('text').attr('display',ev.transform.k<0.6&&nodes.length>40?'none':null);}));
+node.call(d3.drag().on('start',(ev,d)=>{if(!ev.active)sim.alphaTarget(0.25).restart();d.fx=d.x;d.fy=d.y;})
+  .on('drag',(ev,d)=>{d.fx=ev.x;d.fy=ev.y;}).on('end',(ev,d)=>{if(!ev.active)sim.alphaTarget(0);d.fx=null;d.fy=null;}));
+function neighbours(id){const keep=new Set([id]);for(const l of links){const s=l.source.id||l.source,t=l.target.id||l.target;
+  if(s===id)keep.add(t);if(t===id)keep.add(s);}return keep;}
+function highlight(id){const keep=id?neighbours(id):null;
+  node.classed('dim',d=>keep?!keep.has(d.id):false);
+  edge.classed('dim',d=>{const s=d.source.id||d.source,t=d.target.id||d.target;return keep?!(keep.has(s)&&keep.has(t)):false;});}
+const q=document.getElementById('q');
+q.addEventListener('input',()=>{const s=q.value.trim().toLowerCase();
+  if(!s){highlight(null);return;}
+  const hit=new Set(nodes.filter(n=>(n.title+' '+(n.tags||[]).join(' ')+' '+(n.project||'')).toLowerCase().includes(s)).map(n=>n.id));
+  node.classed('dim',d=>!hit.has(d.id));edge.classed('dim',()=>true);});
+for(const kind of ['tag','project'])document.getElementById(kind+'s').addEventListener('change',ev=>{const on=ev.target.checked;
+  edge.filter(d=>d.kind===kind).attr('display',on?null:'none');
+  node.filter(d=>d.kind===kind).attr('display',on?null:'none');});
+svg.on('click',ev=>{if(ev.target.tagName==='svg'){highlight(null);q.value='';}});
+addEventListener('resize',()=>{const [w,h]=box();sim.force('center',d3.forceCenter(w/2,h/2)).alpha(0.2).restart();});
+}
+</script>
+</body>
+</html>

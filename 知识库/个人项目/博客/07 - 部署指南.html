@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>部署指南 · Lhanman 的知识库</title>
+<meta name="description" content="前端： http://localhost">
+<link rel="index" href="../../index.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;800;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+:root{--ground:#F3F4F6;--paper:#FFFFFF;--ink:#161A21;--muted:#5B6372;--rule:#DADDE3;--chip:#E4E8F2;--chip-ink:#2E4893;--accent:#4865AA;--mark:#FDF2C7;
+--serif:"Noto Serif SC","Songti SC",serif;--sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;--mono:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root{--ground:#12151B;--paper:#1A1E26;--ink:#E5E8EE;--muted:#9AA2B1;--rule:#2C323D;--chip:#222B3D;--chip-ink:#AFC1EA;--accent:#95ABDB;--mark:#4A421F}}
+*{box-sizing:border-box}
+html{color-scheme:light dark}
+body{margin:0;background:var(--ground);color:var(--ink);font:15.5px/1.75 var(--sans);padding-inline:20px;padding-block:0 80px}
+a{color:var(--accent)}
+.eyebrow{font:600 11.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.chip{font:500 12px/1 var(--mono);padding:4px 8px;border-radius:3px;background:var(--chip);color:var(--chip-ink)}
+.kb-private{color:var(--muted);font-style:normal;opacity:.75}
+
+main{max-width:820px;margin:0 auto}
+.crumb{padding-block:28px 0;font:500 12.5px/1.6 var(--mono);color:var(--muted)}
+.crumb a{color:var(--muted);text-decoration:none}
+.crumb a:hover{color:var(--accent)}
+header.note{padding-block:14px 22px;border-bottom:1px solid var(--rule)}
+header.note h1{font:900 clamp(26px,4.4vw,38px)/1.25 var(--serif);margin:6px 0 10px;text-wrap:balance}
+header.note .summary{margin:0 0 14px;color:var(--muted)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font:500 12px/1.4 var(--mono);color:var(--muted)}
+.toc{margin:22px 0 0;padding:14px 16px;background:var(--paper);border:1px solid var(--rule);border-radius:8px}
+.toc p{margin:0 0 8px;font:600 11.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.toc li.l3{padding-left:16px;font-size:14px}
+.toc a{color:var(--ink);text-decoration:none}
+.toc a:hover{color:var(--accent)}
+article{padding-block:8px 24px}
+article h2{font:800 22px/1.4 var(--serif);margin:32px 0 10px;padding-top:6px;border-top:1px solid var(--rule)}
+article h3{font:700 17.5px/1.5 var(--sans);margin:22px 0 8px}
+article h4{font:700 15.5px/1.5 var(--sans);margin:18px 0 6px;color:var(--muted)}
+article p{margin:10px 0}
+article ul,article ol{margin:10px 0;padding-left:22px}
+article li{margin:4px 0}
+article li.task{list-style:none;margin-left:-18px}
+article blockquote{margin:14px 0;padding:2px 14px;border-left:3px solid var(--rule);color:var(--muted)}
+article code{font:13.5px/1.6 var(--mono);background:var(--chip);color:var(--chip-ink);padding:1px 5px;border-radius:3px}
+article pre{margin:14px 0;padding:14px 16px;background:var(--paper);border:1px solid var(--rule);border-radius:8px;overflow:auto}
+article pre code{background:none;color:var(--ink);padding:0;font-size:13px;line-height:1.7}
+article hr{border:0;border-top:1px solid var(--rule);margin:26px 0}
+article img{max-width:100%;border-radius:6px}
+.kb-table{overflow-x:auto;margin:14px 0}
+article table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--paper)}
+article th,article td{border:1px solid var(--rule);padding:7px 10px;text-align:left;vertical-align:top}
+article th{background:var(--chip);color:var(--chip-ink);font-weight:600;white-space:nowrap}
+footer.note{border-top:1px solid var(--rule);padding-top:20px;display:grid;gap:18px}
+footer.note section{display:grid;gap:6px}
+footer.note h2{font:600 11.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0}
+footer.note ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+footer.note a{text-decoration:none}
+footer.note a:hover{text-decoration:underline}
+.back{display:flex;flex-wrap:wrap;gap:14px;font:500 13px/1.6 var(--mono)}
+.stamp{color:var(--muted);font-size:12.5px;margin:0}
+@media (max-width:640px){article th{white-space:normal}}
+</style>
+</head>
+<body>
+<main>
+<nav class="crumb"><a href="../../index.html">Lhanman 的知识库</a> / <span>博客</span></nav>
+<header class="note">
+<span class="eyebrow">知识库笔记</span>
+<h1>部署指南</h1>
+<p class="summary">前端： http://localhost</p>
+<div class="meta"><span>博客</span><span>更新于 2026-03-29</span></div>
+</header>
+<nav class="toc"><p>本篇目录</p><ol><li class="l3"><a href="#本地开发环境">本地开发环境</a></li><li class="l3"><a href="#Docker-部署-推荐生产环境">Docker 部署（推荐生产环境）</a></li><li class="l3"><a href="#服务架构">服务架构</a></li><li class="l3"><a href="#环境变量说明">环境变量说明</a></li><li class="l3"><a href="#手动部署">手动部署</a></li><li class="l3"><a href="#生产环境注意事项">生产环境注意事项</a></li></ol></nav>
+<article>
+<h3 id="本地开发环境">本地开发环境</h3>
+<pre><code class="language-bash">./start-dev.sh    # 启动 PostgreSQL + 后端 + Web 前端
+./stop-dev.sh     # 停止所有服务
+./status.sh       # 查看运行状态</code></pre>
+<h3 id="Docker-部署-推荐生产环境">Docker 部署（推荐生产环境）</h3>
+<h4 id="1--构建前端静态文件">1. 构建前端静态文件</h4>
+<pre><code class="language-bash">./gradlew :composeApp:wasmJsBrowserDistribution</code></pre>
+<h4 id="2--配置环境变量">2. 配置环境变量</h4>
+<pre><code class="language-bash">cp .env.example .env
+# 编辑 .env，修改数据库密码和 JWT Secret</code></pre>
+<h4 id="3--启动所有服务">3. 启动所有服务</h4>
+<pre><code class="language-bash">docker compose up -d</code></pre>
+<h4 id="4--访问地址">4. 访问地址</h4>
+<ul><li>前端：<a href="http://localhost" rel="nofollow noopener">http://localhost</a></li><li>后端 API：<a href="http://localhost/api/v1（Nginx" rel="nofollow noopener">http://localhost/api/v1（Nginx</a> 反向代理）</li><li>直接访问后端：<a href="http://localhost:8080" rel="nofollow noopener">http://localhost:8080</a></li></ul>
+<h4 id="常用-Docker-命令">常用 Docker 命令</h4>
+<pre><code class="language-bash">docker compose logs -f       # 查看日志
+docker compose down          # 停止服务
+docker compose ps            # 查看服务状态</code></pre>
+<h3 id="服务架构">服务架构</h3>
+<pre><code>用户请求
+    ↓
+Nginx (80/443)
+    ├── /          → 前端静态文件 (WASM)
+    └── /api/v1    → 后端 Ktor (8080)
+                        ↓
+                   PostgreSQL (5432)</code></pre>
+<h3 id="环境变量说明">环境变量说明</h3>
+<div class="kb-table"><table><thead><tr><th>变量</th><th>说明</th><th>示例</th></tr></thead><tbody><tr><td><code>DB_HOST</code></td><td>数据库主机</td><td><code>db</code>（Docker）/ <code>localhost</code></td></tr><tr><td><code>DB_PORT</code></td><td>数据库端口</td><td><code>5432</code></td></tr><tr><td><code>DB_NAME</code></td><td>数据库名</td><td><code>personalblog</code></td></tr><tr><td><code>DB_USER</code></td><td>数据库用户</td><td><code>postgres</code></td></tr><tr><td><code>DB_PASSWORD</code></td><td>数据库密码</td><td>自定义强密码</td></tr><tr><td><code>JWT_SECRET</code></td><td>JWT 签名密钥</td><td>随机长字符串</td></tr><tr><td><code>JWT_ISSUER</code></td><td>JWT 签发者</td><td><code>personal-blog</code></td></tr><tr><td><code>JWT_AUDIENCE</code></td><td>JWT 受众</td><td><code>personal-blog-users</code></td></tr></tbody></table></div>
+<h3 id="手动部署">手动部署</h3>
+<pre><code class="language-bash">./gradlew :backend:build
+java -jar backend/build/libs/backend-all.jar</code></pre>
+<p>前端静态文件由 Nginx 托管。</p>
+<h3 id="生产环境注意事项">生产环境注意事项</h3>
+<ul><li>移除 Android <code>network_security_config.xml</code> 中的明文 HTTP 配置，只允许 HTTPS</li><li>修改 <code>PlatformConfig.kt</code> 中的 API 地址为实际域名</li><li>使用强密码替换默认的 <code>admin123</code></li><li>配置 SSL 证书（参考 <code>scripts/init-ssl.sh</code>）</li></ul>
+</article>
+<footer class="note">
+
+<div class="back"><a href="../../index.html">← 全部文档和笔记</a><a href="../../graph/">知识图谱</a></div>
+<p class="stamp">这篇笔记由 dispatch 从个人知识库同步，更新于 2026-03-29。</p>
+</footer>
+</main>
+</body>
+</html>
