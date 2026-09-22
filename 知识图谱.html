@@ -82,7 +82,9 @@ const palette=['#4865AA','#2E8B7A','#A8603D','#7A4FA3','#3E7CB1','#8A6D1F','#B05
 const projects=[...new Set(DATA.nodes.filter(n=>n.kind==='note').map(n=>n.project||'其他'))];
 const color=p=>palette[projects.indexOf(p||'其他')%palette.length];
 const legend=document.getElementById('legend');
-legend.innerHTML=projects.map(p=>`<span><i style="background:${color(p)}"></i>${p}</span>`).join('')+'<span><i style="background:#9AA2B1"></i>标签</span>';
+for(const [name,c] of [...projects.map(p=>[p,color(p)]),['标签','#9AA2B1']]){
+  const s=document.createElement('span'),i=document.createElement('i');i.style.background=c;
+  s.append(i,document.createTextNode(name));legend.append(s);}
 const nodes=DATA.nodes.map(n=>({...n})),index=new Map(nodes.map(n=>[n.id,n]));
 const links=DATA.edges.filter(e=>index.has(e.source)&&index.has(e.target)).map(e=>({...e}));
 const degree=new Map();for(const l of links){degree.set(l.source,(degree.get(l.source)||0)+1);degree.set(l.target,(degree.get(l.target)||0)+1);}
