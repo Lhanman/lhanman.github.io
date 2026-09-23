@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>后端架构 · Lhanman 的知识库</title>
-<meta name="description" content="Kotlin + Ktor Server — RESTful API">
+<title>Personal Blog 项目概览 · Lhanman 的知识库</title>
+<meta name="description" content="基于 Kotlin Multiplatform (KMP) + Compose Multiplatform 构建的全栈跨平台个人博客系统。">
 <link rel="index" href="../../index.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -69,71 +69,36 @@ footer.note a:hover{text-decoration:underline}
 <nav class="crumb"><a href="../../index.html">Lhanman 的知识库</a> / <span>博客</span></nav>
 <header class="note">
 <span class="eyebrow">知识库笔记</span>
-<h1>后端架构</h1>
-<p class="summary">Kotlin + Ktor Server — RESTful API</p>
-<div class="meta"><span>博客</span><span>更新于 2026-09-22</span></div>
+<h1>Personal Blog 项目概览</h1>
+<p class="summary">基于 Kotlin Multiplatform (KMP) + Compose Multiplatform 构建的全栈跨平台个人博客系统。</p>
+<div class="meta"><span>博客</span><span>更新于 2026-09-23</span></div>
 </header>
-<nav class="toc"><p>本篇目录</p><ol><li class="l2"><a href="#技术栈">技术栈</a></li><li class="l2"><a href="#启动流程">启动流程</a></li><li class="l2"><a href="#目录结构">目录结构</a></li><li class="l2"><a href="#核心文件">核心文件</a></li><li class="l2"><a href="#安全机制">安全机制</a></li><li class="l2"><a href="#环境变量配置">环境变量配置</a></li><li class="l2"><a href="#认证流程">认证流程</a></li><li class="l2"><a href="#已知问题">已知问题</a></li></ol></nav>
+<nav class="toc"><p>本篇目录</p><ol><li class="l2"><a href="#简介">简介</a></li><li class="l2"><a href="#技术栈">技术栈</a></li><li class="l2"><a href="#平台支持">平台支持</a></li><li class="l2"><a href="#三模块架构">三模块架构</a></li><li class="l2"><a href="#默认管理员账号">默认管理员账号</a></li><li class="l2"><a href="#最近更新">最近更新</a></li><li class="l2"><a href="#相关文档">相关文档</a></li></ol></nav>
 <article>
+<h2 id="简介">简介</h2>
+<p>基于 <strong>Kotlin Multiplatform (KMP) + Compose Multiplatform</strong> 构建的全栈跨平台个人博客系统。</p>
 <h2 id="技术栈">技术栈</h2>
-<ul><li><strong>Kotlin + Ktor Server</strong> — RESTful API</li><li><strong>PostgreSQL</strong> — 数据库</li><li><strong>Exposed ORM</strong> — 数据库访问（DSL 参数化查询，防 SQL 注入）</li><li><strong>JWT (HS256)</strong> — 身份认证，有效期 7 天</li><li><strong>BCrypt (cost=10)</strong> — 密码加密</li><li><strong>Flyway</strong> — 数据库迁移</li><li><strong>HikariCP</strong> — 连接池</li></ul>
-<h2 id="启动流程">启动流程</h2>
-<pre><code class="language-kotlin">// Application.kt
-fun Application.module() {
-    DatabaseFactory.init(dbUrl, dbUser, dbPassword)  // 1. 初始化数据库连接池
-    configurePlugins()   // 2. CORS, ContentNegotiation(JSON), StatusPages
-    configureAuth()      // 3. JWT 认证配置
-    routing {            // 4. 注册路由
-        postRoutes(postRepository)
-        tagRoutes(tagRepository)
-        authRoutes(userRepository)
-        commentRoutes(commentRepository)
-        adminRoutes(postRepository, tagRepository, userRepository)
-    }
-}</code></pre>
-<h2 id="目录结构">目录结构</h2>
-<pre><code>backend/src/main/kotlin/com/personalblog/backend/
-├── Application.kt           # 应用入口
-├── plugins/Plugins.kt       # Ktor 插件配置
-├── auth/JwtConfig.kt        # JWT 配置
-├── db/
-│   ├── DatabaseFactory.kt   # 数据库连接
-│   └── Tables.kt            # Exposed 表定义
-├── repository/              # 数据访问层
-└── routes/                  # API 路由</code></pre>
-<h2 id="核心文件">核心文件</h2>
-<div class="kb-table"><table><thead><tr><th>文件</th><th>说明</th></tr></thead><tbody><tr><td><code>Application.kt</code></td><td>应用入口，初始化所有组件</td></tr><tr><td><code>repository/PostRepository.kt</code></td><td>文章数据访问层</td></tr><tr><td><code>routes/AdminRoutes.kt</code></td><td>管理员 API 路由</td></tr><tr><td><code>routes/PostRoutes.kt</code></td><td>文章公开 API 路由</td></tr><tr><td><code>resources/db/migration/V1__initial_schema.sql</code></td><td>数据库初始结构</td></tr></tbody></table></div>
-<h2 id="安全机制">安全机制</h2>
-<ul><li>密码存储：BCrypt (cost=10)</li><li>JWT 签名：HMAC-SHA256</li><li>Token 有效期：7 天</li><li>SQL 注入防护：Exposed DSL 参数化查询</li><li>XSS 防护：Compose 天然防御</li></ul>
-<h2 id="环境变量配置">环境变量配置</h2>
-<pre><code class="language-env">DB_HOST=db
-DB_PORT=5432
-DB_NAME=personalblog
-DB_USER=postgres
-DB_PASSWORD=your-secure-password
-
-JWT_SECRET=your-jwt-secret
-JWT_ISSUER=personal-blog
-JWT_AUDIENCE=personal-blog-users</code></pre>
-<h2 id="认证流程">认证流程</h2>
-<pre><code>LoginScreen 输入 email + password
-    ↓
-POST /api/v1/auth/login
-    ↓
-BCrypt.checkpw(password, user.passwordHash)
-    ↓
-生成 JWT (有效期 7 天)
-    ↓
-TokenRepository.saveToken(token)
-    ↓
-后续所有请求自动附带 Authorization: Bearer &lt;token&gt;</code></pre>
-<h2 id="已知问题">已知问题</h2>
-<ul><li><strong>N+1 查询</strong>：每篇文章单独查询 tags，待优化为 JOIN</li><li><strong>缺少 Refresh Token</strong>：Token 过期需重新登录</li></ul>
+<div class="kb-table"><table><thead><tr><th>层级</th><th>技术</th><th>说明</th></tr></thead><tbody><tr><td>后端</td><td>Kotlin + Ktor + PostgreSQL + Exposed ORM</td><td>JVM 服务端，RESTful API</td></tr><tr><td>前端</td><td>Compose Multiplatform</td><td>Android / iOS / macOS / Windows / Web(WASM)</td></tr><tr><td>共享层</td><td>Kotlin Multiplatform</td><td>前后端共享 DTO 数据模型</td></tr><tr><td>认证</td><td>JWT (HS256)</td><td>无状态认证，支持角色权限</td></tr><tr><td>数据库</td><td>PostgreSQL 14+</td><td>支持全文搜索（GIN 索引）</td></tr><tr><td>构建工具</td><td>Gradle 8.10.2 + AGP 8.6.1</td><td>Kotlin DSL 配置</td></tr><tr><td>部署</td><td>Docker Compose</td><td>PostgreSQL + Backend + Nginx</td></tr></tbody></table></div>
+<h2 id="平台支持">平台支持</h2>
+<div class="kb-table"><table><thead><tr><th>平台</th><th>状态</th><th>说明</th></tr></thead><tbody><tr><td>Android</td><td>✅ 完全支持</td><td>API 21+</td></tr><tr><td>iOS</td><td>✅ 完全支持</td><td>iOS 14+</td></tr><tr><td>macOS</td><td>✅ 完全支持</td><td>原生 macOS target + Desktop JVM</td></tr><tr><td>Windows</td><td>✅ 完全支持</td><td>Desktop JVM</td></tr><tr><td>Web (WASM)</td><td>✅ 完全支持</td><td>现代浏览器</td></tr><tr><td>Desktop (JVM)</td><td>✅ 完全支持</td><td>Windows / Linux / macOS</td></tr></tbody></table></div>
+<h2 id="三模块架构">三模块架构</h2>
+<pre><code>:composeApp (前端)
+    └── depends on
+:shared (共享模块)
+    └── depends on
+:backend (后端)</code></pre>
+<ul><li><strong>:shared</strong> — 定义前后端共享的 DTO，编译到所有目标平台</li><li><strong>:backend</strong> — 纯 JVM 模块，Exposed ORM 与数据库交互</li><li><strong>:composeApp</strong> — Multiplatform 模块，Compose Multiplatform 构建 UI</li></ul>
+<h2 id="默认管理员账号">默认管理员账号</h2>
+<ul><li>邮箱：<code>admin@example.com</code></li><li>密码：<code>admin123</code></li><li>角色：<code>ADMIN</code></li></ul>
+<h2 id="最近更新">最近更新</h2>
+<ul><li>已接入 <code>jvm(&quot;desktop&quot;)</code>，桌面端支持 <code>macOS / Windows / Linux</code></li><li>已新增桌面入口 <code>frontend/composeApp/src/desktopMain/kotlin/com/personalblog/app/main.kt</code></li><li>已支持桌面打包任务：<code>packageDistributionForCurrentOS</code> / <code>packageDmg</code> / <code>packageExe</code> / <code>packageMsi</code></li><li>已补齐桌面协程主线程实现，解决 <code>Dispatchers.Main</code> 缺失导致的启动崩溃</li></ul>
+<h2 id="相关文档">相关文档</h2>
+<ul><li><a class="kb-link" href="../note-2ecc84/">后端架构</a></li><li><a class="kb-link" href="../note-205fd1/">前端架构</a></li><li><a class="kb-link" href="../note-26818f/">数据库设计</a></li><li><a class="kb-link" href="../note-70c8b2/">API 文档</a></li><li><a class="kb-link" href="../note-909ace/">使用手册</a></li><li><a class="kb-link" href="../note-cbd676/">开发指南</a></li><li><a class="kb-link" href="../note-08a4b6/">部署指南</a></li><li><a class="kb-link" href="../note-a8f9f9/">故障排除</a></li></ul>
 </article>
 <footer class="note">
-<section><h2>被引用</h2><ul><li><a href="../personal-blog/">Personal Blog 项目概览</a></li></ul></section>
+
 <div class="back"><a href="../../index.html">← 全部文档和笔记</a><a href="../../graph/">知识图谱</a></div>
-<p class="stamp">这篇笔记由 dispatch 从个人知识库同步，更新于 2026-09-22。</p>
+<p class="stamp">这篇笔记由 dispatch 从个人知识库同步，更新于 2026-09-23。</p>
 </footer>
 </main>
 </body>

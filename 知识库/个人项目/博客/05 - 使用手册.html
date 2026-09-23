@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>后端架构 · Lhanman 的知识库</title>
-<meta name="description" content="Kotlin + Ktor Server — RESTful API">
+<title>使用手册 · Lhanman 的知识库</title>
+<meta name="description" content="Android 应用：在模拟器或真机上打开">
 <link rel="index" href="../../index.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -69,71 +69,83 @@ footer.note a:hover{text-decoration:underline}
 <nav class="crumb"><a href="../../index.html">Lhanman 的知识库</a> / <span>博客</span></nav>
 <header class="note">
 <span class="eyebrow">知识库笔记</span>
-<h1>后端架构</h1>
-<p class="summary">Kotlin + Ktor Server — RESTful API</p>
-<div class="meta"><span>博客</span><span>更新于 2026-09-22</span></div>
+<h1>使用手册</h1>
+<p class="summary">Android 应用：在模拟器或真机上打开</p>
+<div class="meta"><span>博客</span><span>更新于 2026-09-23</span></div>
 </header>
-<nav class="toc"><p>本篇目录</p><ol><li class="l2"><a href="#技术栈">技术栈</a></li><li class="l2"><a href="#启动流程">启动流程</a></li><li class="l2"><a href="#目录结构">目录结构</a></li><li class="l2"><a href="#核心文件">核心文件</a></li><li class="l2"><a href="#安全机制">安全机制</a></li><li class="l2"><a href="#环境变量配置">环境变量配置</a></li><li class="l2"><a href="#认证流程">认证流程</a></li><li class="l2"><a href="#已知问题">已知问题</a></li></ol></nav>
+<nav class="toc"><p>本篇目录</p><ol><li class="l3"><a href="#快速开始">快速开始</a></li><li class="l3"><a href="#系统管理">系统管理</a></li><li class="l3"><a href="#内容管理">内容管理</a></li><li class="l3"><a href="#用户管理">用户管理</a></li><li class="l3"><a href="#快捷键-Web-应用">快捷键（Web 应用）</a></li><li class="l3"><a href="#系统要求">系统要求</a></li></ol></nav>
 <article>
-<h2 id="技术栈">技术栈</h2>
-<ul><li><strong>Kotlin + Ktor Server</strong> — RESTful API</li><li><strong>PostgreSQL</strong> — 数据库</li><li><strong>Exposed ORM</strong> — 数据库访问（DSL 参数化查询，防 SQL 注入）</li><li><strong>JWT (HS256)</strong> — 身份认证，有效期 7 天</li><li><strong>BCrypt (cost=10)</strong> — 密码加密</li><li><strong>Flyway</strong> — 数据库迁移</li><li><strong>HikariCP</strong> — 连接池</li></ul>
-<h2 id="启动流程">启动流程</h2>
-<pre><code class="language-kotlin">// Application.kt
-fun Application.module() {
-    DatabaseFactory.init(dbUrl, dbUser, dbPassword)  // 1. 初始化数据库连接池
-    configurePlugins()   // 2. CORS, ContentNegotiation(JSON), StatusPages
-    configureAuth()      // 3. JWT 认证配置
-    routing {            // 4. 注册路由
-        postRoutes(postRepository)
-        tagRoutes(tagRepository)
-        authRoutes(userRepository)
-        commentRoutes(commentRepository)
-        adminRoutes(postRepository, tagRepository, userRepository)
-    }
-}</code></pre>
-<h2 id="目录结构">目录结构</h2>
-<pre><code>backend/src/main/kotlin/com/personalblog/backend/
-├── Application.kt           # 应用入口
-├── plugins/Plugins.kt       # Ktor 插件配置
-├── auth/JwtConfig.kt        # JWT 配置
-├── db/
-│   ├── DatabaseFactory.kt   # 数据库连接
-│   └── Tables.kt            # Exposed 表定义
-├── repository/              # 数据访问层
-└── routes/                  # API 路由</code></pre>
-<h2 id="核心文件">核心文件</h2>
-<div class="kb-table"><table><thead><tr><th>文件</th><th>说明</th></tr></thead><tbody><tr><td><code>Application.kt</code></td><td>应用入口，初始化所有组件</td></tr><tr><td><code>repository/PostRepository.kt</code></td><td>文章数据访问层</td></tr><tr><td><code>routes/AdminRoutes.kt</code></td><td>管理员 API 路由</td></tr><tr><td><code>routes/PostRoutes.kt</code></td><td>文章公开 API 路由</td></tr><tr><td><code>resources/db/migration/V1__initial_schema.sql</code></td><td>数据库初始结构</td></tr></tbody></table></div>
-<h2 id="安全机制">安全机制</h2>
-<ul><li>密码存储：BCrypt (cost=10)</li><li>JWT 签名：HMAC-SHA256</li><li>Token 有效期：7 天</li><li>SQL 注入防护：Exposed DSL 参数化查询</li><li>XSS 防护：Compose 天然防御</li></ul>
-<h2 id="环境变量配置">环境变量配置</h2>
-<pre><code class="language-env">DB_HOST=db
-DB_PORT=5432
-DB_NAME=personalblog
-DB_USER=postgres
-DB_PASSWORD=your-secure-password
+<h3 id="快速开始">快速开始</h3>
+<h4 id="启动系统">启动系统</h4>
+<pre><code class="language-bash"># 推荐方式
+./start-dev.sh
 
-JWT_SECRET=your-jwt-secret
-JWT_ISSUER=personal-blog
-JWT_AUDIENCE=personal-blog-users</code></pre>
-<h2 id="认证流程">认证流程</h2>
-<pre><code>LoginScreen 输入 email + password
-    ↓
-POST /api/v1/auth/login
-    ↓
-BCrypt.checkpw(password, user.passwordHash)
-    ↓
-生成 JWT (有效期 7 天)
-    ↓
-TokenRepository.saveToken(token)
-    ↓
-后续所有请求自动附带 Authorization: Bearer &lt;token&gt;</code></pre>
-<h2 id="已知问题">已知问题</h2>
-<ul><li><strong>N+1 查询</strong>：每篇文章单独查询 tags，待优化为 JOIN</li><li><strong>缺少 Refresh Token</strong>：Token 过期需重新登录</li></ul>
+# 手动方式
+brew services start postgresql@15
+./gradlew :backend:run &amp;</code></pre>
+<h4 id="访问地址">访问地址</h4>
+<ul><li>Android 应用：在模拟器或真机上打开</li><li>Web 应用：<a href="http://localhost:8080（开发模式" rel="nofollow noopener">http://localhost:8080（开发模式</a>）</li><li>后端 API：<a href="http://localhost:8080/api/v1" rel="nofollow noopener">http://localhost:8080/api/v1</a></li></ul>
+<h4 id="登录">登录</h4>
+<p>默认管理员账号：</p>
+<pre><code>邮箱: admin@example.com
+密码: admin123</code></pre>
+<blockquote><p>首次登录后请立即修改密码！</p></blockquote>
+<hr>
+<h3 id="系统管理">系统管理</h3>
+<h4 id="查看系统状态">查看系统状态</h4>
+<pre><code class="language-bash">./status.sh</code></pre>
+<p>显示：PostgreSQL 状态、后端服务状态、API 响应、数据库统计、Android 应用状态。</p>
+<h4 id="启动---停止服务">启动 / 停止服务</h4>
+<pre><code class="language-bash">./start-dev.sh    # 启动开发环境
+./stop-dev.sh     # 停止开发环境
+tail -f /tmp/backend.log  # 查看后端日志</code></pre>
+<h4 id="数据库管理">数据库管理</h4>
+<pre><code class="language-bash">./db-manager.sh</code></pre>
+<p>菜单功能：</p>
+<ol><li>查看数据库状态</li><li>查看所有文章</li><li>查看所有用户</li><li>查看所有标签</li><li>创建测试数据</li><li>清空所有数据</li><li>备份数据库</li><li>恢复数据库</li><li>连接数据库 (psql)</li></ol>
+<hr>
+<h3 id="内容管理">内容管理</h3>
+<h4 id="创建文章-通过-API">创建文章（通过 API）</h4>
+<pre><code class="language-bash">TOKEN=$(curl -s -X POST http://localhost:8080/api/v1/auth/login \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;email&quot;:&quot;admin@example.com&quot;,&quot;password&quot;:&quot;admin123&quot;}&#x27; \
+  | grep -o &#x27;&quot;token&quot;:&quot;[^&quot;]*&quot;&#x27; | cut -d&#x27;&quot;&#x27; -f4)
+
+curl -X POST http://localhost:8080/api/v1/admin/posts \
+  -H &quot;Content-Type: application/json&quot; \
+  -H &quot;Authorization: Bearer $TOKEN&quot; \
+  -d &#x27;{
+    &quot;title&quot;: &quot;我的第一篇文章&quot;,
+    &quot;slug&quot;: &quot;my-first-post&quot;,
+    &quot;summary&quot;: &quot;文章摘要&quot;,
+    &quot;content&quot;: &quot;# 标题\n\n文章内容...&quot;,
+    &quot;published&quot;: true
+  }&#x27;</code></pre>
+<h4 id="Markdown-支持">Markdown 支持</h4>
+<p>文章内容支持完整 Markdown 语法：标题、粗体、斜体、列表、链接、图片、代码块、引用、表格等。</p>
+<hr>
+<h3 id="用户管理">用户管理</h3>
+<h4 id="修改用户角色">修改用户角色</h4>
+<pre><code class="language-bash">curl -X PUT http://localhost:8080/api/v1/admin/users/{id}/role \
+  -H &quot;Content-Type: application/json&quot; \
+  -H &quot;Authorization: Bearer $TOKEN&quot; \
+  -d &#x27;{&quot;role&quot;: &quot;ADMIN&quot;}&#x27;</code></pre>
+<h4 id="通过-SQL-直接提升权限">通过 SQL 直接提升权限</h4>
+<pre><code class="language-sql">UPDATE users SET role = &#x27;ADMIN&#x27; WHERE email = &#x27;user@example.com&#x27;;</code></pre>
+<hr>
+<h3 id="快捷键-Web-应用">快捷键（Web 应用）</h3>
+<div class="kb-table"><table><thead><tr><th>快捷键</th><th>功能</th></tr></thead><tbody><tr><td><code>Ctrl/Cmd + K</code></td><td>打开搜索</td></tr><tr><td><code>Ctrl/Cmd + /</code></td><td>切换主题</td></tr><tr><td><code>Esc</code></td><td>关闭对话框</td></tr></tbody></table></div>
+<hr>
+<h3 id="系统要求">系统要求</h3>
+<h4 id="开发环境">开发环境</h4>
+<ul><li>JDK 17+</li><li>Gradle 8.10+</li><li>PostgreSQL 15+</li><li>Android Studio（Android 开发）</li><li>Xcode（iOS/macOS 开发，仅 macOS）</li></ul>
+<h4 id="生产环境">生产环境</h4>
+<ul><li>Docker 20+</li><li>Docker Compose 2+</li><li>2GB+ RAM</li><li>10GB+ 磁盘空间</li></ul>
 </article>
 <footer class="note">
 <section><h2>被引用</h2><ul><li><a href="../personal-blog/">Personal Blog 项目概览</a></li></ul></section>
 <div class="back"><a href="../../index.html">← 全部文档和笔记</a><a href="../../graph/">知识图谱</a></div>
-<p class="stamp">这篇笔记由 dispatch 从个人知识库同步，更新于 2026-09-22。</p>
+<p class="stamp">这篇笔记由 dispatch 从个人知识库同步，更新于 2026-09-23。</p>
 </footer>
 </main>
 </body>

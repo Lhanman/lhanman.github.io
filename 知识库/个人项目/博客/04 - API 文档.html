@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>API 文档 · Lhanman 的知识库</title>
+<meta name="description" content="Base URL（开发）： http://localhost:8080/api/v1">
+<link rel="index" href="../../index.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;800;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+:root{--ground:#F3F4F6;--paper:#FFFFFF;--ink:#161A21;--muted:#5B6372;--rule:#DADDE3;--chip:#E4E8F2;--chip-ink:#2E4893;--accent:#4865AA;--mark:#FDF2C7;
+--serif:"Noto Serif SC","Songti SC",serif;--sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;--mono:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root{--ground:#12151B;--paper:#1A1E26;--ink:#E5E8EE;--muted:#9AA2B1;--rule:#2C323D;--chip:#222B3D;--chip-ink:#AFC1EA;--accent:#95ABDB;--mark:#4A421F}}
+*{box-sizing:border-box}
+html{color-scheme:light dark}
+body{margin:0;background:var(--ground);color:var(--ink);font:15.5px/1.75 var(--sans);padding-inline:20px;padding-block:0 80px}
+a{color:var(--accent)}
+.eyebrow{font:600 11.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.chip{font:500 12px/1 var(--mono);padding:4px 8px;border-radius:3px;background:var(--chip);color:var(--chip-ink)}
+.kb-private{color:var(--muted);font-style:normal;opacity:.75}
+
+main{max-width:820px;margin:0 auto}
+.crumb{padding-block:28px 0;font:500 12.5px/1.6 var(--mono);color:var(--muted)}
+.crumb a{color:var(--muted);text-decoration:none}
+.crumb a:hover{color:var(--accent)}
+header.note{padding-block:14px 22px;border-bottom:1px solid var(--rule)}
+header.note h1{font:900 clamp(26px,4.4vw,38px)/1.25 var(--serif);margin:6px 0 10px;text-wrap:balance}
+header.note .summary{margin:0 0 14px;color:var(--muted)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font:500 12px/1.4 var(--mono);color:var(--muted)}
+.toc{margin:22px 0 0;padding:14px 16px;background:var(--paper);border:1px solid var(--rule);border-radius:8px}
+.toc p{margin:0 0 8px;font:600 11.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.toc li.l3{padding-left:16px;font-size:14px}
+.toc a{color:var(--ink);text-decoration:none}
+.toc a:hover{color:var(--accent)}
+article{padding-block:8px 24px}
+article h2{font:800 22px/1.4 var(--serif);margin:32px 0 10px;padding-top:6px;border-top:1px solid var(--rule)}
+article h3{font:700 17.5px/1.5 var(--sans);margin:22px 0 8px}
+article h4{font:700 15.5px/1.5 var(--sans);margin:18px 0 6px;color:var(--muted)}
+article p{margin:10px 0}
+article ul,article ol{margin:10px 0;padding-left:22px}
+article li{margin:4px 0}
+article li.task{list-style:none;margin-left:-18px}
+article blockquote{margin:14px 0;padding:2px 14px;border-left:3px solid var(--rule);color:var(--muted)}
+article code{font:13.5px/1.6 var(--mono);background:var(--chip);color:var(--chip-ink);padding:1px 5px;border-radius:3px}
+article pre{margin:14px 0;padding:14px 16px;background:var(--paper);border:1px solid var(--rule);border-radius:8px;overflow:auto}
+article pre code{background:none;color:var(--ink);padding:0;font-size:13px;line-height:1.7}
+article hr{border:0;border-top:1px solid var(--rule);margin:26px 0}
+article img{max-width:100%;border-radius:6px}
+.kb-table{overflow-x:auto;margin:14px 0}
+article table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--paper)}
+article th,article td{border:1px solid var(--rule);padding:7px 10px;text-align:left;vertical-align:top}
+article th{background:var(--chip);color:var(--chip-ink);font-weight:600;white-space:nowrap}
+footer.note{border-top:1px solid var(--rule);padding-top:20px;display:grid;gap:18px}
+footer.note section{display:grid;gap:6px}
+footer.note h2{font:600 11.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0}
+footer.note ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+footer.note a{text-decoration:none}
+footer.note a:hover{text-decoration:underline}
+.back{display:flex;flex-wrap:wrap;gap:14px;font:500 13px/1.6 var(--mono)}
+.stamp{color:var(--muted);font-size:12.5px;margin:0}
+@media (max-width:640px){article th{white-space:normal}}
+</style>
+</head>
+<body>
+<main>
+<nav class="crumb"><a href="../../index.html">Lhanman 的知识库</a> / <span>博客</span></nav>
+<header class="note">
+<span class="eyebrow">知识库笔记</span>
+<h1>API 文档</h1>
+<p class="summary">Base URL（开发）： http://localhost:8080/api/v1</p>
+<div class="meta"><span>博客</span><span>更新于 2026-09-23</span></div>
+</header>
+<nav class="toc"><p>本篇目录</p><ol><li class="l2"><a href="#基础信息">基础信息</a></li><li class="l2"><a href="#公开接口-无需认证">公开接口（无需认证）</a></li><li class="l3"><a href="#获取文章列表">获取文章列表</a></li><li class="l3"><a href="#获取文章详情">获取文章详情</a></li><li class="l3"><a href="#搜索文章">搜索文章</a></li><li class="l3"><a href="#获取标签列表">获取标签列表</a></li><li class="l3"><a href="#按标签获取文章">按标签获取文章</a></li><li class="l3"><a href="#获取文章评论">获取文章评论</a></li><li class="l2"><a href="#认证接口">认证接口</a></li><li class="l3"><a href="#用户注册">用户注册</a></li><li class="l3"><a href="#用户登录">用户登录</a></li><li class="l2"><a href="#需要认证的接口">需要认证的接口</a></li><li class="l3"><a href="#发表评论">发表评论</a></li><li class="l2"><a href="#管理员接口-需要-ADMIN-角色">管理员接口（需要 ADMIN 角色）</a></li><li class="l3"><a href="#创建文章">创建文章</a></li><li class="l3"><a href="#更新文章">更新文章</a></li><li class="l3"><a href="#删除文章">删除文章</a></li><li class="l3"><a href="#获取用户列表">获取用户列表</a></li><li class="l3"><a href="#更新用户角色">更新用户角色</a></li><li class="l2"><a href="#快速测试-curl">快速测试（curl）</a></li></ol></nav>
+<article>
+<h2 id="基础信息">基础信息</h2>
+<ul><li>Base URL（开发）：<code>http://localhost:8080/api/v1</code></li><li>Base URL（生产）：<code>http://localhost/api/v1</code>（Nginx 反向代理）</li><li>认证方式：<code>Authorization: Bearer &lt;token&gt;</code></li><li>数据格式：JSON</li></ul>
+<hr>
+<h2 id="公开接口-无需认证">公开接口（无需认证）</h2>
+<h3 id="获取文章列表">获取文章列表</h3>
+<pre><code>GET /api/v1/posts?page=1&amp;size=10</code></pre>
+<p>返回分页文章列表，<code>content</code> 字段为 null（节省流量）。</p>
+<h3 id="获取文章详情">获取文章详情</h3>
+<pre><code>GET /api/v1/posts/{id}</code></pre>
+<p>返回完整文章内容（含 Markdown 正文）。</p>
+<h3 id="搜索文章">搜索文章</h3>
+<pre><code>GET /api/v1/posts/search?q={keyword}</code></pre>
+<p>基于 PostgreSQL tsvector 全文搜索。</p>
+<h3 id="获取标签列表">获取标签列表</h3>
+<pre><code>GET /api/v1/tags</code></pre>
+<h3 id="按标签获取文章">按标签获取文章</h3>
+<pre><code>GET /api/v1/tags/{slug}/posts</code></pre>
+<h3 id="获取文章评论">获取文章评论</h3>
+<pre><code>GET /api/v1/posts/{id}/comments</code></pre>
+<hr>
+<h2 id="认证接口">认证接口</h2>
+<h3 id="用户注册">用户注册</h3>
+<pre><code>POST /api/v1/auth/register
+Content-Type: application/json
+
+{
+  &quot;username&quot;: &quot;newuser&quot;,
+  &quot;email&quot;: &quot;user@example.com&quot;,
+  &quot;password&quot;: &quot;password123&quot;
+}</code></pre>
+<h3 id="用户登录">用户登录</h3>
+<pre><code>POST /api/v1/auth/login
+Content-Type: application/json
+
+{
+  &quot;email&quot;: &quot;admin@example.com&quot;,
+  &quot;password&quot;: &quot;admin123&quot;
+}</code></pre>
+<p>返回：</p>
+<pre><code class="language-json">{
+  &quot;token&quot;: &quot;&lt;jwt-token&gt;&quot;
+}</code></pre>
+<hr>
+<h2 id="需要认证的接口">需要认证的接口</h2>
+<h3 id="发表评论">发表评论</h3>
+<pre><code>POST /api/v1/comments
+Authorization: Bearer &lt;token&gt;
+Content-Type: application/json
+
+{
+  &quot;postId&quot;: 1,
+  &quot;content&quot;: &quot;评论内容&quot;
+}</code></pre>
+<hr>
+<h2 id="管理员接口-需要-ADMIN-角色">管理员接口（需要 ADMIN 角色）</h2>
+<h3 id="创建文章">创建文章</h3>
+<pre><code>POST /api/v1/admin/posts
+Authorization: Bearer &lt;token&gt;
+Content-Type: application/json
+
+{
+  &quot;title&quot;: &quot;文章标题&quot;,
+  &quot;slug&quot;: &quot;article-slug&quot;,
+  &quot;summary&quot;: &quot;文章摘要&quot;,
+  &quot;content&quot;: &quot;# Markdown 内容&quot;,
+  &quot;coverImageUrl&quot;: &quot;https://example.com/image.jpg&quot;,
+  &quot;published&quot;: true,
+  &quot;tags&quot;: [&quot;kotlin&quot;, &quot;backend&quot;]
+}</code></pre>
+<h3 id="更新文章">更新文章</h3>
+<pre><code>PUT /api/v1/admin/posts/{id}
+Authorization: Bearer &lt;token&gt;
+Content-Type: application/json
+
+{
+  &quot;title&quot;: &quot;更新后的标题&quot;,
+  &quot;content&quot;: &quot;更新后的内容&quot;,
+  &quot;published&quot;: true
+}</code></pre>
+<h3 id="删除文章">删除文章</h3>
+<pre><code>DELETE /api/v1/admin/posts/{id}
+Authorization: Bearer &lt;token&gt;</code></pre>
+<h3 id="获取用户列表">获取用户列表</h3>
+<pre><code>GET /api/v1/admin/users
+Authorization: Bearer &lt;token&gt;</code></pre>
+<h3 id="更新用户角色">更新用户角色</h3>
+<pre><code>PUT /api/v1/admin/users/{id}/role
+Authorization: Bearer &lt;token&gt;
+Content-Type: application/json
+
+{
+  &quot;role&quot;: &quot;ADMIN&quot;
+}</code></pre>
+<p>可用角色：<code>USER</code>（默认）、<code>ADMIN</code></p>
+<hr>
+<h2 id="快速测试-curl">快速测试（curl）</h2>
+<pre><code class="language-bash">TOKEN=$(curl -s -X POST http://localhost:8080/api/v1/auth/login \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;email&quot;:&quot;admin@example.com&quot;,&quot;password&quot;:&quot;admin123&quot;}&#x27; \
+  | grep -o &#x27;&quot;token&quot;:&quot;[^&quot;]*&quot;&#x27; | cut -d&#x27;&quot;&#x27; -f4)
+
+curl http://localhost:8080/api/v1/posts
+
+curl -X POST http://localhost:8080/api/v1/admin/posts \
+  -H &quot;Content-Type: application/json&quot; \
+  -H &quot;Authorization: Bearer $TOKEN&quot; \
+  -d &#x27;{&quot;title&quot;:&quot;测试文章&quot;,&quot;content&quot;:&quot;内容&quot;,&quot;published&quot;:true}&#x27;</code></pre>
+<p>也可直接运行 <code>./test-api.sh</code> 执行完整测试套件。</p>
+</article>
+<footer class="note">
+<section><h2>被引用</h2><ul><li><a href="../personal-blog/">Personal Blog 项目概览</a></li></ul></section>
+<div class="back"><a href="../../index.html">← 全部文档和笔记</a><a href="../../graph/">知识图谱</a></div>
+<p class="stamp">这篇笔记由 dispatch 从个人知识库同步，更新于 2026-09-23。</p>
+</footer>
+</main>
+</body>
+</html>

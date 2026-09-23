@@ -26,7 +26,7 @@
 
 - [小说 AI 改编评估](%E6%96%87%E6%A1%A3/%E5%85%B6%E4%BB%96/%E5%B0%8F%E8%AF%B4%20AI%20%E6%94%B9%E7%BC%96%E8%AF%84%E4%BC%B0.html) · [线上](https://lhanman.github.io/p/novel-ai-adaptation/) · 2026-09-19 — 输入书名，产出章节高光与概述、章节漫画、多角色有声剧：国内与海外模型方案的成本对比、可行性、实现方案与风险
 
-## 知识库笔记（10 篇）
+## 知识库笔记（14 篇）
 
 ### ashare-quant
 
@@ -40,6 +40,10 @@
 
 ### 博客
 
+- [Personal Blog 项目概览](%E7%9F%A5%E8%AF%86%E5%BA%93/%E4%B8%AA%E4%BA%BA%E9%A1%B9%E7%9B%AE/%E5%8D%9A%E5%AE%A2/00%20-%20%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%A7%88.html) · [线上](https://lhanman.github.io/kb/personal-blog/) · 2026-09-23 — 基于 Kotlin Multiplatform (KMP) + Compose Multiplatform 构建的全栈跨平台个人博客系统。
+- [故障排除](%E7%9F%A5%E8%AF%86%E5%BA%93/%E4%B8%AA%E4%BA%BA%E9%A1%B9%E7%9B%AE/%E5%8D%9A%E5%AE%A2/08%20-%20%E6%95%85%E9%9A%9C%E6%8E%92%E9%99%A4.html) · [线上](https://lhanman.github.io/kb/note-a8f9f9/) · 2026-09-23 — 确认后端运行： ./status.sh
+- [使用手册](%E7%9F%A5%E8%AF%86%E5%BA%93/%E4%B8%AA%E4%BA%BA%E9%A1%B9%E7%9B%AE/%E5%8D%9A%E5%AE%A2/05%20-%20%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C.html) · [线上](https://lhanman.github.io/kb/note-909ace/) · 2026-09-23 — Android 应用：在模拟器或真机上打开
+- [API 文档](%E7%9F%A5%E8%AF%86%E5%BA%93/%E4%B8%AA%E4%BA%BA%E9%A1%B9%E7%9B%AE/%E5%8D%9A%E5%AE%A2/04%20-%20API%20%E6%96%87%E6%A1%A3.html) · [线上](https://lhanman.github.io/kb/note-70c8b2/) · 2026-09-23 — Base URL（开发）： http://localhost:8080/api/v1
 - [后端架构](%E7%9F%A5%E8%AF%86%E5%BA%93/%E4%B8%AA%E4%BA%BA%E9%A1%B9%E7%9B%AE/%E5%8D%9A%E5%AE%A2/01%20-%20%E5%90%8E%E7%AB%AF%E6%9E%B6%E6%9E%84.html) · [线上](https://lhanman.github.io/kb/note-2ecc84/) · 2026-09-22 — Kotlin + Ktor Server — RESTful API
 - [前端架构](%E7%9F%A5%E8%AF%86%E5%BA%93/%E4%B8%AA%E4%BA%BA%E9%A1%B9%E7%9B%AE/%E5%8D%9A%E5%AE%A2/02%20-%20%E5%89%8D%E7%AB%AF%E6%9E%B6%E6%9E%84.html) · [线上](https://lhanman.github.io/kb/note-205fd1/) · 2026-09-22 — Kotlin Multiplatform — 跨平台代码共享
 - [开发指南](%E7%9F%A5%E8%AF%86%E5%BA%93/%E4%B8%AA%E4%BA%BA%E9%A1%B9%E7%9B%AE/%E5%8D%9A%E5%AE%A2/06%20-%20%E5%BC%80%E5%8F%91%E6%8C%87%E5%8D%97.html) · [线上](https://lhanman.github.io/kb/note-cbd676/) · 2026-03-29 — 项目包含三个 Gradle 子项目：

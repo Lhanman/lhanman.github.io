@@ -1,6 +1,30 @@
 {
   "notes": [
     {
+      "slug": "personal-blog",
+      "title": "Personal Blog 项目概览",
+      "summary": "基于 Kotlin Multiplatform (KMP) + Compose Multiplatform 构建的全栈跨平台个人博客系统。",
+      "type": "",
+      "project": "博客",
+      "tags": [],
+      "created": "2026-09-23",
+      "updated": "2026-09-23",
+      "path": "知识库/个人项目/博客/00 - 项目概览.html",
+      "src": "个人项目/博客/00 - 项目概览.md",
+      "hash": "13c49ed07cb542d22d262a5cdad15eb101e5bc2c",
+      "links": [
+        "note-08a4b6",
+        "note-205fd1",
+        "note-26818f",
+        "note-2ecc84",
+        "note-70c8b2",
+        "note-909ace",
+        "note-a8f9f9",
+        "note-cbd676"
+      ],
+      "text": "Personal Blog 项目概览 基于 Kotlin Multiplatform (KMP) + Compose Multiplatform 构建的全栈跨平台个人博客系统。  博客  简介 技术栈 平台支持 三模块架构 默认管理员账号 最近更新 相关文档 简介 基于 Kotlin Multiplatform (KMP) + Compose Multiplatform 构建的全栈跨平台个人博客系统。 技术栈 层级 技术 说明 后端 Kotlin + Ktor + PostgreSQL + Exposed ORM JVM 服务端，RESTful API 前端 Compose Multiplatform Android / iOS / macOS / Windows / Web(WASM) 共享层 Kotlin Multiplatform 前后端共享 DTO 数据模型 认证 JWT (HS256) 无状态认证，支持角色权限 数据库 PostgreSQL 14+ 支持全文搜索（GIN 索引） 构建工具 Gradle 8.10.2 + AGP 8.6.1 Kotlin DSL 配置 部署 Docker Compose PostgreSQL + Backend + Nginx 平台支持 平台 状态 说明 Android ✅ 完全支持 API 21+ iOS ✅ 完全支持 iOS 14+ m"
+    },
+    {
       "slug": "note-f6c1c4",
       "title": "自研A股日线回测引擎的几个关键口径",
       "summary": "A股日线回测：持仓存真实价、除权日按复权因子折股数；先卖后买、开盘涨停作废；账平不代表引擎对",
@@ -26,6 +50,21 @@
       "text": "自研A股日线回测引擎的几个关键口径 A股日线回测：持仓存真实价、除权日按复权因子折股数；先卖后买、开盘涨停作废；账平不代表引擎对 回测引擎 复权记账 除权除息 broker_sim Context 分层取数 ashare-quant 方案 结论 背景 方案 持仓记账与除权折算 撮合规则（broker_sim） 分层取数与性能 持仓最高价重算 回测结果的诊断：示例策略亏 99.84% 决策记录 相关 结论 持仓记真实价和真实股数 ，和券商 App 对得上，另存一个记账基准复权因子 base_adj_factor ；和行情比价一律先用 cost_at(ctx) 折到 as_of 口径。除权除息日开盘前，股数按因子倍数放大后向下取整、成本价同倍摊薄，零头按除权参考价折现金，挂单股数一并放大。漏掉这一步，10 送 10 会让账面凭空少一半。 撮合 ：先卖后买（卖出资金当日可用）；用未加滑点的开盘价判涨跌停，再加滑点、再夹回 [跌停价, 涨停价]；买单只在 T+1 有效，卖单遇跌停或停牌一直顺延到成交；资金不足时按可用资金下调数量。 性能靠分层取数 ：Universe / Selector 面对全市场，只用 Context.panel() 宽表做向量化；Signal / ExitRule 只面对约 30 只候选和最多 5 只持仓，才逐只 bars() 。这条约定由「每日 bars() 次数上"
     },
     {
+      "slug": "note-a8f9f9",
+      "title": "故障排除",
+      "summary": "确认后端运行： ./status.sh",
+      "type": "",
+      "project": "博客",
+      "tags": [],
+      "created": "2026-09-23",
+      "updated": "2026-09-23",
+      "path": "知识库/个人项目/博客/08 - 故障排除.html",
+      "src": "个人项目/博客/08 - 故障排除.md",
+      "hash": "a8f9f9b29fb7b6677ceb643d5295c623ffbbefc7",
+      "links": [],
+      "text": "故障排除 确认后端运行： ./status.sh  博客  后端服务无法启动 PostgreSQL 未运行 数据库不存在 端口被占用 查看后端日志 Android 应用问题 无法连接后端 应用启动崩溃 Desktop 应用问题 :composeApp:run 启动后立即退出 Module with the Main dispatcher is missing Windows 安装包打包失败 数据库连接失败 用户不存在 确认数据库名 API 错误 401 Unauthorized 500 Internal Server Error 编译问题 Yarn Lock 冲突 macOS/iOS 依赖下载失败 inline 函数编译错误 expect/actual 注解不匹配 常用诊断命令 后端服务无法启动 PostgreSQL 未运行 brew services start postgresql@15 数据库不存在 /opt/homebrew/opt/postgresql@15/bin/psql postgres -c \"CREATE DATABASE personalblog;\" 端口被占用 lsof -i :9191 kill -9 <PID> 查看后端日志 tail -f /tmp/backend.log Android 应用问题 无法连接后端 确认后端运行： ./status.sh "
+    },
+    {
       "slug": "note-a087d7",
       "title": "A股免费数据源实测与数据层决策",
       "summary": "A股日线免费源实测：东财封IP弃用，Baostock主新浪备，北交所靠新浪，涨跌停自算，复权以as_of为基准",
@@ -48,6 +87,36 @@
         "note-f6c1c4"
       ],
       "text": "A股免费数据源实测与数据层决策 A股日线免费源实测：东财封IP弃用，Baostock主新浪备，北交所靠新浪，涨跌停自算，复权以as_of为基准 Baostock AKShare 新浪快照 涨跌停价 复权因子 未来函数 ashare-quant 方案 结论 背景 方案 数据源分工 各源实测要点 涨跌停规则 复权与未来函数 缺数三层兜底 实测规模（2026-09-20 首次回填） 决策记录 相关 结论 弃用两个源 ：东财接口（AKShare 的 _em 系列）从家用 IP 请求约 8 次就被封 IP，45 分钟以上都没恢复；通达信协议（pytdx、mootdx）从 2026-09 起行情类请求全部返回空。 沪深以 Baostock 为主 ： 每天都有 preclose 、 tradestatus 、 isST ，停牌日有行，已退市股票也能拉到； query_daily_history_k_AStock(日期) 一次请求拉全市场，约 1 分钟； 缺点：全量逐只回填 5807 只要 7 小时 46 分；当日数据约 17:30 以后才有；不含北交所。 北交所和兜底靠新浪 ： 个股日线用 920 新代码能拿到全部历史和后复权因子； 全市场快照和 Baostock 逐只对比完全一致，但拉一次 IP 就被封 5–60 分钟，只能一天拉一次。 历史涨跌停价没有免费来源 ：按\"板块 × ST × 日期"
+    },
+    {
+      "slug": "note-909ace",
+      "title": "使用手册",
+      "summary": "Android 应用：在模拟器或真机上打开",
+      "type": "",
+      "project": "博客",
+      "tags": [],
+      "created": "2026-09-23",
+      "updated": "2026-09-23",
+      "path": "知识库/个人项目/博客/05 - 使用手册.html",
+      "src": "个人项目/博客/05 - 使用手册.md",
+      "hash": "909ace41d48abba4c8289e5bff4021c6a8dd47aa",
+      "links": [],
+      "text": "使用手册 Android 应用：在模拟器或真机上打开  博客  快速开始 启动系统 访问地址 登录 系统管理 查看系统状态 启动 / 停止服务 数据库管理 内容管理 创建文章（通过 API） Markdown 支持 用户管理 修改用户角色 通过 SQL 直接提升权限 快捷键（Web 应用） 系统要求 开发环境 生产环境 快速开始 启动系统 # 推荐方式 ./start-dev.sh # 手动方式 brew services start postgresql@15 ./gradlew :backend:run & 访问地址 Android 应用：在模拟器或真机上打开 Web 应用： http://localhost:8080（开发模式 ） 后端 API： http://localhost:8080/api/v1 登录 默认管理员账号： 邮箱: admin@example.com 密码: admin123 首次登录后请立即修改密码！ 系统管理 查看系统状态 ./status.sh 显示：PostgreSQL 状态、后端服务状态、API 响应、数据库统计、Android 应用状态。 启动 / 停止服务 ./start-dev.sh # 启动开发环境 ./stop-dev.sh # 停止开发环境 tail -f /tmp/backend.log # 查看后端日志 数据库管理 ./db-ma"
+    },
+    {
+      "slug": "note-70c8b2",
+      "title": "API 文档",
+      "summary": "Base URL（开发）： http://localhost:8080/api/v1",
+      "type": "",
+      "project": "博客",
+      "tags": [],
+      "created": "2026-09-23",
+      "updated": "2026-09-23",
+      "path": "知识库/个人项目/博客/04 - API 文档.html",
+      "src": "个人项目/博客/04 - API 文档.md",
+      "hash": "70c8b260ce877f76ce7a92f726352134c64c676d",
+      "links": [],
+      "text": "API 文档 Base URL（开发）： http://localhost:8080/api/v1  博客  基础信息 公开接口（无需认证） 获取文章列表 获取文章详情 搜索文章 获取标签列表 按标签获取文章 获取文章评论 认证接口 用户注册 用户登录 需要认证的接口 发表评论 管理员接口（需要 ADMIN 角色） 创建文章 更新文章 删除文章 获取用户列表 更新用户角色 快速测试（curl） 基础信息 Base URL（开发）： http://localhost:8080/api/v1 Base URL（生产）： http://localhost/api/v1 （Nginx 反向代理） 认证方式： Authorization: Bearer <token> 数据格式：JSON 公开接口（无需认证） 获取文章列表 GET /api/v1/posts?page=1&size=10 返回分页文章列表， content 字段为 null（节省流量）。 获取文章详情 GET /api/v1/posts/{id} 返回完整文章内容（含 Markdown 正文）。 搜索文章 GET /api/v1/posts/search?q={keyword} 基于 PostgreSQL tsvector 全文搜索。 获取标签列表 GET /api/v1/tags 按标签获取文章 GET /api/v1/t"
     },
     {
       "slug": "note-32c264",
