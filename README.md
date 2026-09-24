@@ -13,7 +13,11 @@
 
 这些文件全部由 `dispatch-pages` 自动生成，不要手动修改；笔记的正文请在知识库里改，下一次同步会覆盖这里的副本。
 
-## 文档清单（5 篇）
+## 文档清单（6 篇）
+
+### ashare-quant
+
+- [青霉素出海股速览](%E6%96%87%E6%A1%A3/ashare-quant/%E9%9D%92%E9%9C%89%E7%B4%A0%E5%87%BA%E6%B5%B7%E8%82%A1%E9%80%9F%E8%A7%88.html) · [线上](https://lhanman.github.io/p/penicillin-export-stocks/) · 2026-09-25 — A股青霉素出海公司近一年走势、主力成本线与买卖点（按主板/创业板分组）
 
 ### claude-dispatch
 
