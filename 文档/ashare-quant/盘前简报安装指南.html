@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="盘前简报的 Telegram 机器人和 launchd 定时任务安装步骤">
+<meta name="description" content="盘前简报的 Telegram 机器人、定时任务和行情自动更新的安装步骤">
 <link rel="index" href="../../index.html">
 <title>盘前简报安装指南</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -159,7 +159,7 @@
   <header>
     <span class="eyebrow">ASHARE-QUANT · M5 盘前外围简报</span>
     <h1>盘前简报安装指南</h1>
-    <p class="lead">装好之后，每个 A 股交易日早上，Mac mini 会自己生成一份盘前简报，发到你手机的 Telegram 上。A 股休市的日子什么也不发。一共三步，前两步在手机和浏览器上点几下，第三步复制几条命令。</p>
+    <p class="lead">装好之后，每个 A 股交易日早上，Mac mini 会自己生成一份盘前简报，发到你手机的 Telegram 上。A 股休市的日子什么也不发。一共四步，前两步在手机和浏览器上点几下，后两步各复制几条命令。</p>
     <div class="clock" aria-label="时区换算">
       <div><span class="l">北京时间</span><span class="t">08:30</span></div>
       <span class="eq">=</span>
@@ -169,6 +169,7 @@
       <a href="#bot">① 建机器人</a>
       <a href="#env">② 填 .env</a>
       <a href="#install">③ 装定时任务</a>
+      <a href="#data">④ 行情自动更新</a>
       <a href="#daily">平时怎么查</a>
       <a href="#uninstall">卸载</a>
       <a href="#notes">注意事项</a>
@@ -229,6 +230,26 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.ashare-quant.brief.p
       <li>马上手动触发一次，确认整条链路是通的：
         <div class="code"><pre>launchctl kickstart -k gui/$(id -u)/com.ashare-quant.brief</pre><button class="copy" type="button">复制</button></div>
         <p>交易日手机会收到简报；休市日不会收到消息，但日志里会有一条"A 股休市，不生成简报"。</p>
+      </li>
+    </ol>
+  </section>
+
+  <section id="data">
+    <div class="step-head"><span class="num">4</span><div><h2>装行情自动更新</h2><p>终端里复制一段命令</p></div></div>
+    <p>简报要用前一个交易日的 A 股行情判断"近期主线"和"冷门"。这个定时任务每个工作日北京时间 20:30 和 07:45 各更新一次行情。不装的话，简报会写"本地 A 股行情停在某天，这次没有标注主线和冷门"。</p>
+    <ol class="sub">
+      <li>装上：
+        <div class="code"><pre>cd ~/workbench/ashare-quant
+cp deploy/launchd/com.ashare-quant.data.plist.example ~/Library/LaunchAgents/com.ashare-quant.data.plist
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.ashare-quant.data.plist</pre><button class="copy" type="button">复制</button></div>
+      </li>
+      <li>手动触发一次（大约 2 分钟），再看日志：
+        <div class="code"><pre>launchctl kickstart -k gui/$(id -u)/com.ashare-quant.data
+tail -n 20 ~/workbench/ashare-quant/data/logs/data.log</pre><button class="copy" type="button">复制</button></div>
+      </li>
+      <li>卸载：
+        <div class="code"><pre>launchctl bootout gui/$(id -u)/com.ashare-quant.data
+rm ~/Library/LaunchAgents/com.ashare-quant.data.plist</pre><button class="copy" type="button">复制</button></div>
       </li>
     </ol>
   </section>

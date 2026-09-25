@@ -16,7 +16,7 @@
     {
       "slug": "ashare-brief-setup",
       "title": "盘前简报安装指南",
-      "description": "盘前简报的 Telegram 机器人和 launchd 定时任务安装步骤",
+      "description": "盘前简报的 Telegram 机器人、定时任务和行情自动更新的安装步骤",
       "tags": [
         "ashare-quant",
         "telegram",

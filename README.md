@@ -18,7 +18,7 @@
 ### ashare-quant
 
 - [青霉素出海股速览](%E6%96%87%E6%A1%A3/ashare-quant/%E9%9D%92%E9%9C%89%E7%B4%A0%E5%87%BA%E6%B5%B7%E8%82%A1%E9%80%9F%E8%A7%88.html) · [线上](https://lhanman.github.io/p/penicillin-export-stocks/) · 2026-09-25 — A股青霉素出海公司：最近一周、日本梅毒事件复盘、买卖点、近一月A股主线与医药走势
-- [盘前简报安装指南](%E6%96%87%E6%A1%A3/ashare-quant/%E7%9B%98%E5%89%8D%E7%AE%80%E6%8A%A5%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97.html) · [线上](https://lhanman.github.io/p/ashare-brief-setup/) · 2026-09-25 — 盘前简报的 Telegram 机器人和 launchd 定时任务安装步骤
+- [盘前简报安装指南](%E6%96%87%E6%A1%A3/ashare-quant/%E7%9B%98%E5%89%8D%E7%AE%80%E6%8A%A5%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97.html) · [线上](https://lhanman.github.io/p/ashare-brief-setup/) · 2026-09-25 — 盘前简报的 Telegram 机器人、定时任务和行情自动更新的安装步骤
 
 ### claude-dispatch
 
