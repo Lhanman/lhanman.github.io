@@ -14,6 +14,21 @@
       "path": "文档/ashare-quant/青霉素出海股速览.html"
     },
     {
+      "slug": "ashare-brief-setup",
+      "title": "盘前简报安装指南",
+      "description": "盘前简报的 Telegram 机器人和 launchd 定时任务安装步骤",
+      "tags": [
+        "ashare-quant",
+        "telegram",
+        "launchd",
+        "安装指南"
+      ],
+      "project": "ashare-quant",
+      "created": "2026-09-25",
+      "updated": "2026-09-25",
+      "path": "文档/ashare-quant/盘前简报安装指南.html"
+    },
+    {
       "slug": "dispatch-manual",
       "title": "dispatch 分级调度手册",
       "description": "dispatch 插件手册：分层方案、七条核心原理、运行过程、五个级别、审查环节、模型与消耗、知识库、文档站、脑暴和上手步骤",

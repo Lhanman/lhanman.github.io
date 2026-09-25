@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="盘前简报的 Telegram 机器人和 launchd 定时任务安装步骤">
+<link rel="index" href="../../index.html">
+<title>盘前简报安装指南</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+  :root {
+    --bg: #f5f7f8;
+    --surface: #ffffff;
+    --ink: #1b2429;
+    --muted: #5b6a72;
+    --line: #dde4e7;
+    --accent: #1f6f8b;
+    --accent-soft: #e3eff3;
+    --code-bg: #17232a;
+    --code-ink: #dce8ec;
+    --warn: #9a5b12;
+    --warn-soft: #fbf1e3;
+    --ok: #2f7a4f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #11181c;
+      --surface: #182228;
+      --ink: #e4ecef;
+      --muted: #97a7ae;
+      --line: #2a3840;
+      --accent: #5fb3cf;
+      --accent-soft: #1b3440;
+      --code-bg: #0b1114;
+      --code-ink: #d6e4e9;
+      --warn: #e0a55a;
+      --warn-soft: #2d2419;
+      --ok: #6cc796;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #11181c;
+    --surface: #182228;
+    --ink: #e4ecef;
+    --muted: #97a7ae;
+    --line: #2a3840;
+    --accent: #5fb3cf;
+    --accent-soft: #1b3440;
+    --code-bg: #0b1114;
+    --code-ink: #d6e4e9;
+    --warn: #e0a55a;
+    --warn-soft: #2d2419;
+    --ok: #6cc796;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.75 "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif;
+    padding-inline: 16px;
+    padding-block: 28px 56px;
+  }
+  main { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 36px; }
+  h1, h2, h3 { text-wrap: balance; line-height: 1.3; margin: 0; }
+  h1 { font-size: 1.75rem; font-weight: 700; }
+  h2 { font-size: 1.3rem; font-weight: 700; }
+  h3 { font-size: 1.02rem; font-weight: 700; }
+  p { margin: 0; }
+  a { color: var(--accent); }
+  code { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 0.88em; }
+  :not(pre) > code { background: var(--accent-soft); padding: 1px 6px; border-radius: 4px; word-break: break-all; }
+
+  header { display: flex; flex-direction: column; gap: 14px; }
+  .eyebrow { font-size: 0.8rem; letter-spacing: 0.08em; color: var(--muted); }
+  .lead { color: var(--muted); }
+
+  .clock {
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+  }
+  .clock div { display: flex; flex-direction: column; }
+  .clock .t { font-family: "JetBrains Mono", monospace; font-size: 1.6rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .clock .l { font-size: 0.8rem; color: var(--muted); }
+  .clock .eq { color: var(--muted); font-size: 1.2rem; }
+  .clock .right { text-align: right; }
+  .clock .right .t { color: var(--accent); }
+
+  nav.steps { display: flex; flex-wrap: wrap; gap: 8px; }
+  nav.steps a {
+    text-decoration: none; font-size: 0.9rem; padding: 6px 12px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--ink); background: var(--surface);
+  }
+  nav.steps a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  section { display: flex; flex-direction: column; gap: 16px; }
+  .step-head { display: flex; align-items: baseline; gap: 12px; }
+  .num {
+    flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--accent); color: var(--bg); font-weight: 700; font-size: 0.95rem;
+  }
+  .step-head p { color: var(--muted); font-size: 0.9rem; }
+
+  ol.sub { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 14px; }
+  ol.sub li { padding-left: 4px; }
+  ol.sub li > * + * { margin-top: 8px; }
+  ol.sub li::marker { color: var(--accent); font-weight: 700; }
+
+  .code {
+    position: relative; background: var(--code-bg); border-radius: 8px;
+    display: flex; flex-direction: column;
+  }
+  .code pre {
+    margin: 0; padding: 14px 16px; padding-right: 76px; overflow-x: auto;
+    color: var(--code-ink); font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 0.84rem; line-height: 1.65; white-space: pre;
+  }
+  .code .cap { font-size: 0.72rem; color: #8aa0a9; padding: 8px 16px 0; letter-spacing: 0.04em; }
+  .copy {
+    position: absolute; top: 8px; right: 8px;
+    font: 500 0.8rem "Noto Sans SC", system-ui, sans-serif; color: var(--code-ink);
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 6px; padding: 5px 10px; cursor: pointer; min-height: 32px;
+  }
+  .copy:hover { background: rgba(255,255,255,0.16); }
+  .copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .copy.done { color: #9be0b6; border-color: #6cc796; }
+
+  .note {
+    background: var(--warn-soft); border-left: 3px solid var(--warn); border-radius: 0 8px 8px 0;
+    padding: 10px 14px; font-size: 0.93rem;
+  }
+  .note strong { color: var(--warn); }
+  .secret { background: var(--accent-soft); border-radius: 8px; padding: 10px 14px; font-size: 0.93rem; }
+
+  .checks { display: flex; flex-direction: column; gap: 18px; }
+  .check { display: flex; flex-direction: column; gap: 8px; }
+  .check p { color: var(--muted); font-size: 0.93rem; }
+
+  dl.faq { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+  dl.faq dt { font-weight: 700; }
+  dl.faq dd { margin: 4px 0 0; color: var(--muted); }
+
+  footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 16px; }
+
+  @media (max-width: 420px) {
+    h1 { font-size: 1.5rem; }
+    .clock .t { font-size: 1.3rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<main>
+  <header>
+    <span class="eyebrow">ASHARE-QUANT · M5 盘前外围简报</span>
+    <h1>盘前简报安装指南</h1>
+    <p class="lead">装好之后，每个 A 股交易日早上，Mac mini 会自己生成一份盘前简报，发到你手机的 Telegram 上。A 股休市的日子什么也不发。一共三步，前两步在手机和浏览器上点几下，第三步复制几条命令。</p>
+    <div class="clock" aria-label="时区换算">
+      <div><span class="l">北京时间</span><span class="t">08:30</span></div>
+      <span class="eq">=</span>
+      <div class="right"><span class="l">这台 Mac（东京时间）</span><span class="t">09:30</span></div>
+    </div>
+    <nav class="steps" aria-label="目录">
+      <a href="#bot">① 建机器人</a>
+      <a href="#env">② 填 .env</a>
+      <a href="#install">③ 装定时任务</a>
+      <a href="#daily">平时怎么查</a>
+      <a href="#uninstall">卸载</a>
+      <a href="#notes">注意事项</a>
+    </nav>
+  </header>
+
+  <section id="bot">
+    <div class="step-head"><span class="num">1</span><div><h2>在 Telegram 里建一个机器人</h2><p>在手机上做，大约 3 分钟</p></div></div>
+    <ol class="sub">
+      <li>在 Telegram 里搜索 <code>@BotFather</code>（带蓝色认证标记的那个），点进去，发：
+        <div class="code"><pre>/newbot</pre><button class="copy" type="button">复制</button></div>
+      </li>
+      <li>它先问机器人的显示名字，随便起，比如"盘前简报"。</li>
+      <li>再问用户名，必须以 <code>bot</code> 结尾，而且全网不能重名，比如 <code>lhan_brief_bot</code>。</li>
+      <li>建好后它会回一段话，里面有一串形如 <code>1234567890:AAH…</code> 的字符，这就是<strong>机器人密钥</strong>。
+        <div class="secret">密钥相当于这个机器人的钥匙：不要发给别人，也不要截图外传。</div>
+      </li>
+      <li>搜索你刚起的用户名，点进去，点"开始"（Start），再随便发一句话，比如"你好"。
+        <div class="note"><strong>这一步不能省。</strong>机器人不能主动找一个从没跟它说过话的人。</div>
+      </li>
+    </ol>
+  </section>
+
+  <section id="env">
+    <div class="step-head"><span class="num">2</span><div><h2>拿到聊天编号，填进 .env</h2><p>浏览器加终端，大约 2 分钟</p></div></div>
+    <ol class="sub">
+      <li>在浏览器里打开下面这个网址。复制后先把 <code>&lt;密钥&gt;</code> 换成上一步拿到的整串密钥：
+        <div class="code"><pre>https://api.telegram.org/bot&lt;密钥&gt;/getUpdates</pre><button class="copy" type="button">复制</button></div>
+      </li>
+      <li>页面上找 <code>"chat":{"id":</code> 后面的那串数字（一般 9 到 10 位），这就是你的<strong>聊天编号</strong>。页面上什么都没有的话，回 Telegram 再给机器人发一句话，然后刷新。</li>
+      <li>在 Mac 的终端里复制一份模板，并打开它：
+        <div class="code"><pre>cd ~/workbench/ashare-quant
+cp .env.example .env
+open -e .env</pre><button class="copy" type="button">复制</button></div>
+      </li>
+      <li>在打开的文件里填上这两项（换成你自己的值），保存：
+        <div class="code"><span class="cap">.env 的样子</span><pre>AQ_TELEGRAM_BOT_TOKEN=1234567890:AAH...
+AQ_TELEGRAM_CHAT_ID=987654321</pre></div>
+        <p><code>.env</code> 不会进 git，放心填。</p>
+      </li>
+      <li>手动试发一次，确认手机能收到：
+        <div class="code"><pre>uv run aq brief --push</pre><button class="copy" type="button">复制</button></div>
+        <p>休市日它只会提示"A 股休市，不生成简报"。想在休市日也试试发送，就补看一个以前的交易日：</p>
+        <div class="code"><pre>uv run aq brief --date 2026-09-24 --push</pre><button class="copy" type="button">复制</button></div>
+      </li>
+    </ol>
+  </section>
+
+  <section id="install">
+    <div class="step-head"><span class="num">3</span><div><h2>装定时任务</h2><p>终端里复制两段命令</p></div></div>
+    <ol class="sub">
+      <li>装上：
+        <div class="code"><pre>cd ~/workbench/ashare-quant
+mkdir -p data/logs
+cp deploy/launchd/com.ashare-quant.brief.plist.example ~/Library/LaunchAgents/com.ashare-quant.brief.plist
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.ashare-quant.brief.plist</pre><button class="copy" type="button">复制</button></div>
+      </li>
+      <li>马上手动触发一次，确认整条链路是通的：
+        <div class="code"><pre>launchctl kickstart -k gui/$(id -u)/com.ashare-quant.brief</pre><button class="copy" type="button">复制</button></div>
+        <p>交易日手机会收到简报；休市日不会收到消息，但日志里会有一条"A 股休市，不生成简报"。</p>
+      </li>
+    </ol>
+  </section>
+
+  <section id="daily">
+    <h2>平时怎么查</h2>
+    <div class="checks">
+      <div class="check">
+        <h3>看日志</h3>
+        <p>每次运行开头有一行"aq brief --push 开始"，后面是简报正文和"已推送"，或者失败原因。</p>
+        <div class="code"><pre>cd ~/workbench/ashare-quant
+tail -n 60 data/logs/brief.log</pre><button class="copy" type="button">复制</button></div>
+      </div>
+      <div class="check">
+        <h3>看历史简报</h3>
+        <p>每份简报都存在 <code>data/briefs/&lt;日期&gt;-&lt;时间戳&gt;/</code>：<code>brief.txt</code> 是发出去的原文，<code>brief.json</code> 记着每一项的数字、用的是美东哪一天、有没有推送成功。</p>
+        <div class="code"><pre>ls -t ~/workbench/ashare-quant/data/briefs | head</pre><button class="copy" type="button">复制</button></div>
+      </div>
+      <div class="check">
+        <h3>看定时任务在不在</h3>
+        <div class="code"><pre>launchctl print gui/$(id -u)/com.ashare-quant.brief | head -20</pre><button class="copy" type="button">复制</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="uninstall">
+    <h2>卸载</h2>
+    <p>卸载只是不再定时运行，已经存下的简报和数据都不动。</p>
+    <div class="code"><pre>launchctl bootout gui/$(id -u)/com.ashare-quant.brief
+rm ~/Library/LaunchAgents/com.ashare-quant.brief.plist</pre><button class="copy" type="button">复制</button></div>
+  </section>
+
+  <section id="notes">
+    <h2>注意事项</h2>
+    <dl class="faq">
+      <div><dt>时区换算</dt><dd>这台 Mac 的时区是东京，比北京快 1 小时。模板里写的 09:30 就是北京时间 08:30。以后要改运行时间，在北京时间上加 1 小时再填。</dd></div>
+      <div><dt>代理要开着</dt><dd>Telegram 在国内要经 Clash Verge（<code>127.0.0.1:7890</code>）才能连上。Clash Verge 没开或者端口改了，简报就发不出去，日志里会写"Telegram 发送失败"。端口改了要同步改模板并重装。</dd></div>
+      <div><dt>Mac 不能关机，要保持登录</dt><dd>这个任务跟着你的用户账号运行，关机或退出登录就不会跑。机器睡着时错过的那次，唤醒后会补跑一次。</dd></div>
+      <div><dt>改了模板要重装</dt><dd>改完 <code>~/Library/LaunchAgents/com.ashare-quant.brief.plist</code> 之后，先执行"卸载"里的第一条，再执行第 3 步里 <code>launchctl bootstrap</code> 那一条。</dd></div>
+      <div><dt>收不到消息</dt><dd>先看日志。常见原因：密钥填错（日志写"机器人密钥无效"）、聊天编号填错（"找不到这个聊天编号"）、代理没开、还没给机器人发过消息。</dd></div>
+    </dl>
+  </section>
+
+  <footer>来源：仓库里的 deploy/launchd/安装说明.md。这是 M7 常驻程序上线之前的临时做法，用的是 macOS 自带的 launchd。</footer>
+</main>
+
+<script>
+  document.querySelectorAll(".copy").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var pre = btn.parentElement.querySelector("pre");
+      var text = pre.textContent;
+      function done(label) {
+        btn.textContent = label;
+        btn.classList.add("done");
+        setTimeout(function () { btn.textContent = "复制"; btn.classList.remove("done"); }, 1600);
+      }
+      function selectFallback() {
+        var range = document.createRange();
+        range.selectNodeContents(pre);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        done("已选中，长按复制");
+      }
+      try {
+        navigator.clipboard.writeText(text).then(function () { done("已复制"); }, selectFallback);
+      } catch (e) {
+        selectFallback();
+      }
+    });
+  });
+</script>
+</body>
+</html>
