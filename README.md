@@ -31,10 +31,11 @@
 
 - [小说 AI 改编评估](%E6%96%87%E6%A1%A3/%E5%85%B6%E4%BB%96/%E5%B0%8F%E8%AF%B4%20AI%20%E6%94%B9%E7%BC%96%E8%AF%84%E4%BC%B0.html) · [线上](https://lhanman.github.io/p/novel-ai-adaptation/) · 2026-09-19 — 输入书名，产出章节高光与概述、章节漫画、多角色有声剧：国内与海外模型方案的成本对比、可行性、实现方案与风险
 
-## 知识库笔记（15 篇）
+## 知识库笔记（16 篇）
 
 ### ashare-quant
 
+- [组合型策略与独立风控的设计要点](%E7%9F%A5%E8%AF%86%E5%BA%93/%E4%B8%AA%E4%BA%BA%E9%A1%B9%E7%9B%AE/ashare-quant/%E7%BB%84%E5%90%88%E5%9E%8B%E7%AD%96%E7%95%A5%E4%B8%8E%E7%8B%AC%E7%AB%8B%E9%A3%8E%E6%8E%A7%E7%9A%84%E8%AE%BE%E8%AE%A1%E8%A6%81%E7%82%B9.html) · [线上](https://lhanman.github.io/kb/portfolio-strategy-risk-design/) · 2026-09-26 — 组合型策略别把指数择时写进卖出规则；风控要看的历史需单独载入；复现旧回测用 --cash 1000000 --no-risk
 - [A股中短线策略研究的教训](%E7%9F%A5%E8%AF%86%E5%BA%93/%E4%B8%AA%E4%BA%BA%E9%A1%B9%E7%9B%AE/ashare-quant/A%E8%82%A1%E4%B8%AD%E7%9F%AD%E7%BA%BF%E7%AD%96%E7%95%A5%E7%A0%94%E7%A9%B6%E7%9A%84%E6%95%99%E8%AE%AD.html) · [线上](https://lhanman.github.io/kb/ashare-strategy-lessons/) · 2026-09-25 — A股追当天大涨的买点负期望、高开大概率低走；大盘过滤加破位清仓唯一普遍有效；好成绩先查集中度，样本外只考一次
 - [自研A股日线回测引擎的几个关键口径](%E7%9F%A5%E8%AF%86%E5%BA%93/%E4%B8%AA%E4%BA%BA%E9%A1%B9%E7%9B%AE/ashare-quant/%E8%87%AA%E7%A0%94A%E8%82%A1%E6%97%A5%E7%BA%BF%E5%9B%9E%E6%B5%8B%E5%BC%95%E6%93%8E%E7%9A%84%E5%87%A0%E4%B8%AA%E5%85%B3%E9%94%AE%E5%8F%A3%E5%BE%84.html) · [线上](https://lhanman.github.io/kb/note-f6c1c4/) · 2026-09-23 — A股日线回测：持仓存真实价、除权日按复权因子折股数；先卖后买、开盘涨停作废；账平不代表引擎对
 - [A股免费数据源实测与数据层决策](%E7%9F%A5%E8%AF%86%E5%BA%93/%E4%B8%AA%E4%BA%BA%E9%A1%B9%E7%9B%AE/ashare-quant/A%E8%82%A1%E5%85%8D%E8%B4%B9%E6%95%B0%E6%8D%AE%E6%BA%90%E5%AE%9E%E6%B5%8B%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%B1%82%E5%86%B3%E7%AD%96.html) · [线上](https://lhanman.github.io/kb/note-a087d7/) · 2026-09-23 — A股日线免费源实测：东财封IP弃用，Baostock主新浪备，北交所靠新浪，涨跌停自算，复权以as_of为基准
