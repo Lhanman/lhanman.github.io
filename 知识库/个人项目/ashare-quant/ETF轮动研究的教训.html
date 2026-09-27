@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ETF轮动研究的教训 · Lhanman 的知识库</title>
+<meta name="description" content="ETF轮动打分选3只每周换，跑不赢按类等权对照组；窗口拉长有效，结果对keep_top敏感，样本内打平样本外差36点">
+<link rel="index" href="../../index.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;800;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+:root{--ground:#F3F4F6;--paper:#FFFFFF;--ink:#161A21;--muted:#5B6372;--rule:#DADDE3;--chip:#E4E8F2;--chip-ink:#2E4893;--accent:#4865AA;--mark:#FDF2C7;
+--serif:"Noto Serif SC","Songti SC",serif;--sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;--mono:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root{--ground:#12151B;--paper:#1A1E26;--ink:#E5E8EE;--muted:#9AA2B1;--rule:#2C323D;--chip:#222B3D;--chip-ink:#AFC1EA;--accent:#95ABDB;--mark:#4A421F}}
+*{box-sizing:border-box}
+html{color-scheme:light dark}
+body{margin:0;background:var(--ground);color:var(--ink);font:15.5px/1.75 var(--sans);padding-inline:20px;padding-block:0 80px}
+a{color:var(--accent)}
+.eyebrow{font:600 11.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.chip{font:500 12px/1 var(--mono);padding:4px 8px;border-radius:3px;background:var(--chip);color:var(--chip-ink)}
+.kb-private{color:var(--muted);font-style:normal;opacity:.75}
+
+main{max-width:820px;margin:0 auto}
+.crumb{padding-block:28px 0;font:500 12.5px/1.6 var(--mono);color:var(--muted)}
+.crumb a{color:var(--muted);text-decoration:none}
+.crumb a:hover{color:var(--accent)}
+header.note{padding-block:14px 22px;border-bottom:1px solid var(--rule)}
+header.note h1{font:900 clamp(26px,4.4vw,38px)/1.25 var(--serif);margin:6px 0 10px;text-wrap:balance}
+header.note .summary{margin:0 0 14px;color:var(--muted)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font:500 12px/1.4 var(--mono);color:var(--muted)}
+.toc{margin:22px 0 0;padding:14px 16px;background:var(--paper);border:1px solid var(--rule);border-radius:8px}
+.toc p{margin:0 0 8px;font:600 11.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.toc li.l3{padding-left:16px;font-size:14px}
+.toc a{color:var(--ink);text-decoration:none}
+.toc a:hover{color:var(--accent)}
+article{padding-block:8px 24px}
+article h2{font:800 22px/1.4 var(--serif);margin:32px 0 10px;padding-top:6px;border-top:1px solid var(--rule)}
+article h3{font:700 17.5px/1.5 var(--sans);margin:22px 0 8px}
+article h4{font:700 15.5px/1.5 var(--sans);margin:18px 0 6px;color:var(--muted)}
+article p{margin:10px 0}
+article ul,article ol{margin:10px 0;padding-left:22px}
+article li{margin:4px 0}
+article li.task{list-style:none;margin-left:-18px}
+article blockquote{margin:14px 0;padding:2px 14px;border-left:3px solid var(--rule);color:var(--muted)}
+article code{font:13.5px/1.6 var(--mono);background:var(--chip);color:var(--chip-ink);padding:1px 5px;border-radius:3px}
+article pre{margin:14px 0;padding:14px 16px;background:var(--paper);border:1px solid var(--rule);border-radius:8px;overflow:auto}
+article pre code{background:none;color:var(--ink);padding:0;font-size:13px;line-height:1.7}
+article hr{border:0;border-top:1px solid var(--rule);margin:26px 0}
+article img{max-width:100%;border-radius:6px}
+.kb-table{overflow-x:auto;margin:14px 0}
+article table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--paper)}
+article th,article td{border:1px solid var(--rule);padding:7px 10px;text-align:left;vertical-align:top}
+article th{background:var(--chip);color:var(--chip-ink);font-weight:600;white-space:nowrap}
+footer.note{border-top:1px solid var(--rule);padding-top:20px;display:grid;gap:18px}
+footer.note section{display:grid;gap:6px}
+footer.note h2{font:600 11.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0}
+footer.note ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+footer.note a{text-decoration:none}
+footer.note a:hover{text-decoration:underline}
+.back{display:flex;flex-wrap:wrap;gap:14px;font:500 13px/1.6 var(--mono)}
+.stamp{color:var(--muted);font-size:12.5px;margin:0}
+@media (max-width:640px){article th{white-space:normal}}
+</style>
+</head>
+<body>
+<main>
+<nav class="crumb"><a href="../../index.html">Lhanman 的知识库</a> / <span>ashare-quant</span></nav>
+<header class="note">
+<span class="eyebrow">知识库笔记</span>
+<h1>ETF轮动研究的教训</h1>
+<p class="summary">ETF轮动打分选3只每周换，跑不赢按类等权对照组；窗口拉长有效，结果对keep_top敏感，样本内打平样本外差36点</p>
+<div class="meta"><span class="chip">踩坑</span><span>ashare-quant</span><span>更新于 2026-09-28</span><span class="chip">ETF轮动</span><span class="chip">对照组</span><span class="chip">trend_linear</span><span class="chip">etf_rotation_pool</span><span class="chip">keep_top</span><span class="chip">样本外</span></div>
+</header>
+<nav class="toc"><p>本篇目录</p><ol><li class="l2"><a href="#结论">结论</a></li><li class="l2"><a href="#现象">现象</a></li><li class="l2"><a href="#根因">根因</a></li><li class="l2"><a href="#解决">解决</a></li><li class="l2"><a href="#如何避免">如何避免</a></li><li class="l2"><a href="#相关">相关</a></li></ol></nav>
+<article>
+<h2 id="结论">结论</h2>
+<ul><li><strong>对照组用&quot;候选池按类等权、每月调回&quot;，不用沪深 300</strong>。它本身就是很强的分散组合：2018—2022 年 +32.07%、回撤 12.1%；<br>2023-01 至 2026-09 +42.73%、回撤 8.0%。ETF 线的任何新做法，先回答&quot;比它好在哪&quot;。</li><li><strong>趋势指标的窗口要长</strong>：5 个指标都看 20 日时样本内卡玛 −0.05，60 日 0.36，120 日 0.42。短窗口名次一周就大变，<br>亏损集中在&quot;买进 4—10 天就跌出前几名被卖掉&quot;的交易。</li><li><strong>打分用名次分位时，&quot;波动&quot;&quot;回撤&quot;两项的窗口长短几乎不起作用</strong>：高波动品种在池子里永远排最高，急跌时股票类的<br>波动一起变大，相对名次不变。但这两项不能去掉——去掉后下跌年份不再躲进债券、货币，回撤从 15% 涨到 25%。</li><li><strong>结果对 <code>keep_top</code> 很敏感</strong>：取 6、8、10，样本内卡玛 0.36、0.27、0.38，不随参数平滑变化。缓冲宽，急跌时持仓卖不掉；<br>缓冲窄，&quot;同一类最多 1 只&quot;挤到第 7—13 名的买入一周就被卖。这种不平滑是&quot;再调就是凑数&quot;的信号。</li><li><strong>样本内打平，样本外会差得远</strong>：候选样本内比对照组少 0.44 个百分点，样本外 +6.30% 对 +42.73%，差 36.4 个百分点，<br>回撤 24.07% 也超过上限。&quot;打分挑 3 只、每周整只换&quot;每年都在付换错的代价。</li></ul>
+<h2 id="现象">现象</h2>
+<ul><li>候选（<code>strategies/etf_rotation.yaml</code>，样本内第 8 版）：18 个大类资产名额 + 每月 10 只行业 ETF 的池子里，5 个趋势指标<br>（全 120 日）名次分位加权，持 3 只、同一类最多 1 只、跌出前 6 名才换、每周换仓、次日收盘价成交，12 万元、开风控。</li><li>样本内（2018-03 至 2022-12）+31.63%、回撤 14.35%、卡玛 0.42，四条标准里只差&quot;跑赢对照组&quot;。</li><li>样本外（2023-01 至 2026-09）：总收益 +6.30%（满足）、回撤 24.07%（超过 20%）、平仓 101 笔（满足）、落后对照组 36.4 个百分点。<br>赚钱几乎全靠黄金（17 笔赚 3.52 万元）；2026 年名次轮换追进化工、豆粕、通信等又回落，两次触发账户熔断。</li></ul>
+<h2 id="根因">根因</h2>
+<ul><li><strong>对照组吃满了少数资产的长期上涨</strong>：样本外纳指 ETF +189%、黄金 ETF +120%，对照组一直各拿一份；轮动只断断续续拿过纳指。</li><li><strong>轮动的利润只来自拿得久的交易</strong>：样本内外都是&quot;持有 21 天以上赚钱、4—20 天亏钱&quot;。换手本身不贵（费用只占毛收益 4%—19%），<br>贵的是换错。</li><li><strong>样本内的规律到样本外会反过来</strong>：样本内靠&quot;涨势类指标&quot;入选的买入赚钱、靠&quot;稳健类&quot;入选的亏钱；样本外正好相反。</li><li><strong>急跌时的回撤由缓冲决定</strong>：规矩允许改的几项里，只有 <code>keep_top</code> 能决定急跌时卖不卖；换指标窗口作用不大（见结论第 3 条）。</li></ul>
+<h2 id="解决">解决</h2>
+<ul><li>按规矩：8 个版本里没有一版四条全满足，选样本内卡玛最高的一版去考，事先写明&quot;大概率考不过跑赢对照组&quot;。</li><li>考试不达标，ETF 线不挂策略；看过样本外成绩后不改候选重考。</li><li>剩下的 2 个版本名额不用：结果对参数不平滑，再调只是凑那 0.44 个百分点。</li></ul>
+<h2 id="如何避免">如何避免</h2>
+<ul><li><strong>研究前先把对照组跑出来</strong>，看它的样本内成绩有多强，再判断轮动有没有机会；对照组和候选用同一个池子、同一个引擎。</li><li><strong>单一参数的相邻取值结果来回跳时，停止细调</strong>，把现象写进研究记录，而不是换着数去凑达标线。</li><li><strong>样本内只和对照组打平的候选，不要期待样本外能赢</strong>；四条里差的那一条，考试时通常差得更多。</li><li>以后如果还做 ETF 轮动，值得试的方向是&quot;以按类分散持有为底、只做小幅倾斜&quot;，而不是&quot;只拿 3 只、整只换&quot;；这是新的一轮研究，<br>要重新定规则、另开变更。</li><li>候选池规则、指标清单、对照组在第一次回测前提交封存；每个版本跑之前写下改什么和依据，放弃的版本也记。</li></ul>
+<h2 id="相关">相关</h2>
+<ul><li>研究记录：<code>docs/research/2026-09-27-ETF轮动研究记录.md</code>（8 个版本的数字、候选池样子、样本外市场特征）</li><li>OpenSpec 变更：<code>openspec/changes/archive/2026-09-28-e1-etf-rotation-research/</code>；新规格 <code>openspec/specs/etf-candidate-pool/</code></li><li>代码：<code>src/aq/components/universe/etf_rotation_pool.py</code>（名额表）、<code>src/aq/factors/trend.py</code>（5 个趋势指标）、<br><code>src/aq/components/scorer/trend_linear.py</code>、<code>src/aq/components/portfolio/kind_equal.py</code>（对照组）、<code>src/aq/engine/criteria.py</code>（按线选标准、对照组运行）</li><li>策略文件：<code>strategies/etf_rotation.yaml</code>（候选）、<code>strategies/etf_benchmark.yaml</code>（对照组）</li><li>提交：<code>ad5c6f5</code>（规则定稿）、<code>e655a10</code>（候选定稿）、<code>df52cf0</code>（样本外考试与归档）</li><li>相关笔记：<a class="kb-link" href="../ashare-strategy-lessons/">A股中短线策略研究的教训</a>、<a class="kb-link" href="../portfolio-strategy-risk-design/">组合型策略与独立风控的设计要点</a></li></ul>
+</article>
+<footer class="note">
+
+<div class="back"><a href="../../index.html">← 全部文档和笔记</a><a href="../../graph/">知识图谱</a></div>
+<p class="stamp">这篇笔记由 dispatch 从个人知识库同步，更新于 2026-09-28。</p>
+</footer>
+</main>
+</body>
+</html>
