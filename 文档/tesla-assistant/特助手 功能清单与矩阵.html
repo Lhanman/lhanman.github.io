@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>特助手 功能清单与矩阵</title>
+<meta name="description" content="特助手（tesla-assistant）候选功能清单、属性矩阵、入口矩阵与风险分级。">
+<style>
+:root {
+  --bg: #f6f6f3;
+  --surface: #ffffff;
+  --panel: #eef0f4;
+  --text: #1b1d21;
+  --muted: #5a626d;
+  --line: #dfe2e7;
+  --accent: #2f5bea;
+  --accent-bg: #e8eeff;
+  --read: #4a5a78;      --read-bg: #e9edf4;
+  --rev: #12714f;       --rev-bg: #e2f3ec;
+  --conf: #b4400c;      --conf-bg: #fdeadf;
+  --none: #5a626d;      --none-bg: #eef0f3;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111215;
+    --surface: #1a1c21;
+    --panel: #20232a;
+    --text: #e9eaed;
+    --muted: #a0a7b2;
+    --line: #2d3037;
+    --accent: #8aa6ff;
+    --accent-bg: #1f2a4d;
+    --read: #aebbd6;    --read-bg: #242b38;
+    --rev: #5fd1a6;     --rev-bg: #15302a;
+    --conf: #ffa77a;    --conf-bg: #3a2218;
+    --none: #a0a7b2;    --none-bg: #24272d;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.65 -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px 64px; }
+header.hero { padding: 48px 0 24px; }
+.hero h1 { margin: 0 0 8px; font-size: 34px; line-height: 1.2; letter-spacing: .01em; }
+.hero p { margin: 0; max-width: 40em; color: var(--muted); font-size: 16px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.chip {
+  font-size: 13px; padding: 3px 12px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--line); color: var(--muted);
+}
+section { margin-top: 48px; }
+h2 { margin: 0 0 4px; font-size: 22px; line-height: 1.3; }
+.lead { margin: 0 0 20px; color: var(--muted); }
+.vgrid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.vcard {
+  background: var(--surface); border: 1px solid var(--line);
+  border-top: 3px solid var(--accent); border-radius: 10px; padding: 14px 16px;
+}
+.vcard h3 { margin: 0 0 4px; font-size: 16px; }
+.vcard p { margin: 0; color: var(--muted); font-size: 14px; }
+
+.diagram {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  padding: 12px; overflow-x: auto;
+}
+.diagram svg { display: block; width: 100%; min-width: 760px; height: auto; }
+.bx { fill: var(--surface); stroke: var(--line); stroke-width: 1; }
+.pn { fill: var(--panel); stroke: var(--line); stroke-width: 1; }
+.gw { fill: var(--accent-bg); stroke: var(--accent); stroke-width: 1.5; }
+.t { fill: var(--text); font-size: 13px; font-weight: 600; }
+.s { fill: var(--muted); font-size: 11px; }
+.hd { fill: var(--muted); font-size: 12px; letter-spacing: .1em; }
+.ln { stroke: var(--muted); stroke-width: 1.3; fill: none; }
+.ln.dash { stroke-dasharray: 5 4; }
+.mk { fill: var(--muted); }
+.caption { margin: 12px 4px 0; color: var(--muted); font-size: 14px; }
+
+.fgrid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.card header { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.card h3 { margin: 0; font-size: 17px; }
+.tag { font-size: 12px; color: var(--accent); background: var(--accent-bg); padding: 1px 8px; border-radius: 6px; }
+.note { margin-left: auto; font-size: 12px; color: var(--muted); }
+.card ul { list-style: none; margin: 0; padding: 0; }
+.card li { display: flex; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.card li:first-child { border-top: 0; }
+.id {
+  flex: none; width: 34px; height: 24px; display: inline-flex; align-items: center; justify-content: center;
+  font: 600 12px ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--accent); background: var(--accent-bg); border-radius: 6px;
+}
+.nm { font-weight: 600; }
+.ds { color: var(--muted); font-size: 14px; }
+
+.badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 8px; border-radius: 6px; line-height: 20px; white-space: nowrap; }
+.r-read { color: var(--read); background: var(--read-bg); }
+.r-rev  { color: var(--rev);  background: var(--rev-bg); }
+.r-conf { color: var(--conf); background: var(--conf-bg); }
+.r-none { color: var(--none); background: var(--none-bg); }
+.val { display: inline-block; font-size: 12px; padding: 0 6px; margin: 1px 2px 1px 0; border-radius: 4px; background: var(--panel); color: var(--text); white-space: nowrap; }
+
+.scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 900px; }
+table.mb { min-width: 560px; }
+th, td { padding: 9px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+thead th { position: sticky; top: 0; background: var(--panel); font-size: 13px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--panel); }
+td.c, th:not(:first-child) .x { text-align: center; }
+.mb td.c { text-align: center; font-size: 18px; }
+.mb th:not(:first-child) { text-align: center; }
+.mono { font: 600 12px ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--accent); white-space: nowrap; }
+.strong { font-weight: 600; }
+.m-full { color: var(--accent); }
+.m-part { color: var(--muted); }
+.m-none { color: var(--muted); opacity: .5; }
+.legend { margin: 10px 4px 0; color: var(--muted); font-size: 13px; display: flex; gap: 16px; flex-wrap: wrap; }
+
+.lanes { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.lane { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.lane h3 { margin: 0 0 8px; font-size: 16px; display: flex; gap: 8px; align-items: center; }
+.lane p { margin: 4px 0; font-size: 14px; }
+.lane .k { color: var(--muted); }
+.lane.read { border-top: 3px solid var(--read); }
+.lane.rev { border-top: 3px solid var(--rev); }
+.lane.conf { border-top: 3px solid var(--conf); }
+
+.todo { margin: 0; padding-left: 1.2em; }
+.todo li { margin: 6px 0; }
+.box { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px; }
+.foot { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+a { color: var(--accent); }
+@media (max-width: 520px) {
+  header.hero { padding-top: 32px; }
+  .hero h1 { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>特助手 功能清单与矩阵</h1>
+  <p>围绕特斯拉用车场景，做周边设备互联和车机控制。把车变成一台能被手机、手表、语音和家里设备顺手调用的设备。</p>
+  <div class="chips">
+    <span class="chip">20 项功能</span>
+    <span class="chip">候选清单，不排期</span>
+    <span class="chip">优先级待定</span>
+    <span class="chip">个人自用 demo 阶段</span>
+  </div>
+</header>
+
+<section>
+  <h2>体验价值</h2>
+  <p class="lead">每个功能都问一句：能不能少一步、少一次等待，或者多一点仪式感。下文用这四个标签。</p>
+  <div class="vgrid"><div class="vcard"><h3>省一步</h3><p>原本要在车机或官方 App 里点几下，现在一句话或一个按钮搞定。</p></div><div class="vcard"><h3>免等待</h3><p>上车前就把温度、座椅、导航备好，不用坐进去再等。</p></div><div class="vcard"><h3>仪式感</h3><p>一个场景名对应一组动作，比如“下班模式”“午休模式”。</p></div><div class="vcard"><h3>安心</h3><p>离车后门窗、充电状态心里有数，该提醒的会提醒。</p></div></div>
+</section>
+
+<section>
+  <h2>整体结构</h2>
+  <p class="lead">入口很多，出口只有一个：所有车控都经过指令网关，分级和确认只做一次。</p>
+  <div class="diagram">
+    <svg viewBox="0 0 960 460" role="img" aria-labelledby="dg-t dg-d">
+      <title id="dg-t">特助手整体结构图</title>
+      <desc id="dg-d">左侧五类入口汇入中间的特助手，特助手内含场景编排、指令网关、数据通道、授权与密钥、存储与分析，右侧通过 Fleet API、Fleet Telemetry 和 Tesla BLE 连接车辆。</desc>
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" class="mk"/>
+        </marker>
+      </defs>
+
+      <text class="hd" x="120" y="24" text-anchor="middle">入口</text>
+      <text class="hd" x="480" y="24" text-anchor="middle">特助手</text>
+      <text class="hd" x="840" y="24" text-anchor="middle">车辆侧（TESLA）</text>
+
+      <!-- entries -->
+      <g>
+        <rect class="bx" x="20" y="62" width="200" height="52" rx="8"/>
+        <text class="t" x="120" y="86" text-anchor="middle">Siri / 快捷指令</text>
+        <text class="s" x="120" y="103" text-anchor="middle">P1 一句话触发场景</text>
+        <rect class="bx" x="20" y="130" width="200" height="52" rx="8"/>
+        <text class="t" x="120" y="154" text-anchor="middle">手表 / 小组件</text>
+        <text class="s" x="120" y="171" text-anchor="middle">P2 常用场景一键点</text>
+        <rect class="bx" x="20" y="198" width="200" height="52" rx="8"/>
+        <text class="t" x="120" y="222" text-anchor="middle">家居场景</text>
+        <text class="s" x="120" y="239" text-anchor="middle">P3 家里的按键、场景</text>
+        <rect class="bx" x="20" y="266" width="200" height="52" rx="8"/>
+        <text class="t" x="120" y="290" text-anchor="middle">手机 App</text>
+        <text class="s" x="120" y="307" text-anchor="middle">C4 分享菜单、场景按钮</text>
+        <rect class="bx" x="20" y="334" width="200" height="52" rx="8"/>
+        <text class="t" x="120" y="358" text-anchor="middle">定时 / 事件触发</text>
+        <text class="s" x="120" y="375" text-anchor="middle">出发时间、车辆事件</text>
+      </g>
+      <g>
+        <path class="ln" d="M222 88 H296" marker-end="url(#ah)"/>
+        <path class="ln" d="M222 156 H296" marker-end="url(#ah)"/>
+        <path class="ln" d="M222 224 H296" marker-end="url(#ah)"/>
+        <path class="ln" d="M222 292 H296" marker-end="url(#ah)"/>
+        <path class="ln" d="M222 360 H296" marker-end="url(#ah)"/>
+      </g>
+
+      <!-- core -->
+      <rect class="pn" x="300" y="36" width="360" height="398" rx="12"/>
+      <rect class="bx" x="324" y="56" width="312" height="56" rx="8"/>
+      <text class="t" x="480" y="80" text-anchor="middle">场景编排</text>
+      <text class="s" x="480" y="98" text-anchor="middle">C1–C3 一个场景名对应一组动作</text>
+
+      <path class="ln" d="M480 114 V130" marker-end="url(#ah)"/>
+
+      <rect class="gw" x="324" y="132" width="312" height="90" rx="8"/>
+      <text class="t" x="480" y="160" text-anchor="middle">指令网关 F2</text>
+      <text class="s" x="480" y="181" text-anchor="middle">签名 · 风险分级 · 确认 · 操作日志</text>
+      <text class="s" x="480" y="200" text-anchor="middle">所有入口的车控都从这里出去</text>
+
+      <rect class="bx" x="324" y="242" width="312" height="56" rx="8"/>
+      <text class="t" x="480" y="266" text-anchor="middle">数据通道 F3</text>
+      <text class="s" x="480" y="284" text-anchor="middle">轮询 vehicle_data 或接 Telemetry</text>
+
+      <rect class="bx" x="324" y="316" width="312" height="50" rx="8"/>
+      <text class="t" x="480" y="338" text-anchor="middle">授权与密钥 F1</text>
+      <text class="s" x="480" y="355" text-anchor="middle">OAuth · 车端公钥 · 密钥不入库</text>
+
+      <rect class="bx" x="324" y="384" width="312" height="42" rx="8"/>
+      <text class="t" x="480" y="403" text-anchor="middle">存储与分析</text>
+      <text class="s" x="480" y="418" text-anchor="middle">N1–N3 · S1 · P5</text>
+
+      <!-- vehicle side -->
+      <rect class="bx" x="740" y="130" width="200" height="94" rx="8"/>
+      <text class="t" x="840" y="162" text-anchor="middle">Fleet API 云端</text>
+      <text class="s" x="840" y="183" text-anchor="middle">车控指令</text>
+      <text class="s" x="840" y="200" text-anchor="middle">vehicle_data 轮询</text>
+
+      <rect class="bx" x="740" y="242" width="200" height="56" rx="8"/>
+      <text class="t" x="840" y="266" text-anchor="middle">Fleet Telemetry</text>
+      <text class="s" x="840" y="284" text-anchor="middle">车辆主动推送</text>
+
+      <rect class="bx" x="740" y="316" width="200" height="50" rx="8"/>
+      <text class="t" x="840" y="338" text-anchor="middle">Tesla BLE 近场</text>
+      <text class="s" x="840" y="355" text-anchor="middle">P4 不经云端</text>
+
+      <path class="ln" d="M662 160 H738" marker-end="url(#ah)"/>
+      <text class="s" x="700" y="153" text-anchor="middle">指令</text>
+      <path class="ln" d="M738 198 H662" marker-end="url(#ah)"/>
+      <text class="s" x="700" y="216" text-anchor="middle">状态</text>
+      <path class="ln" d="M738 270 H662" marker-end="url(#ah)"/>
+      <text class="s" x="700" y="263" text-anchor="middle">推送</text>
+      <path class="ln dash" d="M738 341 H662" marker-end="url(#ah)"/>
+      <text class="s" x="700" y="334" text-anchor="middle">近场</text>
+    </svg>
+  </div>
+  <p class="caption">虚线是近场蓝牙，不经过云端，对应 P4。导航分析（N1–N3）只读，不走指令网关，直接使用数据通道里的数据。</p>
+</section>
+
+<section>
+  <h2>功能清单</h2>
+  <p class="lead">五组共 20 项。标签表示车辆影响：只读、可逆、需确认。</p>
+  <div class="fgrid">
+<article class="card grp-nav"><header><span class="tag">模块一</span><h3>导航预测准确度分析</h3><span class="note">已有调研</span></header><ul><li><span class="id">N1</span><div class="item"><div class="nm">导航数据采集 <span class="badge r-read">只读</span></div><div class="ds">记录起点、终点、车机预计到达时间、实际到达时间、轨迹</div></div></li><li><span class="id">N2</span><div class="item"><div class="nm">路线级准确度统计 <span class="badge r-read">只读</span></div><div class="ds">把常走路线归类，算长期预测偏差</div></div></li><li><span class="id">N3</span><div class="item"><div class="nm">偏差规律分析 <span class="badge r-read">只读</span></div><div class="ds">按早高峰、平峰、晚高峰和路段拆解，看系统性偏早还是偏晚</div></div></li></ul></article>
+<article class="card grp-ctl"><header><span class="tag">模块二</span><h3>车机控制</h3><span class="note">8 项</span></header><ul><li><span class="id">C1</span><div class="item"><div class="nm">预热 / 预冷场景 <span class="badge r-rev">可逆</span></div><div class="ds">一键启动空调，同时开座椅和方向盘加热，可设定时</div></div></li><li><span class="id">C2</span><div class="item"><div class="nm">离车检查与一键锁 <span class="badge r-rev">可逆</span></div><div class="ds">查门窗、后备箱、充电口是否关好，再锁车</div></div></li><li><span class="id">C3</span><div class="item"><div class="nm">露营 / 午休场景 <span class="badge r-rev">可逆</span></div><div class="ds">空调保持运行，同时设电量下限，低于下限提醒</div></div></li><li><span class="id">C4</span><div class="item"><div class="nm">目的地下发 <span class="badge r-rev">可逆</span></div><div class="ds">从手机分享菜单把地点推到车机导航</div></div></li><li><span class="id">C5</span><div class="item"><div class="nm">充电管理 <span class="badge r-rev">可逆</span></div><div class="ds">调充电上限和电流，启停充电，设定时充电</div></div></li><li><span class="id">C6</span><div class="item"><div class="nm">找车 <span class="badge r-rev">可逆</span></div><div class="ds">闪灯、鸣笛</div></div></li><li><span class="id">C7</span><div class="item"><div class="nm">开锁与开启类操作 <span class="badge r-conf">需确认</span></div><div class="ds">解锁、前后备箱、通风窗，每次先确认</div></div></li><li><span class="id">C8</span><div class="item"><div class="nm">媒体控制 <span class="badge r-rev">可逆</span></div><div class="ds">播放、暂停、切歌、音量</div></div></li></ul></article>
+<article class="card grp-link"><header><span class="tag">模块二</span><h3>周边互联</h3><span class="note">5 项</span></header><ul><li><span class="id">P1</span><div class="item"><div class="nm">语音入口 </div><div class="ds">Siri 和快捷指令，一句话触发场景</div></div></li><li><span class="id">P2</span><div class="item"><div class="nm">手表与小组件 </div><div class="ds">Apple Watch、桌面小组件，常用场景一键点</div></div></li><li><span class="id">P3</span><div class="item"><div class="nm">智能家居联动 </div><div class="ds">家里的按键或场景触发车辆动作，比如玄关按键启动预热</div></div></li><li><span class="id">P4</span><div class="item"><div class="nm">近场蓝牙控制 </div><div class="ds">走 Tesla BLE，不经云端，停车库没信号也能用</div></div></li><li><span class="id">P5</span><div class="item"><div class="nm">车辆事件推送 <span class="badge r-read">只读</span></div><div class="ds">充电完成、车门未关、哨兵触发推到手机或手表</div></div></li></ul></article>
+<article class="card grp-stat"><header><span class="tag">状态</span><h3>车辆状态面板</h3><span class="note">1 项</span></header><ul><li><span class="id">S1</span><div class="item"><div class="nm">车辆状态面板 <span class="badge r-read">只读</span></div><div class="ds">电量、续航、门窗、胎压、车内温度，只读</div></div></li></ul></article>
+<article class="card grp-base"><header><span class="tag">基础</span><h3>基础设施</h3><span class="note">3 项</span></header><ul><li><span class="id">F1</span><div class="item"><div class="nm">授权与密钥 </div><div class="ds">Fleet API 的 OAuth 授权，车端公钥部署，密钥不入库</div></div></li><li><span class="id">F2</span><div class="item"><div class="nm">指令网关 </div><div class="ds">统一收口车控：签名、风险分级、确认、操作日志</div></div></li><li><span class="id">F3</span><div class="item"><div class="nm">数据通道 </div><div class="ds">轮询 vehicle_data 或接 Fleet Telemetry，决定采集频率</div></div></li></ul></article>
+  </div>
+</section>
+
+<section>
+  <h2>矩阵 A：功能属性</h2>
+  <p class="lead">能力来源、车辆影响、是否要签名、依赖哪些基础设施，以及目前的验证状态。“待核对”只表示调研文档里还没逐项确认，不代表不可行。</p>
+  <div class="scroll"><table><thead><tr><th>ID</th><th>功能</th><th>能力来源</th><th>车辆影响</th><th>需签名</th><th>依赖</th><th>验证状态</th><th>体验价值</th></tr></thead><tbody><tr><td class="mono">N1</td><td class="strong">导航数据采集</td><td>vehicle_data / Telemetry</td><td><span class="badge r-read">只读</span></td><td>否</td><td class="mono">F1 F3</td><td>字段已确认，实测待做</td><td><span class="val">安心</span></td></tr><tr><td class="mono">N2</td><td class="strong">路线级准确度统计</td><td>自建</td><td><span class="badge r-read">只读</span></td><td>否</td><td class="mono">N1</td><td>依赖 N1 数据量</td><td><span class="val">安心</span></td></tr><tr><td class="mono">N3</td><td class="strong">偏差规律分析</td><td>自建</td><td><span class="badge r-read">只读</span></td><td>否</td><td class="mono">N1 N2</td><td>依赖 N1 数据量</td><td><span class="val">安心</span></td></tr><tr><td class="mono">C1</td><td class="strong">预热 / 预冷场景</td><td>车控指令</td><td><span class="badge r-rev">可逆</span></td><td>是</td><td class="mono">F1 F2</td><td>指令组已列出，实测待做</td><td><span class="val">免等待</span> <span class="val">仪式感</span></td></tr><tr><td class="mono">C2</td><td class="strong">离车检查与一键锁</td><td>vehicle_data + 车控指令</td><td><span class="badge r-rev">可逆</span></td><td>是</td><td class="mono">F1 F2 F3</td><td>门窗字段待核对</td><td><span class="val">安心</span> <span class="val">省一步</span></td></tr><tr><td class="mono">C3</td><td class="strong">露营 / 午休场景</td><td>车控指令 + vehicle_data</td><td><span class="badge r-rev">可逆</span></td><td>是</td><td class="mono">F1 F2 F3</td><td>空调保持指令待核对</td><td><span class="val">仪式感</span> <span class="val">安心</span></td></tr><tr><td class="mono">C4</td><td class="strong">目的地下发</td><td>navigation_request</td><td><span class="badge r-rev">可逆</span></td><td>是</td><td class="mono">F1 F2</td><td>指令已列出，实测待做</td><td><span class="val">省一步</span> <span class="val">免等待</span></td></tr><tr><td class="mono">C5</td><td class="strong">充电管理</td><td>车控指令</td><td><span class="badge r-rev">可逆</span></td><td>是</td><td class="mono">F1 F2</td><td>待核对官方文档</td><td><span class="val">省一步</span></td></tr><tr><td class="mono">C6</td><td class="strong">找车</td><td>车控指令</td><td><span class="badge r-rev">可逆</span></td><td>是</td><td class="mono">F1 F2</td><td>待核对官方文档</td><td><span class="val">省一步</span></td></tr><tr><td class="mono">C7</td><td class="strong">开锁与开启类操作</td><td>车控指令</td><td><span class="badge r-conf">需确认</span></td><td>是</td><td class="mono">F1 F2</td><td>开关锁、前后备箱已列出，通风窗待核对</td><td><span class="val">省一步</span></td></tr><tr><td class="mono">C8</td><td class="strong">媒体控制</td><td>车控指令</td><td><span class="badge r-rev">可逆</span></td><td>是</td><td class="mono">F1 F2</td><td>待核对官方文档</td><td><span class="val">省一步</span></td></tr><tr><td class="mono">P1</td><td class="strong">语音入口</td><td>自建网关 + 快捷指令</td><td><span class="badge r-none">随所调功能</span></td><td>随所调功能</td><td class="mono">F2</td><td>待设计</td><td><span class="val">省一步</span> <span class="val">仪式感</span></td></tr><tr><td class="mono">P2</td><td class="strong">手表与小组件</td><td>自建网关</td><td><span class="badge r-none">随所调功能</span></td><td>随所调功能</td><td class="mono">F2</td><td>待设计</td><td><span class="val">省一步</span></td></tr><tr><td class="mono">P3</td><td class="strong">智能家居联动</td><td>自建网关 + 家居平台</td><td><span class="badge r-none">随所调功能</span></td><td>随所调功能</td><td class="mono">F2</td><td>家居平台未选</td><td><span class="val">仪式感</span> <span class="val">免等待</span></td></tr><tr><td class="mono">P4</td><td class="strong">近场蓝牙控制</td><td>Tesla BLE</td><td><span class="badge r-none">随所调功能</span></td><td>是</td><td class="mono">F1</td><td>待核对官方 SDK</td><td><span class="val">省一步</span></td></tr><tr><td class="mono">P5</td><td class="strong">车辆事件推送</td><td>Fleet Telemetry</td><td><span class="badge r-read">只读</span></td><td>否</td><td class="mono">F1 F3</td><td>事件字段待核对</td><td><span class="val">安心</span></td></tr><tr><td class="mono">S1</td><td class="strong">车辆状态面板</td><td>vehicle_data</td><td><span class="badge r-read">只读</span></td><td>否</td><td class="mono">F1 F3</td><td>具体字段待核对</td><td><span class="val">安心</span></td></tr><tr><td class="mono">F1</td><td class="strong">授权与密钥</td><td>Fleet API 授权</td><td><span class="badge r-none">—</span></td><td>—</td><td class="mono">无</td><td>需先注册开发者账号</td><td>—</td></tr><tr><td class="mono">F2</td><td class="strong">指令网关</td><td>自建，含 Vehicle Command Protocol 签名</td><td><span class="badge r-none">—</span></td><td>是</td><td class="mono">F1</td><td>车型是否需要签名待确认</td><td>—</td></tr><tr><td class="mono">F3</td><td class="strong">数据通道</td><td>轮询或 Telemetry</td><td><span class="badge r-none">—</span></td><td>否</td><td class="mono">F1</td><td>采集方案待定</td><td>—</td></tr></tbody></table></div>
+</section>
+
+<section>
+  <h2>矩阵 B：功能 × 入口</h2>
+  <p class="lead">哪些功能适合从哪个入口触发。</p>
+  <div class="scroll"><table class="mb"><thead><tr><th>功能</th><th>Siri / 快捷指令</th><th>手表 / 小组件</th><th>家居场景</th><th>定时 / 事件触发</th></tr></thead><tbody><tr><td class="strong"><span class="mono">N1</span> 导航数据采集</td><td class="c"><span class="m-none" aria-label="不适用">·</span></td><td class="c"><span class="m-none" aria-label="不适用">·</span></td><td class="c"><span class="m-none" aria-label="不适用">·</span></td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td></tr><tr><td class="strong"><span class="mono">C1</span> 预热 / 预冷</td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td></tr><tr><td class="strong"><span class="mono">C2</span> 离车检查与一键锁</td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td><td class="c"><span class="m-part" role="img" aria-label="能做但意义有限">○</span></td><td class="c"><span class="m-none" aria-label="不适用">·</span></td></tr><tr><td class="strong"><span class="mono">C3</span> 露营 / 午休</td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td><td class="c"><span class="m-part" role="img" aria-label="能做但意义有限">○</span></td><td class="c"><span class="m-none" aria-label="不适用">·</span></td></tr><tr><td class="strong"><span class="mono">C4</span> 目的地下发</td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td><td class="c"><span class="m-part" role="img" aria-label="能做但意义有限">○</span></td><td class="c"><span class="m-none" aria-label="不适用">·</span></td><td class="c"><span class="m-none" aria-label="不适用">·</span></td></tr><tr><td class="strong"><span class="mono">C5</span> 充电管理</td><td class="c"><span class="m-part" role="img" aria-label="能做但意义有限">○</span></td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td><td class="c"><span class="m-part" role="img" aria-label="能做但意义有限">○</span></td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td></tr><tr><td class="strong"><span class="mono">C6</span> 找车</td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td><td class="c"><span class="m-none" aria-label="不适用">·</span></td><td class="c"><span class="m-none" aria-label="不适用">·</span></td></tr><tr><td class="strong"><span class="mono">C7</span> 开锁与开启类</td><td class="c"><span class="m-part" role="img" aria-label="能做但意义有限">○</span></td><td class="c"><span class="m-part" role="img" aria-label="能做但意义有限">○</span></td><td class="c"><span class="m-none" aria-label="不适用">·</span></td><td class="c"><span class="m-none" aria-label="不适用">·</span></td></tr><tr><td class="strong"><span class="mono">C8</span> 媒体控制</td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td><td class="c"><span class="m-none" aria-label="不适用">·</span></td><td class="c"><span class="m-none" aria-label="不适用">·</span></td></tr><tr><td class="strong"><span class="mono">P5</span> 事件推送</td><td class="c"><span class="m-none" aria-label="不适用">·</span></td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td><td class="c"><span class="m-none" aria-label="不适用">·</span></td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td></tr><tr><td class="strong"><span class="mono">S1</span> 状态面板</td><td class="c"><span class="m-part" role="img" aria-label="能做但意义有限">○</span></td><td class="c"><span class="m-full" role="img" aria-label="适合直接做">●</span></td><td class="c"><span class="m-part" role="img" aria-label="能做但意义有限">○</span></td><td class="c"><span class="m-none" aria-label="不适用">·</span></td></tr></tbody></table></div>
+  <div class="legend">
+    <span><span class="m-full">●</span> 适合直接做</span>
+    <span><span class="m-part">○</span> 能做但意义有限或要额外工作</span>
+    <span><span class="m-none">·</span> 不适用</span>
+  </div>
+  <p class="caption">C7 在所有入口都标 ○：这类操作安全优先，入口越多暴露面越大，建议只留手机端并强制确认。</p>
+</section>
+
+<section>
+  <h2>风险分级与网关规则</h2>
+  <p class="lead">和项目约定一致：涉及开锁、开门类指令先让用户确认。</p>
+  <div class="lanes">
+    <div class="lane read">
+      <h3><span class="badge r-read">只读</span> 直接执行</h3>
+      <p><span class="k">包含</span> N1–N3、P5、S1</p>
+      <p><span class="k">网关</span> 控制查询频率，避免频繁唤醒车辆</p>
+    </div>
+    <div class="lane rev">
+      <h3><span class="badge r-rev">可逆</span> 直接执行，留日志</h3>
+      <p><span class="k">包含</span> C1–C6、C8</p>
+      <p><span class="k">网关</span> 写操作日志，随时可撤回</p>
+    </div>
+    <div class="lane conf">
+      <h3><span class="badge r-conf">需确认</span> 确认后执行</h3>
+      <p><span class="k">包含</span> C7 解锁、前后备箱、通风窗</p>
+      <p><span class="k">网关</span> 弹确认后执行并留日志；开发调试期默认不发</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>待确认</h2>
+  <div class="box">
+    <ol class="todo">
+      <li>自己的车型是否需要 Vehicle Command Protocol 签名，公钥怎么部署到车上。</li>
+      <li>车控指令的调用频率限制和计费。</li>
+      <li>常驻服务放在哪：本机、家里的小主机，还是云端。这决定指令网关和 Telemetry 接收端的形态。</li>
+      <li>P3 用哪个家居平台，目前未选。</li>
+      <li>P4 的 BLE 方案在官方 SDK 里的支持程度。</li>
+    </ol>
+  </div>
+  <p class="caption">验证顺序：先注册开发者账号、完成授权、实测 <code>vehicle_data</code>，再试一条可逆的车控指令。</p>
+</section>
+
+<div class="foot">
+  文字版：docs/features.md · 需求与调研：docs/requirements.md。已放弃方向不在本清单内，扩展特性在 demo 跑通前不做。
+</div>
+
+</div>
+</body>
+</html>
