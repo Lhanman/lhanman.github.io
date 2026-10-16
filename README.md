@@ -29,7 +29,7 @@
 
 ### tesla-assistant
 
-- [特助手 功能清单与矩阵](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E5%8A%9F%E8%83%BD%E6%B8%85%E5%8D%95%E4%B8%8E%E7%9F%A9%E9%98%B5.html) · [线上](https://lhanman.github.io/p/tesla-assistant-features/) · 2026-10-16 — 特助手候选功能清单、矩阵与逐项资料调研结论
+- [特助手 功能清单与矩阵](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E5%8A%9F%E8%83%BD%E6%B8%85%E5%8D%95%E4%B8%8E%E7%9F%A9%E9%98%B5.html) · [线上](https://lhanman.github.io/p/tesla-assistant-features/) · 2026-10-16 — 特助手的功能清单、属性矩阵、入口矩阵和两轮调研结论
 
 ### 其他
 

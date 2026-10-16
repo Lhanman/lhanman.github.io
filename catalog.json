@@ -3,11 +3,9 @@
     {
       "slug": "tesla-assistant-features",
       "title": "特助手 功能清单与矩阵",
-      "description": "特助手候选功能清单、矩阵与逐项资料调研结论",
+      "description": "特助手的功能清单、属性矩阵、入口矩阵和两轮调研结论",
       "tags": [
         "tesla",
-        "功能清单",
-        "矩阵",
         "调研"
       ],
       "project": "tesla-assistant",
