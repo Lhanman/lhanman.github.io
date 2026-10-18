@@ -49,8 +49,4 @@ done += sum(copy(n["path"], ("kb", n["slug"]), "../../index.html") for n in note
 if notes and os.path.exists(os.path.join(root, "知识图谱.html")):
     done += copy("知识图谱.html", ("graph",), "../index.html")
 shutil.copy(os.path.join(root, "index.html"), os.path.join(out, "index.html"))
-# Tesla Fleet API 要求公钥放在 /.well-known/appspecific/ 下；dispatch-pages 重新生成本文件时需保留这几行
-wk = os.path.join(root, ".well-known")
-if os.path.isdir(wk):
-    shutil.copytree(wk, os.path.join(out, ".well-known"))
 print(f"已生成 {done} 个页面（文档 {len(pages)} · 笔记 {len(notes)}）→ {out}")
