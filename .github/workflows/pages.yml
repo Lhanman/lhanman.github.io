@@ -22,8 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - run: python3 .github/build-site.py _site
-      # upload-pages-artifact 会丢掉以点开头的目录，而 Tesla 公钥要放在 /.well-known/ 下，所以手动打包并上传
-      # dispatch-pages 重新生成本文件时需保留这一段
+      # upload-pages-artifact 会丢掉以点开头的目录（如 /.well-known/），所以手动打包并上传
       - run: tar --dereference --hard-dereference --directory _site -cvf "$RUNNER_TEMP/artifact.tar" .
       - uses: actions/upload-artifact@v4
         with:
