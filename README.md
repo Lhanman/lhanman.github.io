@@ -29,7 +29,7 @@
 
 ### tesla-assistant
 
-- [特助手 UI 预览](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20UI%20%E9%A2%84%E8%A7%88.html) · [线上](https://lhanman.github.io/p/tesla-assistant-ui-preview/) · 2026-10-19 — 特助手移动端 UI 预览：首页有可旋转的 3D Model 3、清漆镀膜车漆和跟随车窗的状态标注，统一的仪表刻度语言，浅色和深色，全部为演示数据。
+- [特助手 UI 预览](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20UI%20%E9%A2%84%E8%A7%88.html) · [线上](https://lhanman.github.io/p/tesla-assistant-ui-preview/) · 2026-10-19 — 特助手移动端 UI 预览：首页默认是平面示意图，可导入特斯拉 App 截图并在本机抠出车身，统一的仪表刻度语言，浅色和深色，全部为演示数据。
 - [特助手 功能清单与矩阵](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E5%8A%9F%E8%83%BD%E6%B8%85%E5%8D%95%E4%B8%8E%E7%9F%A9%E9%98%B5.html) · [线上](https://lhanman.github.io/p/tesla-assistant-features/) · 2026-10-18 — 特助手的功能清单、属性矩阵、入口矩阵和调研与实测结论
 
 ### 其他
