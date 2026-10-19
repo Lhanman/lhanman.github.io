@@ -1,6 +1,20 @@
 {
   "pages": [
     {
+      "slug": "tesla-assistant-ui-preview",
+      "title": "特助手 UI 风格预览",
+      "description": "特助手已选定风格 A（新能源号牌）的移动端 UI 预览，含首页、车控、行程、日志四页，B、C 保留作对照，全部为演示数据。",
+      "tags": [
+        "tesla",
+        "设计",
+        "UI"
+      ],
+      "project": "tesla-assistant",
+      "created": "2026-10-19",
+      "updated": "2026-10-19",
+      "path": "文档/tesla-assistant/特助手 UI 风格预览.html"
+    },
+    {
       "slug": "tesla-assistant-features",
       "title": "特助手 功能清单与矩阵",
       "description": "特助手的功能清单、属性矩阵、入口矩阵和调研与实测结论",

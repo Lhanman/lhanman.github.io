@@ -13,7 +13,7 @@
 
 这些文件全部由 `dispatch-pages` 自动生成，不要手动修改；笔记的正文请在知识库里改，下一次同步会覆盖这里的副本。
 
-## 文档清单（8 篇）
+## 文档清单（9 篇）
 
 ### ashare-quant
 
@@ -29,6 +29,7 @@
 
 ### tesla-assistant
 
+- [特助手 UI 风格预览](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20UI%20%E9%A3%8E%E6%A0%BC%E9%A2%84%E8%A7%88.html) · [线上](https://lhanman.github.io/p/tesla-assistant-ui-preview/) · 2026-10-19 — 特助手已选定风格 A（新能源号牌）的移动端 UI 预览，含首页、车控、行程、日志四页，B、C 保留作对照，全部为演示数据。
 - [特助手 功能清单与矩阵](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E5%8A%9F%E8%83%BD%E6%B8%85%E5%8D%95%E4%B8%8E%E7%9F%A9%E9%98%B5.html) · [线上](https://lhanman.github.io/p/tesla-assistant-features/) · 2026-10-18 — 特助手的功能清单、属性矩阵、入口矩阵和调研与实测结论
 
 ### 其他
