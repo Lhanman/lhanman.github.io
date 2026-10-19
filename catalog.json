@@ -1,6 +1,22 @@
 {
   "pages": [
     {
+      "slug": "ui-preview-artifact",
+      "title": "特助手 UI 预览",
+      "description": "特助手手机 App 界面预览：iOS 液态玻璃与 Android 毛玻璃，四个页面，示例数据",
+      "tags": [
+        "UI",
+        "设计",
+        "预览",
+        "iOS",
+        "Android"
+      ],
+      "project": "tesla-assistant",
+      "created": "2026-10-19",
+      "updated": "2026-10-19",
+      "path": "文档/tesla-assistant/特助手 UI 预览（ui-preview-artifact）.html"
+    },
+    {
       "slug": "tesla-assistant-ui-preview",
       "title": "特助手 UI 预览",
       "description": "特助手移动端 UI 预览：首页默认是平面示意图，可导入特斯拉 App 截图并在本机抠出车身，统一的仪表刻度语言，浅色和深色，全部为演示数据。",

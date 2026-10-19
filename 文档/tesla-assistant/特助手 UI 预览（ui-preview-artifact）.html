@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="特助手手机 App 界面预览：iOS 液态玻璃与 Android 毛玻璃，四个页面，示例数据">
+<link rel="index" href="../../index.html">
+<title>特助手 UI 预览</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+:root { --page-bg: #e3e5e8; --page-ink: #15181b; --page-muted: #545a61; --page-line: #c9ccd1; --page-surface: #ffffff; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --page-bg: #0a0b0c; --page-ink: #f2f3f4; --page-muted: #a3a8ae; --page-line: #2a2d31; --page-surface: #17191c; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --page-bg: #0a0b0c; --page-ink: #f2f3f4; --page-muted: #a3a8ae; --page-line: #2a2d31; --page-surface: #17191c; color-scheme: dark; }
+[hidden] { display: none !important; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page-bg); color: var(--page-ink); font: 15px/1.55 -apple-system, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1760px; margin: 0 auto; padding: 28px 12px 56px; }
+h1 { font-size: 22px; margin: 0 0 4px; font-weight: 700; }
+.sub { color: var(--page-muted); margin: 0 0 16px; max-width: 74ch; }
+.bar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+.seg { display: inline-flex; background: rgba(120,120,128,.2); border-radius: 12px; padding: 3px; }
+.seg button { font: inherit; font-size: 14px; font-weight: 500; color: var(--page-ink); background: transparent; border: 0; border-radius: 9px; padding: 0 16px; min-height: 44px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--page-surface); box-shadow: 0 1px 4px rgba(0,0,0,.18); font-weight: 600; }
+.seg button:focus-visible { outline: 3px solid #f5a300; outline-offset: 1px; }
+.notes { display: grid; gap: 4px 28px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-bottom: 26px; max-width: 1180px; }
+.notes p { margin: 0; color: var(--page-muted); }
+.notes b { color: var(--page-ink); font-weight: 600; }
+.phones { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(390px, 100%), 1fr)); gap: 32px 20px; justify-items: center; }
+.cell { margin: 0; width: 100%; display: flex; flex-direction: column; align-items: center; }
+.cell figcaption { color: var(--page-muted); font-size: 13px; margin-top: 10px; }
+.phone { width: min(390px, 100%); height: 820px; border-radius: 48px; background: #08090a; padding: 9px; box-shadow: 0 0 0 1.5px #34373b, 0 18px 40px rgba(0,0,0,.28); position: relative; }
+
+/* ============ 应用：玻璃材质系统 ============ */
+.screen { position: relative; width: 100%; height: 100%; border-radius: 40px; overflow: hidden; color: var(--ink); background: var(--scene);
+  font-family: -apple-system, "PingFang SC", "Noto Sans SC", system-ui, sans-serif; font-size: 16px; line-height: 1.35; isolation: isolate; }
+/* 浅色 */
+.screen[data-scheme="light"] { --amb:.34; --ink:#14171a; --ink2:rgba(20,23,26,.68); --ink3:rgba(20,23,26,.4); --scene:linear-gradient(180deg,#dde2e9 0%,#c9d0da 52%,#b8c0cd 100%);
+  --amber:#f5a300; --amber-t:#8a5300; --ok:#14803f; --bad:#d23a2a; --tick-off:rgba(20,23,26,.16); --sep:rgba(20,23,26,.1); --fill:rgba(20,23,26,.07); --chip-ink:#14171a; }
+.screen[data-scheme="light"][data-platform="ios"] { --g-bg:rgba(255,255,255,.4); --g-edge:rgba(255,255,255,.75); --g-hi:inset 0 1px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(255,255,255,.3); --g-sh:0 10px 28px rgba(0,0,0,.16); --g-blur:22px; --g-sat:190%; --g-r:28px; }
+.screen[data-scheme="light"][data-platform="android"] { --g-bg:rgba(250,251,253,.7); --g-edge:rgba(255,255,255,.55); --g-hi:none; --g-sh:0 2px 10px rgba(0,0,0,.1); --g-blur:18px; --g-sat:140%; --g-r:24px; }
+/* 深色 */
+.screen[data-scheme="dark"] { --ink:#f3f4f5; --ink2:rgba(243,244,245,.72); --ink3:rgba(243,244,245,.42); --scene:linear-gradient(180deg,#232a33 0%,#14181e 55%,#0b0d10 100%);
+  --amber:#ffb224; --amber-t:#ffc85a; --ok:#47dc92; --bad:#ff7466; --tick-off:rgba(243,244,245,.18); --sep:rgba(243,244,245,.12); --fill:rgba(243,244,245,.09); --chip-ink:#f3f4f5; }
+.screen[data-scheme="dark"][data-platform="ios"] { --g-bg:rgba(255,255,255,.1); --g-edge:rgba(255,255,255,.2); --g-hi:inset 0 1px 0 rgba(255,255,255,.34), inset 0 -1px 0 rgba(255,255,255,.06); --g-sh:0 12px 30px rgba(0,0,0,.4); --g-blur:24px; --g-sat:170%; --g-r:28px; }
+.screen[data-scheme="dark"][data-platform="android"] { --g-bg:rgba(36,40,46,.72); --g-edge:rgba(255,255,255,.1); --g-hi:none; --g-sh:0 2px 12px rgba(0,0,0,.4); --g-blur:18px; --g-sat:130%; --g-r:24px; }
+
+.n { font-family: "Barlow Semi Condensed", "DIN Alternate", "Roboto Condensed", "PingFang SC", system-ui, sans-serif; font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.ambient { position: absolute; z-index: -1; top: -40px; left: -25%; width: 150%; opacity: var(--amb, .5); filter: blur(44px) saturate(1.5); pointer-events: none; }
+.ico { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* 玻璃 */
+.g { background: var(--g-bg); border: 1px solid var(--g-edge); border-radius: var(--g-r); box-shadow: var(--g-hi), var(--g-sh); backdrop-filter: blur(var(--g-blur)) saturate(var(--g-sat)); -webkit-backdrop-filter: blur(var(--g-blur)) saturate(var(--g-sat)); position: relative; }
+.screen[data-platform="ios"] .g::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(135deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,0) 38%); mix-blend-mode: soft-light; }
+.pill { border-radius: 999px; }
+
+.sb { position: absolute; z-index: 5; top: 0; left: 0; right: 0; height: 46px; display: flex; justify-content: space-between; align-items: center; padding: 8px 28px 0; font-weight: 600; font-size: 15px; }
+.sb .r { display: flex; gap: 6px; align-items: center; }
+.scroll { position: absolute; inset: 0; overflow-y: auto; padding: 50px 0 118px; scrollbar-width: none; display: flex; flex-direction: column; gap: 12px; }
+.scroll::-webkit-scrollbar { display: none; }
+.scroll > * { flex: none; }
+.pad { padding: 0 14px; display: flex; flex-direction: column; gap: 12px; }
+.head { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 18px 0; }
+.head h2 { margin: 0; font-size: 30px; line-height: 36px; font-weight: 700; letter-spacing: .01em; }
+.chip { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 0 13px; font-size: 13px; font-weight: 600; color: var(--chip-ink); }
+.chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex: none; }
+.chip.bad i { background: var(--bad); box-shadow: 0 0 0 4px color-mix(in srgb, var(--bad) 28%, transparent); }
+.chip.bad { color: var(--bad); }
+
+/* 首页英雄 */
+.hero { position: relative; height: 258px; margin-top: -2px; }
+.hero .car { position: absolute; left: 50%; top: 14px; width: 112%; max-width: none; transform: translateX(-50%); filter: drop-shadow(0 22px 18px rgba(0,0,0,.3)); user-select: none; -webkit-user-drag: none; }
+.hero .fb { position: absolute; left: 0; right: 0; top: 24px; padding: 0 22px; }
+.hero .floor { position: absolute; left: 14%; right: 14%; bottom: 40px; height: 26px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(0,0,0,.3), rgba(0,0,0,0) 70%); }
+.hero .c1 { position: absolute; right: 16px; top: 8px; }
+.hero .c2 { position: absolute; left: 16px; bottom: 36px; }
+.hero .c3 { position: absolute; right: 16px; bottom: 34px; display: flex; gap: 0; padding: 0 6px; align-items: center; height: 36px; }
+.sw { width: 32px; height: 36px; border: 0; background: transparent; padding: 0; cursor: pointer; display: grid; place-items: center; }
+.sw span { width: 18px; height: 18px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.22); }
+.sw[aria-pressed="true"] span { box-shadow: inset 0 0 0 1px rgba(0,0,0,.22), 0 0 0 2px var(--g-edge), 0 0 0 4px var(--amber); }
+.sw:focus-visible { outline: 3px solid var(--amber); border-radius: 8px; }
+
+/* 面板与行 */
+.panel { padding: 18px; }
+.big { font-size: 60px; line-height: 56px; font-weight: 600; }
+.big small { font-size: 24px; font-weight: 500; color: var(--ink2); margin-left: 3px; }
+.scale { position: relative; height: 40px; }
+.ticks { display: flex; justify-content: space-between; height: 22px; position: absolute; left: 0; right: 0; top: 0; }
+.ticks i { width: 3px; height: 22px; border-radius: 1.5px; background: var(--tick-off); }
+.ticks i.on { background: var(--amber); }
+.lim { position: absolute; top: 25px; width: 0; height: 0; transform: translateX(-50%); border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 7px solid var(--ink); }
+.limt { position: absolute; top: 31px; transform: translateX(-50%); font-size: 11px; color: var(--ink2); white-space: nowrap; }
+.rows > div { display: flex; align-items: center; gap: 12px; min-height: 50px; border-top: 1px solid var(--sep); }
+.rows > div:first-child { border-top: 0; }
+.rows .k { flex: 1; min-width: 0; }
+.rows .k small { display: block; color: var(--ink2); font-size: 12.5px; line-height: 17px; }
+.rows .v { color: var(--ink2); text-align: right; white-space: nowrap; }
+.rows svg.ico { width: 22px; height: 22px; color: var(--ink2); flex: none; }
+.bad { color: var(--bad); } .ok { color: var(--ok); }
+.lab { font-size: 12px; color: var(--ink2); letter-spacing: .06em; margin: 6px 22px -6px; }
+.foot { font-size: 12.5px; line-height: 18px; color: var(--ink2); margin: -4px 22px 0; }
+.ex { text-align: center; font-size: 12px; color: var(--ink3); margin: 2px 0 0; }
+
+/* 车控 */
+.scenes { display: flex; gap: 8px; overflow-x: auto; padding: 0 14px; scrollbar-width: none; }
+.scenes::-webkit-scrollbar { display: none; }
+.scn { flex: none; min-height: 44px; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: 14.5px; font-weight: 600; color: var(--ink); cursor: pointer; border-radius: 999px; }
+.scn svg { width: 18px; height: 18px; }
+.scn.run { box-shadow: var(--g-hi), 0 0 0 2px var(--amber); }
+.scn:active, .tile:active { transform: scale(.97); }
+.scn:focus-visible, .tile:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+.cl { padding: 16px 18px 14px; }
+.cl .top { display: flex; align-items: center; gap: 12px; }
+.cl .top svg { width: 24px; height: 24px; color: var(--ink2); }
+.cl .nm { flex: 1; } .cl .nm b { font-weight: 600; } .cl .nm small { display: block; color: var(--ink2); font-size: 13px; }
+.sws { width: 52px; height: 32px; border-radius: 16px; background: var(--fill); position: relative; flex: none; border: 1px solid var(--g-edge); }
+.sws::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--ink3); }
+.cl .val { display: flex; align-items: flex-end; justify-content: space-between; margin: 12px 0 8px; }
+.cl .val .t { font-size: 62px; line-height: 56px; font-weight: 600; }
+.cl .val .t sup { font-size: 26px; color: var(--ink2); vertical-align: top; margin-left: 2px; line-height: 34px; }
+.cl .val span.r { color: var(--ink2); font-size: 12.5px; padding-bottom: 6px; }
+.wait { height: 3px; border-radius: 2px; background: var(--fill); position: relative; overflow: hidden; margin-top: 12px; }
+.wait::after { content: ""; position: absolute; inset: 0 auto 0 -30%; width: 30%; background: var(--amber); animation: go 1.3s cubic-bezier(.4,0,.2,1) infinite; }
+@keyframes go { to { left: 100%; } }
+@media (prefers-reduced-motion: reduce) { .wait::after { animation: none; left: 0; width: 55%; } }
+.rng { position: absolute; inset: -8px 0 -8px; width: 100%; height: 56px; opacity: 0; margin: 0; cursor: pointer; }
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tile { text-align: left; font: inherit; color: var(--ink); cursor: pointer; padding: 14px 16px; min-height: 92px; display: flex; flex-direction: column; justify-content: space-between; transition: transform .12s; }
+.tile svg { width: 26px; height: 26px; }
+.tile .tn { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
+.tile .tn b { font-weight: 600; font-size: 16px; } .tile .tn span { font-size: 12.5px; color: var(--ink2); }
+.tile.on svg { color: var(--ok); }
+.tile.dis { opacity: .5; cursor: default; }
+
+/* 行程与日志 */
+.segc { display: flex; padding: 3px; margin: 0 14px; }
+.segc span { flex: 1; text-align: center; font-size: 13px; font-weight: 500; padding: 9px 0; border-radius: 999px; color: var(--ink2); }
+.segc span.on { color: var(--ink); font-weight: 600; background: var(--fill); box-shadow: inset 0 0 0 1px var(--g-edge); }
+.trip { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--sep); }
+.trip:first-child { border-top: 0; }
+.trip small { display: block; color: var(--ink2); font-size: 12.5px; line-height: 17px; }
+.trip .dv { font-size: 28px; font-weight: 600; text-align: right; white-space: nowrap; }
+.trip .dv small { display: inline; font-size: 13px; font-weight: 500; font-family: -apple-system, "PingFang SC", sans-serif; margin-left: 2px; }
+.tl { display: grid; grid-template-columns: 52px 1fr auto; gap: 12px; padding: 12px 0; border-top: 1px solid var(--sep); align-items: start; }
+.tl:first-child { border-top: 0; }
+.tl .tm { font-size: 17px; color: var(--ink2); padding-top: 1px; }
+.tl b { font-weight: 600; } .tl small { display: block; color: var(--ink2); font-size: 12.5px; line-height: 17px; }
+.tl .st { font-size: 13px; font-weight: 600; padding-top: 3px; text-align: right; }
+
+/* 标签栏：iOS 浮动玻璃胶囊，Android 毛玻璃底栏 */
+.tabs { position: absolute; z-index: 6; display: grid; grid-template-columns: repeat(4, 1fr); }
+.screen[data-platform="ios"] .tabs { left: 16px; right: 16px; bottom: 18px; height: 66px; padding: 5px; border-radius: 33px; }
+.screen[data-platform="android"] .tabs { left: 0; right: 0; bottom: 0; height: 84px; padding: 10px 6px 16px; border-radius: 26px 26px 0 0; border-bottom: 0; }
+.tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--ink2); font-size: 11px; font-weight: 500; position: relative; min-height: 48px; }
+.tab svg { width: 25px; height: 25px; position: relative; }
+.tab span { position: relative; }
+.screen[data-platform="ios"] .tab[aria-current="page"] { color: var(--ink); font-weight: 700; }
+.screen[data-platform="ios"] .tab[aria-current="page"]::before { content: ""; position: absolute; inset: 0; border-radius: 28px; background: var(--fill); box-shadow: inset 0 0 0 1px var(--g-edge), inset 0 1px 0 rgba(255,255,255,.5); }
+.screen[data-platform="android"] .tab[aria-current="page"] { color: var(--ink); font-weight: 700; }
+.screen[data-platform="android"] .tab[aria-current="page"]::before { content: ""; position: absolute; top: 0; width: 60px; height: 30px; border-radius: 15px; background: color-mix(in srgb, var(--amber) 34%, transparent); }
+.screen[data-platform="android"] .tab svg { margin-top: 2px; }
+</style>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M5 16v-5l1.7-4.3A2 2 0 0 1 8.6 5.4h6.8a2 2 0 0 1 1.9 1.3L19 11v5"/><path d="M3.5 16h17v2.6h-3V16M6.5 16v2.6h-3"/><circle cx="8" cy="13" r=".9"/><circle cx="16" cy="13" r=".9"/></symbol>
+  <symbol id="i-ctl" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></symbol>
+  <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6a3 3 0 0 0 0-6h-4a3 3 0 0 1 0-6h6"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-snow" viewBox="0 0 24 24"><path d="M12 3v18M4.2 7.5l15.6 9M19.8 7.5l-15.6 9M9.5 4.5 12 7l2.5-2.5M9.5 19.5 12 17l2.5 2.5"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M12 3a5 5 0 0 0-3 9v2h6v-2a5 5 0 0 0-3-9z"/><path d="M10 18h4M10.5 21h3"/></symbol>
+  <symbol id="i-horn" viewBox="0 0 24 24"><path d="M4 10v4h3l6 4V6L7 10z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+  <symbol id="i-temp" viewBox="0 0 24 24"><path d="M10 14.5V5a2 2 0 0 1 4 0v9.5a4 4 0 1 1-4 0z"/></symbol>
+  <symbol id="i-win" viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M5 11h14"/></symbol>
+  <symbol id="i-home2" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9h-5v-6H9v6H4z"/></symbol>
+  <symbol id="i-tent" viewBox="0 0 24 24"><path d="M3 20 12 4l9 16zM12 4v16M9 20l3-6 3 6"/></symbol>
+</svg>
+
+<div class="wrap">
+  <h1>特助手 UI 预览</h1>
+  <p class="sub">iOS 用液态玻璃，Android 用毛玻璃，同一套信息结构。车是主角，状态芯片直接浮在车上，控制用玻璃磁贴和刻度滑块，轻点即执行。页面里的车名、数值、行程、日志都是编造的示例数据。</p>
+  <div class="bar">
+    <div class="seg" role="group" aria-label="平台"><button type="button" data-k="platform" data-v="ios" aria-pressed="true">iOS · 液态玻璃</button><button type="button" data-k="platform" data-v="android" aria-pressed="false">Android · 毛玻璃</button></div>
+    <div class="seg" role="group" aria-label="外观"><button type="button" data-k="scheme" data-v="light" aria-pressed="true">浅色</button><button type="button" data-k="scheme" data-v="dark" aria-pressed="false">深色</button></div>
+  </div>
+  <div class="notes">
+    <p><b>车是主角</b>　首页上半屏就是你的车，在线、电量、"左后车窗未关"这些状态是飘在车周围的玻璃芯片，下面一块玻璃面板收着电量刻度和各项状态。</p>
+    <p><b>车图的来源</b>　车图只在手机运行时从特斯拉官网的出图服务加载并缓存本机，不进仓库、不进公开站点；加载失败自动退回平面图。接口读不到车漆颜色，需要你选一次。</p>
+    <p><b>少一点按钮</b>　锁车、闪灯、鸣笛是玻璃磁贴，轻点就做，结果写在磁贴上；空调和充电上限是刻度滑块；场景是顶部一排玻璃胶囊。没有满宽实心按钮，也没有成排的"执行"。</p>
+  </div>
+  <div class="phones" id="phones"></div>
+</div>
+
+<script>
+/* 车图：特斯拉官网配置器的出图服务（非公开接口）。USE_TESLA_IMG 为 false 时一律走平面图。
+   发布版（公开站点和 Artifact）把它设为 false，不分发、不外链特斯拉的图片。 */
+const USE_TESLA_IMG = false;
+const PAINTS = [
+  { code: "PN01", k: "星空灰", c: "#3c4046" }, { code: "PPSW", k: "珍珠白", c: "#e9eaec" },
+  { code: "PR01", k: "红", c: "#b3201b" }, { code: "PN00", k: "银", c: "#9b9ea3" }, { code: "PB02", k: "深蓝", c: "#1c2f55" }
+];
+const carUrl = code => "https://static-assets.tesla.cn/configurator/compositor?context=design_studio_2&options=$MT382,$" + code + ",$W38A,$IPB11&view=STUD_FRONT34&model=m3&size=1200&bkba_opt=1";
+const S = { platform: "ios", scheme: "light", paint: 0 };
+try { const s = JSON.parse(localStorage.getItem("ui-state") || "{}"); ["platform", "scheme"].forEach(k => { if (s[k]) S[k] = s[k]; }); if (Number.isInteger(s.paint)) S.paint = s.paint; } catch (e) {}
+const imgOk = {};   // code -> true / false（未知则未设置）
+
+const D = {
+  car: "我的车", battery: 62, rangeKm: 180, limit: 90, temp: 21,
+  trips: [
+    { dest: "公司", pred: 25, act: 31, when: "今天 08:12" }, { dest: "家", pred: 40, act: 38, when: "昨天 18:40" },
+    { dest: "健身房", pred: 12, act: 12, when: "周五 19:05" }, { dest: "机场", pred: 55, act: 63, when: "周三 06:30" }
+  ],
+  logs: [
+    { tm: "14:20", ok: "ok", n: "开启空调 21°", d: "iPhone · 先唤醒车辆，用时 14 秒", w: "成功" },
+    { tm: "12:03", ok: "ok", n: "闪灯", d: "Pixel · 车辆在线", w: "成功" },
+    { tm: "昨 22:41", ok: "bad", n: "设置充电上限 80%", d: "车辆离线，唤醒超时", w: "失败" },
+    { tm: "昨 18:02", ok: "deny", n: "开锁", d: "远程不允许，请在本机终端操作", w: "已拒绝" },
+    { tm: "昨 08:50", ok: "ok", n: "关闭空调", d: "iPhone · 车辆在线", w: "成功" }
+  ]
+};
+const N = 25;
+const I = (n, st = "") => `<svg class="ico" ${st ? `style="${st}"` : ""} aria-hidden="true" viewBox="0 0 24 24"><use href="#i-${n}"/></svg>`;
+function scale(level, limit, id) {
+  const on = Math.round(level / 100 * N);
+  return `<div class="scale" ${id ? `id="${id}"` : ""}><div class="ticks" aria-hidden="true">${Array.from({ length: N }, (_, i) => `<i class="${i < on ? "on" : ""}"></i>`).join("")}</div>${limit != null ? `<i class="lim" style="left:${limit}%"></i><span class="limt" style="left:${limit}%">上限 ${limit}%</span>` : ""}</div>`;
+}
+/* 兜底的平面车（侧视线稿） */
+function flatCar() {
+  return `<svg viewBox="0 0 400 160" width="100%" role="img" aria-label="车辆示意图" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <ellipse cx="200" cy="140" rx="168" ry="9" fill="rgba(0,0,0,.16)"/>
+  <path d="M16 108c0-9 8-13 26-15l70-11c20-9 48-32 84-37 42-4 90 5 126 30 16 6 42 10 52 16 6 4 8 12 6 19l-6 6H28c-8 0-12-3-12-8z" fill="color-mix(in srgb, var(--ink) 22%, transparent)" stroke="var(--ink)" stroke-width="1.6"/>
+  <path d="M124 82c20-14 42-28 70-31 36-3 76 6 106 26z" fill="color-mix(in srgb, var(--ink) 46%, transparent)" stroke="var(--ink)" stroke-width="1.2"/>
+  <path d="M200 52v28" stroke="var(--ink)" stroke-width="1" opacity=".5"/>
+  <circle cx="98" cy="118" r="23" fill="var(--ink)" opacity=".9"/><circle cx="98" cy="118" r="13" fill="color-mix(in srgb, var(--ink) 40%, transparent)"/>
+  <circle cx="314" cy="118" r="23" fill="var(--ink)" opacity=".9"/><circle cx="314" cy="118" r="13" fill="color-mix(in srgb, var(--ink) 40%, transparent)"/>
+  <path d="M22 100h14" stroke="#fff" stroke-width="3" opacity=".8"/>
+</svg>`;
+}
+function status() {
+  return `<div class="sb"><span class="n" style="font-size:16px">9:41</span><span class="r">
+    <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+    <svg width="26" height="12" viewBox="0 0 26 12" aria-hidden="true"><rect x=".5" y=".5" width="22" height="11" rx="3.5" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="16" height="8" rx="2" fill="currentColor"/></svg></span></div>`;
+}
+function tabs(cur) {
+  const t = [["home", "首页"], ["ctl", "车控"], ["route", "行程"], ["list", "日志"]];
+  return `<nav class="tabs g" aria-label="主导航">${t.map(([k, l]) => `<div class="tab" ${k === cur ? 'aria-current="page"' : ""}><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-${k}"/></svg><span>${l}</span></div>`).join("")}</nav>`;
+}
+const row = (icon, k, v, sub) => `<div>${I(icon)}<div class="k">${k}${sub ? `<small>${sub}</small>` : ""}</div><span class="v">${v}</span></div>`;
+
+function carImg(cls) {
+  const p = PAINTS[S.paint];
+  return USE_TESLA_IMG && imgOk[p.code] !== false ? `<img class="${cls}" alt="" src="${carUrl(p.code)}" data-code="${p.code}" onload="imgLoaded(this)" onerror="imgFailed(this)">` : "";
+}
+function home() {
+  const p = PAINTS[S.paint], showImg = USE_TESLA_IMG && imgOk[p.code] !== false;
+  return `<div class="head"><h2>${D.car}</h2><span class="chip g pill"><i></i>在线 · 2 分钟前</span></div>
+  <div class="hero">${showImg ? carImg("car") : `<div class="fb">${flatCar()}</div>`}<div class="floor"></div>
+    <span class="chip g pill c1 n" style="gap:6px">${I("bolt", "width:15px;height:15px")}<span class="n" style="font-size:16px;font-weight:600">${D.battery}%</span><span style="font-weight:500;color:var(--ink2)">· ${D.rangeKm} km</span></span>
+    <span class="chip g pill c2 bad"><i></i>左后车窗未关</span>
+    <span class="g pill c3" role="group" aria-label="车漆（示例）">${PAINTS.map((q, i) => `<button class="sw" type="button" data-paint="${i}" aria-label="${q.k}" aria-pressed="${i === S.paint}"><span style="background:${q.c}"></span></button>`).join("")}</span></div>
+  <div class="pad">
+    <div class="g panel"><div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px"><div class="big n">${D.battery}<small>%</small></div><div style="text-align:right;color:var(--ink2);font-size:14px;line-height:20px;padding-bottom:4px">续航约 <span class="n" style="font-size:20px;color:var(--ink);font-weight:600">${D.rangeKm}</span> 公里<br>未连接充电</div></div>${scale(D.battery, D.limit)}</div>
+    <div class="g panel rows" style="padding-top:6px;padding-bottom:6px">
+      ${row("lock", "车锁", "已锁")}${row("win", "门窗", `<span class="bad">1 处未关</span>`)}${row("snow", "空调", "关闭")}${row("temp", "车内 / 车外", `<span class="n" style="font-size:17px;color:var(--ink)">30° / 30°</span>`)}
+    </div>
+    <p class="foot" style="margin:0 8px">车休眠时显示上一次的数据，不会自动唤醒车辆。窗需要在车上关闭，手机无法远程关窗。</p><p class="ex">示例数据</p>
+  </div>`;
+}
+function control() {
+  const lv = (D.temp - 16) / 12 * 100;
+  return `<div class="head"><h2>车控</h2></div>
+  <div class="scenes" role="group" aria-label="场景"><button class="scn g pill run" type="button">${I("play")}出门模式</button><button class="scn g pill" type="button">${I("home2")}回家模式</button><button class="scn g pill" type="button">${I("tent")}露营模式</button></div>
+  <div class="pad">
+  <div class="g cl"><div class="top">${I("snow")}<div class="nm"><b>空调</b><small>正在唤醒车辆… <span class="n">12</span> 秒</small></div><div class="sws" role="switch" aria-checked="false" aria-label="空调开关"></div></div>
+    <div class="val"><div class="t n" id="tv">${D.temp}<sup>°</sup></div><span class="r">16° – 28°</span></div>
+    <div style="position:relative">${scale(lv, null, "tscale")}<input class="rng" id="trng" type="range" min="16" max="28" step="1" value="${D.temp}" aria-label="目标温度"></div><div class="wait" role="progressbar" aria-label="正在唤醒"></div></div>
+  <div class="tiles">
+    <button class="tile g on" type="button">${I("lock")}<div class="tn"><b>锁车</b><span>已锁</span></div></button>
+    <button class="tile g" type="button">${I("bulb")}<div class="tn"><b>闪灯</b><span>需 P 档</span></div></button>
+    <button class="tile g" type="button">${I("horn")}<div class="tn"><b>鸣笛</b><span>需 P 档</span></div></button>
+    <button class="tile g dis" type="button" aria-disabled="true">${I("bolt")}<div class="tn"><b>充电</b><span>未连接</span></div></button>
+  </div>
+  <div class="g cl"><div class="top">${I("bolt")}<div class="nm"><b>充电上限</b></div><span class="n" id="limv" style="font-size:28px;font-weight:600">${D.limit}%</span></div>
+    <div style="position:relative;margin-top:12px">${scale(D.limit, null, "limscale")}<input class="rng" id="limrng" type="range" min="50" max="100" value="${D.limit}" aria-label="充电上限"></div></div>
+  <p class="foot" style="margin:0 8px">开锁、后备箱、车窗等高风险操作不在手机上提供。车休眠时控车会先唤醒，最长约 60 秒。</p><p class="ex">示例数据</p>
+  </div>`;
+}
+function stripPlot() {
+  const x = d => 165 + d * 15, devs = D.trips.map(t => t.act - t.pred), mean = devs.reduce((a, b) => a + b, 0) / devs.length;
+  const ticks = [-10, -5, 0, 5, 10].map(v => `<line x1="${x(v)}" x2="${x(v)}" y1="${v === 0 ? 26 : 34}" y2="52" stroke="${v === 0 ? "var(--ink)" : "var(--ink3)"}" stroke-width="${v === 0 ? 1.6 : 1}"/><text x="${x(v)}" y="68" text-anchor="middle" font-size="12" fill="var(--ink2)" class="n">${v > 0 ? "+" + v : v}</text>`).join("");
+  return `<svg viewBox="0 0 330 78" width="100%" role="img" aria-label="各次行程的预计与实际偏差，平均慢 ${mean.toFixed(0)} 分钟" style="display:block"><line x1="15" x2="315" y1="52" y2="52" stroke="var(--ink3)" stroke-width="1.2"/>${ticks}
+   <path d="M${x(mean)} 22l-6-9h12z" fill="var(--amber)"/><text x="${x(mean)}" y="9" text-anchor="middle" font-size="12" font-weight="600" fill="var(--amber-t)" class="n">平均 +${mean.toFixed(0)}</text>
+   <line x1="${x(mean)}" x2="${x(mean)}" y1="23" y2="52" stroke="var(--amber)" stroke-width="2"/>${devs.map(d => `<circle cx="${x(d)}" cy="42" r="7" fill="var(--ink)" opacity=".9"/>`).join("")}</svg>`;
+}
+function trips() {
+  const dv = t => { const d = t.act - t.pred; return d === 0 ? `<span class="ok" style="font-size:20px">准时</span>` : `<span class="${d > 0 ? "bad" : ""}">${d > 0 ? "+" : "−"}${Math.abs(d)}<small>分</small></span>`; };
+  return `<div class="head"><h2>行程</h2></div>
+  <div class="segc g pill" role="group" aria-label="范围"><span class="on">最近 7 天</span><span>30 天</span><span>全部</span></div>
+  <div class="pad">
+  <div class="lab" style="margin:4px 8px -6px">预计与实际的偏差（分钟）</div>
+  <div class="g panel" style="padding:14px 16px 12px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);margin-bottom:4px"><span>实际更快</span><span>实际更慢</span></div>${stripPlot()}<p style="margin:6px 0 0;color:var(--ink2);font-size:13px">车机预计平均偏快约 4 分钟，近 4 次。</p></div>
+  <div class="g panel" style="padding:14px 18px"><div class="trip" style="padding:0"><div><b style="font-weight:600">超市 <span style="font-size:12px;color:var(--amber-t);font-weight:600;margin-left:6px">导航中</span></b><small>已行驶 7 分钟</small></div><div style="text-align:right"><span class="n" style="font-size:28px;font-weight:600">11</span><small style="display:inline;color:var(--ink2)"> 分钟后到</small></div></div></div>
+  <div class="g panel" style="padding-top:6px;padding-bottom:6px">${D.trips.map(t => `<div class="trip"><div><b style="font-weight:600">${t.dest}</b><small>${t.when} · 预计 ${t.pred} 分 · 实际 ${t.act} 分</small></div><div class="dv n">${dv(t)}</div></div>`).join("")}</div>
+  <p class="foot" style="margin:0 8px">偏差 = 实际用时 − 车机预计。积累的行程越多，规律越清楚。</p><p class="ex">示例数据</p></div>`;
+}
+function log() {
+  const col = { ok: "var(--ok)", bad: "var(--bad)", deny: "var(--amber-t)" };
+  return `<div class="head"><h2>日志</h2></div><div class="pad">
+  <div class="g panel" style="padding-top:6px;padding-bottom:6px">${D.logs.map(l => `<div class="tl"><span class="tm n">${l.tm}</span><div><b>${l.n}</b><small>${l.d}</small></div><span class="st" style="color:${col[l.ok]}">${l.w}</span></div>`).join("")}</div>
+  <p class="foot" style="margin:0 8px">每条控车都会记录，包含被拒绝的。</p><p class="ex">示例数据</p></div>`;
+}
+const PAGES = [["home", "首页", home], ["ctl", "车控", control], ["route", "行程", trips], ["list", "日志", log]];
+
+function imgLoaded(el) { imgOk[el.dataset.code] = true; }
+function imgFailed(el) { imgOk[el.dataset.code] = false; render(); }
+function bindRange(root) {
+  const bind = (rid, sid, vid, fmt, lvl) => { const r = root.querySelector(rid); if (!r) return; r.addEventListener("input", () => { const v = +r.value, on = Math.round(lvl(v) / 100 * N); root.querySelectorAll(sid + " .ticks i").forEach((t, i) => t.classList.toggle("on", i < on)); root.querySelector(vid).innerHTML = fmt(v); }); };
+  bind("#limrng", "#limscale", "#limv", v => v + "%", v => v);
+  bind("#trng", "#tscale", "#tv", v => v + "<sup>°</sup>", v => (v - 16) / 12 * 100);
+}
+function save() { try { localStorage.setItem("ui-state", JSON.stringify(S)); } catch (e) {} }
+function render() {
+  const ph = document.getElementById("phones");
+  const imgCode = PAINTS[S.paint].code, ambient = USE_TESLA_IMG && imgOk[imgCode] !== false ? `<img class="ambient" alt="" src="${carUrl(imgCode)}">` : "";
+  ph.innerHTML = PAGES.map(([k, label, fn]) => `<figure class="cell"><div class="phone"><div class="screen" data-platform="${S.platform}" data-scheme="${S.scheme}">${ambient}${status()}<div class="scroll">${fn()}</div>${tabs(k)}</div></div><figcaption>${label}</figcaption></figure>`).join("");
+  bindRange(document);
+  ph.querySelectorAll("[data-paint]").forEach(b => b.addEventListener("click", () => { S.paint = +b.dataset.paint; save(); render(); }));
+  document.querySelectorAll("button[data-k]").forEach(b => b.setAttribute("aria-pressed", S[b.dataset.k] === b.dataset.v));
+}
+document.querySelectorAll("button[data-k]").forEach(b => b.addEventListener("click", () => { S[b.dataset.k] = b.dataset.v; save(); render(); }));
+render();
+</script>
+</body>
+</html>
