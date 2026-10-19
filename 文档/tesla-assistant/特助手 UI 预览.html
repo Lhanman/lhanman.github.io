@@ -3,24 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="参考苹果设计语言重做的特助手移动端 UI 预览：首页、车控、行程、日志四页，浅色和深色，全部为演示数据。">
+<meta name="description" content="特助手移动端 UI 预览第三版：车的俯视示意图、统一的仪表刻度语言、琥珀色品牌色，浅色和深色，全部为演示数据。">
 <link rel="index" href="../../index.html">
 <title>特助手 UI 预览</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
 <style>
 :root {
-  --page-bg: #e9e9ee; --page-ink: #1c1c1e; --page-muted: #55555c; --page-line: #cfcfd6; --page-surface: #ffffff;
+  --page-bg: #e4e4df; --page-ink: #17191c; --page-muted: #565b62; --page-line: #c9c9c2; --page-surface: #ffffff;
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --page-bg: #0b0b0d; --page-ink: #f2f2f7; --page-muted: #a1a1aa; --page-line: #2c2c30; --page-surface: #1a1a1d; color-scheme: dark; }
+  :root:not([data-theme="light"]) { --page-bg: #0a0b0c; --page-ink: #f2f2ef; --page-muted: #a3a7ad; --page-line: #2a2d31; --page-surface: #17191c; color-scheme: dark; }
 }
-:root[data-theme="dark"] { --page-bg: #0b0b0d; --page-ink: #f2f2f7; --page-muted: #a1a1aa; --page-line: #2c2c30; --page-surface: #1a1a1d; color-scheme: dark; }
+:root[data-theme="dark"] { --page-bg: #0a0b0c; --page-ink: #f2f2ef; --page-muted: #a3a7ad; --page-line: #2a2d31; --page-surface: #17191c; color-scheme: dark; }
 
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--page-bg); color: var(--page-ink); font: 15px/1.55 -apple-system, "SF Pro Text", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: var(--page-bg); color: var(--page-ink); font: 15px/1.55 -apple-system, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
 .wrap { max-width: 1760px; margin: 0 auto; padding-block: 28px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 h1 { font-size: 22px; margin: 0 0 4px; font-weight: 700; }
 .sub { color: var(--page-muted); margin: 0 0 18px; max-width: 72ch; }
@@ -28,80 +31,97 @@ h1 { font-size: 22px; margin: 0 0 4px; font-weight: 700; }
 .seg { display: inline-flex; background: rgba(120,120,128,.18); border-radius: 10px; padding: 2px; }
 .seg button { font: inherit; font-size: 14px; font-weight: 500; color: var(--page-ink); background: transparent; border: 0; border-radius: 8px; padding: 0 16px; min-height: 44px; cursor: pointer; }
 .seg button[aria-pressed="true"] { background: var(--page-surface); box-shadow: 0 1px 4px rgba(0,0,0,.18); font-weight: 600; }
-.seg button:focus-visible { outline: 3px solid #0a84ff; outline-offset: 1px; }
+.seg button:focus-visible { outline: 3px solid #f5a300; outline-offset: 1px; }
 .notes { display: grid; gap: 4px 28px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-bottom: 28px; max-width: 1100px; }
 .notes p { margin: 0; color: var(--page-muted); }
 .notes b { color: var(--page-ink); font-weight: 600; }
 .phones { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(390px, 100%), 1fr)); gap: 32px 20px; justify-items: center; }
 .cell { margin: 0; width: 100%; display: flex; flex-direction: column; align-items: center; }
 .cell figcaption { color: var(--page-muted); font-size: 13px; margin-top: 10px; }
-.phone { width: min(390px, 100%); height: 820px; border-radius: 54px; background: #000; padding: 10px; box-shadow: 0 0 0 1.5px #3a3a3e, 0 18px 40px rgba(0,0,0,.28); position: relative; }
+.phone { width: min(390px, 100%); height: 820px; border-radius: 48px; background: #08090a; padding: 9px; box-shadow: 0 0 0 1.5px #34373b, 0 18px 40px rgba(0,0,0,.28); position: relative; }
 
-/* ===== app tokens ===== */
-.screen { --bg:#f2f2f7; --grp:#ffffff; --label:#000000; --label2:rgba(60,60,67,.62); --label3:rgba(60,60,67,.32); --sep:rgba(60,60,67,.22); --fill:rgba(120,120,128,.14);
-  --blue:#007aff; --green:#34c759; --orange:#ff9500; --red:#ff3b30; --gray:#8e8e93;
-  --green-t:#1f8a3b; --orange-t:#b45309; --red-t:#d70015; --blue-t:#0062cc; --tabbg:rgba(247,247,250,.82); --tabline:rgba(60,60,67,.18); --knob:#ffffff; --tint:rgba(0,122,255,.13);
-  position: relative; width: 100%; height: 100%; border-radius: 44px; overflow: hidden; background: var(--bg); color: var(--label);
-  font-family: -apple-system, "SF Pro Text", "PingFang SC", "Noto Sans SC", system-ui, sans-serif; font-size: 17px; line-height: 1.3; letter-spacing: -0.01em; }
-.screen[data-scheme="dark"] { --bg:#000000; --grp:#1c1c1e; --label:#ffffff; --label2:rgba(235,235,245,.62); --label3:rgba(235,235,245,.3); --sep:rgba(84,84,88,.6); --fill:rgba(120,120,128,.32);
-  --blue:#0a84ff; --green:#30d158; --orange:#ff9f0a; --red:#ff453a; --gray:#98989d;
-  --green-t:#30d158; --orange-t:#ff9f0a; --red-t:#ff6961; --blue-t:#4da3ff; --tabbg:rgba(24,24,26,.78); --tabline:rgba(84,84,88,.5); --tint:rgba(10,132,255,.22); }
+/* ===== app tokens：仪表刻度 ===== */
+.screen { --bg:#efefec; --card:#ffffff; --card2:#f5f5f2; --ink:#15171a; --ink2:#595e65; --ink3:#a3a7ac; --line:#e2e2dd;
+  --amber:#f5a300; --amber-t:#8a5300; --on-amber:#15171a; --ok:#1e8e5a; --bad:#d93f2e; --tabbg:rgba(239,239,236,.84); --tick-off:#d9d9d4;
+  position: relative; width: 100%; height: 100%; border-radius: 40px; overflow: hidden; background: var(--bg); color: var(--ink);
+  font-family: -apple-system, "PingFang SC", "Noto Sans SC", system-ui, sans-serif; font-size: 16px; line-height: 1.35; }
+.screen[data-scheme="dark"] { --bg:#0d0e10; --card:#17191c; --card2:#1f2226; --ink:#f2f2ef; --ink2:#a7abb1; --ink3:#6b7076; --line:#2a2d31;
+  --amber:#ffb224; --amber-t:#ffc85a; --on-amber:#15171a; --ok:#3dd68c; --bad:#ff6b5c; --tabbg:rgba(13,14,16,.82); --tick-off:#2d3035; }
+.n { font-family: "Barlow Semi Condensed", "DIN Alternate", "Roboto Condensed", "PingFang SC", system-ui, sans-serif; font-variant-numeric: tabular-nums; letter-spacing: 0; }
 
-.island { position: absolute; z-index: 5; top: 11px; left: 50%; width: 118px; height: 34px; margin-left: -59px; border-radius: 20px; background: #000; }
-.sb { position: absolute; z-index: 4; top: 0; left: 0; right: 0; height: 54px; display: flex; justify-content: space-between; align-items: center; padding: 6px 34px 0 40px; font-weight: 600; font-size: 16px; letter-spacing: 0; }
+.sb { position: absolute; z-index: 4; top: 0; left: 0; right: 0; height: 46px; display: flex; justify-content: space-between; align-items: center; padding: 8px 28px 0; font-weight: 600; font-size: 15px; }
 .sb .r { display: flex; gap: 6px; align-items: center; }
-.scroll { position: absolute; inset: 0; overflow-y: auto; padding: 56px 0 104px; scrollbar-width: none; }
+.scroll { position: absolute; inset: 0; overflow-y: auto; padding: 50px 16px 104px; scrollbar-width: none; display: flex; flex-direction: column; gap: 12px; }
 .scroll::-webkit-scrollbar { display: none; }
-.lt { font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: 0.01em; margin: 6px 20px 2px; }
-.lsub { margin: 0 20px 10px; color: var(--label2); font-size: 15px; display: flex; align-items: center; gap: 6px; }
-.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex: none; }
-
-.sh { margin: 22px 32px 7px; font-size: 13px; color: var(--label2); letter-spacing: 0; }
-.sf { margin: 7px 32px 0; font-size: 13px; line-height: 18px; color: var(--label2); }
-.grp { margin: 0 16px; background: var(--grp); border-radius: 18px; overflow: hidden; }
-.row { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 8px 16px; position: relative; }
-.row + .row::before { content: ""; position: absolute; top: 0; left: 16px; right: 0; height: 0.5px; background: var(--sep); }
-.row.ic + .row.ic::before { left: 60px; }
-.row .t { flex: 1; min-width: 0; }
-.row .t > b { font-weight: 400; display: block; }
-.row .t > small { display: block; color: var(--label2); font-size: 13px; line-height: 17px; margin-top: 1px; }
-.row .v { color: var(--label2); text-align: right; white-space: nowrap; }
-.num { font-variant-numeric: tabular-nums; }
-.sq { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; color: #fff; flex: none; }
-.sq svg { width: 18px; height: 18px; }
+.ttl { margin: 6px 4px 0; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.ttl h2 { margin: 0; font-size: 30px; line-height: 36px; font-weight: 700; letter-spacing: .01em; }
+.stat { font-size: 13px; color: var(--ink2); display: inline-flex; align-items: center; gap: 6px; }
+.stat i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+.card { background: var(--card); border-radius: 18px; padding: 16px; }
+.lab { font-size: 12px; color: var(--ink2); letter-spacing: .06em; margin: 8px 4px -4px; }
+.foot { font-size: 12.5px; line-height: 18px; color: var(--ink2); margin: -4px 6px 0; }
 .ico { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.ok { color: var(--green-t); } .warn { color: var(--orange-t); } .bad { color: var(--red-t); }
 
-.big { font-size: 48px; line-height: 52px; font-weight: 600; letter-spacing: -0.02em; }
-.big small { font-size: 22px; font-weight: 600; margin-left: 2px; letter-spacing: 0; color: var(--label2); }
-.batt { width: 52px; height: 26px; border: 2px solid var(--label3); border-radius: 8px; padding: 2px; position: relative; flex: none; }
-.batt i { display: block; height: 100%; border-radius: 4.5px; background: var(--green); width: 62%; }
-.batt::after { content: ""; position: absolute; right: -6px; top: 7px; width: 3px; height: 8px; border-radius: 0 2px 2px 0; background: var(--label3); }
+/* 刻度 */
+.scale { position: relative; height: 40px; }
+.ticks { display: flex; justify-content: space-between; align-items: flex-end; height: 22px; position: absolute; left: 0; right: 0; top: 0; }
+.ticks i { width: 3px; height: 22px; border-radius: 1.5px; background: var(--tick-off); }
+.ticks i.on { background: var(--amber); }
+.ticks i.m { height: 22px; }
+.lim { position: absolute; top: 24px; width: 0; height: 0; transform: translateX(-50%); border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 7px solid var(--ink); }
+.limt { position: absolute; top: 26px; transform: translateX(-50%); font-size: 11px; color: var(--ink2); white-space: nowrap; padding-top: 7px; }
+.big { font-size: 64px; line-height: 60px; font-weight: 600; }
+.big small { font-size: 26px; font-weight: 500; color: var(--ink2); margin-left: 3px; }
 
-.cap { font: inherit; font-size: 15px; font-weight: 600; color: var(--blue-t); background: var(--tint); border: 0; border-radius: 999px; min-height: 34px; padding: 0 16px; cursor: pointer; flex: none; position: relative; }
-.cap::after { content: ""; position: absolute; inset: -6px -4px; }
-.cap:active { opacity: .6; }
-.cap.fill { background: var(--blue); color: #fff; }
-.cap:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
-.step { display: inline-flex; background: var(--fill); border-radius: 9px; height: 34px; flex: none; }
-.step button { width: 47px; border: 0; background: transparent; color: var(--label); font: inherit; font-size: 22px; line-height: 1; cursor: pointer; border-radius: 9px; min-height: 44px; margin: -5px 0; }
-.step button + button { border-left: 1px solid var(--sep); border-radius: 0 9px 9px 0; }
-.step button:focus-visible { outline: 3px solid var(--blue); outline-offset: -2px; }
-.spin { width: 22px; height: 22px; border-radius: 50%; border: 2.5px solid var(--label3); border-top-color: var(--label2); animation: spin .9s linear infinite; flex: none; }
-@keyframes spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
-.rng { width: 100%; accent-color: var(--blue); height: 44px; margin: 0; }
-.seg2 { display: flex; background: var(--fill); border-radius: 9px; padding: 2px; margin: 4px 16px 0; }
-.seg2 span { flex: 1; text-align: center; font-size: 13px; font-weight: 500; padding: 7px 0; border-radius: 7px; color: var(--label); }
-.seg2 span.on { background: var(--grp); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,.14); }
-.screen[data-scheme="dark"] .seg2 span.on { background: #636366; box-shadow: none; }
+/* 车示意图 */
+.car { display: block; margin: 0 auto; max-width: 100%; height: auto; }
 
-.tabs { position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; padding: 7px 8px 26px; display: grid; grid-template-columns: repeat(4, 1fr); background: var(--tabbg); backdrop-filter: saturate(180%) blur(22px); -webkit-backdrop-filter: saturate(180%) blur(22px); border-top: 0.5px solid var(--tabline); }
-.tab { display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--gray); font-size: 10.5px; font-weight: 500; min-height: 48px; justify-content: center; }
-.tab svg { width: 26px; height: 26px; }
-.tab[aria-current="page"] { color: var(--blue); }
-.hi { position: absolute; z-index: 7; bottom: 8px; left: 50%; width: 134px; margin-left: -67px; height: 5px; border-radius: 3px; background: var(--label); opacity: .9; }
-.ex { text-align: center; font-size: 12px; color: var(--label3); margin: 18px 0 0; }
+/* 行 */
+.rows > div { display: flex; align-items: center; gap: 12px; min-height: 50px; padding: 6px 0; border-top: 1px solid var(--line); }
+.rows > div:first-child { border-top: 0; }
+.rows .k { flex: 1; min-width: 0; }
+.rows .k small { display: block; color: var(--ink2); font-size: 12.5px; line-height: 17px; }
+.rows .v { color: var(--ink2); text-align: right; white-space: nowrap; }
+.rows svg.ico { width: 22px; height: 22px; color: var(--ink2); flex: none; }
+.bad { color: var(--bad); } .ok { color: var(--ok); }
+
+.btn { font: inherit; font-weight: 600; font-size: 16px; border: 0; cursor: pointer; border-radius: 14px; min-height: 48px; padding: 0 18px; background: var(--amber); color: var(--on-amber); display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.btn.block { width: 100%; }
+.btn.sm { min-height: 36px; padding: 0 14px; font-size: 14px; border-radius: 10px; position: relative; background: var(--card2); color: var(--ink); }
+.btn.sm::after { content: ""; position: absolute; inset: -4px -4px; }
+.btn:focus-visible, .rd button:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+.btn svg { width: 20px; height: 20px; }
+.dial { display: flex; align-items: center; justify-content: space-between; padding: 6px 4px 2px; }
+.dial .t { font-size: 76px; line-height: 70px; font-weight: 600; text-align: center; }
+.dial .t sup { font-size: 30px; font-weight: 500; color: var(--ink2); vertical-align: top; margin-left: 2px; line-height: 40px; }
+.rd { width: 52px; height: 52px; border-radius: 50%; border: 0; background: var(--card2); color: var(--ink); font-size: 26px; line-height: 1; cursor: pointer; }
+.wait { height: 3px; border-radius: 2px; background: var(--card2); position: relative; overflow: hidden; margin-top: 12px; }
+.wait::after { content: ""; position: absolute; inset: 0 auto 0 -30%; width: 30%; background: var(--amber); animation: go 1.3s cubic-bezier(.4,0,.2,1) infinite; }
+@keyframes go { to { left: 100%; } }
+@media (prefers-reduced-motion: reduce) { .wait::after { animation: none; left: 0; width: 55%; } }
+.sw { width: 50px; height: 30px; border-radius: 15px; background: var(--card2); position: relative; flex: none; }
+.sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--ink3); }
+.rng { position: absolute; inset: -8px 0 -8px; width: 100%; height: 56px; opacity: 0; margin: 0; cursor: pointer; }
+.seg2 { display: flex; background: var(--card); border-radius: 12px; padding: 3px; }
+.seg2 span { flex: 1; text-align: center; font-size: 13px; font-weight: 500; padding: 8px 0; border-radius: 9px; color: var(--ink2); }
+.seg2 span.on { background: var(--card2); color: var(--ink); font-weight: 600; }
+.tl { display: grid; grid-template-columns: 52px 1fr auto; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); align-items: start; }
+.tl:first-child { border-top: 0; }
+.tl .tm { font-size: 17px; color: var(--ink2); padding-top: 1px; }
+.tl b { font-weight: 600; } .tl small { display: block; color: var(--ink2); font-size: 12.5px; line-height: 17px; }
+.tl .st { font-size: 13px; font-weight: 600; padding-top: 3px; text-align: right; }
+.trip { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.trip:first-child { border-top: 0; }
+.trip small { display: block; color: var(--ink2); font-size: 12.5px; line-height: 17px; }
+.trip .dv { font-size: 28px; font-weight: 600; text-align: right; white-space: nowrap; }
+.trip .dv small { display: inline; font-size: 13px; font-weight: 500; font-family: -apple-system, "PingFang SC", sans-serif; margin-left: 2px; }
+
+.tabs { position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; padding: 6px 8px 22px; display: grid; grid-template-columns: repeat(4, 1fr); background: var(--tabbg); backdrop-filter: saturate(160%) blur(20px); -webkit-backdrop-filter: saturate(160%) blur(20px); border-top: 1px solid var(--line); }
+.tab { display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--ink2); font-size: 11px; font-weight: 500; min-height: 50px; justify-content: center; position: relative; }
+.tab svg { width: 25px; height: 25px; }
+.tab[aria-current="page"] { color: var(--ink); font-weight: 700; }
+.tab[aria-current="page"]::before { content: ""; position: absolute; top: -6px; width: 22px; height: 3px; border-radius: 0 0 3px 3px; background: var(--amber); }
+.ex { text-align: center; font-size: 12px; color: var(--ink3); margin: 6px 0 0; }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -115,25 +135,21 @@ h1 { font-size: 22px; margin: 0 0 4px; font-weight: 700; }
   <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M12 3a5 5 0 0 0-3 9v2h6v-2a5 5 0 0 0-3-9z"/><path d="M10 18h4M10.5 21h3"/></symbol>
   <symbol id="i-horn" viewBox="0 0 24 24"><path d="M4 10v4h3l6 4V6L7 10z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></symbol>
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
-  <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 4 3 19.5h18z"/><path d="M12 10v4.5M12 17.2v.1"/></symbol>
   <symbol id="i-temp" viewBox="0 0 24 24"><path d="M10 14.5V5a2 2 0 0 1 4 0v9.5a4 4 0 1 1-4 0z"/></symbol>
-  <symbol id="i-door" viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M15 12v.1"/></symbol>
-  <symbol id="i-okc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M7.8 12.4 10.8 15.3 16.4 9.4"/></symbol>
-  <symbol id="i-xc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></symbol>
-  <symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5.7 5.7l12.6 12.6"/></symbol>
-  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24"><path d="M9 3v5M15 3v5M7 8h10v3a5 5 0 0 1-10 0zM12 16v5"/></symbol>
+  <symbol id="i-win" viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M5 11h14"/></symbol>
 </svg>
 
 <div class="wrap">
   <h1>特助手 UI 预览</h1>
-  <p class="sub">参考苹果的设计语言：大标题、分组列表、系统字体和系统色、半透明标签栏、原生形态的控件。页面里的车名、电量、行程、日志都是编造的示例数据。iOS 和 Android 两端按同一套视觉做。</p>
+  <p class="sub">这一版从产品本身出发：特助手做的事是"量"和"状态"，所以所有数值（电量、充电上限、温度、行程偏差）都用同一种刻度语言表达，首页主角是车的俯视示意图。页面里的车名、数值、行程、日志都是编造的示例数据。</p>
   <div class="bar">
     <div class="seg" role="group" aria-label="外观"><button type="button" data-scheme="light" aria-pressed="true">浅色</button><button type="button" data-scheme="dark" aria-pressed="false">深色</button></div>
   </div>
   <div class="notes">
-    <p><b>怎么做的</b>　信息都放进分组列表，一行一件事。状态用文字加一个小符号，不只靠颜色。蓝色只给能点的东西。</p>
-    <p><b>不做什么</b>　没有渐变、发光、自造的图表，也没有大数字加几张统计小卡。电量用电池符号，不用进度圈。</p>
-    <p><b>两端怎么办</b>　iOS 用 SwiftUI 的原生控件即可；Android 用 Compose 自绘同样的行、开关、步进器和标签栏，保持一致。</p>
+    <p><b>车就是界面</b>　首页不堆统计，而是画一张车的俯视图：哪扇窗没关、锁没锁，直接画在车上。</p>
+    <p><b>一把尺量所有</b>　电量是一排刻度，充电上限是刻度上的标记，行程偏差是同一种尺上的点。</p>
+    <p><b>琥珀是仪表背光</b>　唯一的品牌色，只给能点的和选中的；异常用珊瑚红、正常用绿，并且总带文字。</p>
   </div>
   <div class="phones" id="phones"></div>
 </div>
@@ -148,93 +164,127 @@ const D = {
     { dest: "机场", pred: 55, act: 63, when: "周三 06:30" }
   ],
   logs: [
-    { day: "今天", items: [
-      { s: "ok", n: "开启空调 21°", d: "iPhone · 先唤醒车辆，用时 14 秒", t: "14:20" },
-      { s: "ok", n: "闪灯", d: "Pixel · 车辆在线", t: "12:03" } ] },
-    { day: "昨天", items: [
-      { s: "bad", n: "设置充电上限 80%", d: "失败：车辆离线，唤醒超时", t: "22:41" },
-      { s: "deny", n: "开锁", d: "已拒绝：远程不允许，请在本机终端操作", t: "18:02" },
-      { s: "ok", n: "关闭空调", d: "iPhone · 车辆在线", t: "08:50" } ] }
+    { tm: "14:20", ok: "ok", n: "开启空调 21°", d: "iPhone · 先唤醒车辆，用时 14 秒", w: "成功" },
+    { tm: "12:03", ok: "ok", n: "闪灯", d: "Pixel · 车辆在线", w: "成功" },
+    { tm: "昨 22:41", ok: "bad", n: "设置充电上限 80%", d: "车辆离线，唤醒超时", w: "失败" },
+    { tm: "昨 18:02", ok: "deny", n: "开锁", d: "远程不允许，请在本机终端操作", w: "已拒绝" },
+    { tm: "昨 08:50", ok: "ok", n: "关闭空调", d: "iPhone · 车辆在线", w: "成功" }
   ]
 };
+const N = 25;
 const I = (n, st = "") => `<svg class="ico" ${st ? `style="${st}"` : ""} aria-hidden="true" viewBox="0 0 24 24"><use href="#i-${n}"/></svg>`;
-const sq = (n, bg) => `<span class="sq" style="background:${bg}" aria-hidden="true">${I(n)}</span>`;
-const delta = t => { const d = t.act - t.pred; return d > 0 ? `慢 ${d} 分` : d < 0 ? `快 ${-d} 分` : "准时"; };
-const dcls = t => t.act > t.pred ? "bad" : t.act < t.pred ? "warn" : "ok";
 
+function scale(level, limit, id) {
+  const on = Math.round(level / 100 * N);
+  return `<div class="scale" ${id ? `id="${id}"` : ""} data-level="${level}"><div class="ticks" aria-hidden="true">${Array.from({ length: N }, (_, i) => `<i class="${i < on ? "on" : ""}"></i>`).join("")}</div>${limit != null ? `<i class="lim" style="left:${limit}%"></i><span class="limt" style="left:${limit}%">上限 ${limit}%</span>` : ""}</div>`;
+}
+function carSvg() {
+  // 俯视示意图：车头向上。窗用侧边线段表示，状态用颜色。
+  return `<svg class="car" width="300" height="286" viewBox="0 0 300 286" role="img" aria-label="车辆示意图：左后车窗未关，车已上锁" fill="none" stroke="currentColor" style="color:var(--ink)">
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <rect x="90" y="52" width="9" height="32" rx="3.5" fill="var(--ink3)" stroke="none" opacity=".55"/>
+    <rect x="201" y="52" width="9" height="32" rx="3.5" fill="var(--ink3)" stroke="none" opacity=".55"/>
+    <rect x="90" y="200" width="9" height="32" rx="3.5" fill="var(--ink3)" stroke="none" opacity=".55"/>
+    <rect x="201" y="200" width="9" height="32" rx="3.5" fill="var(--ink3)" stroke="none" opacity=".55"/>
+    <path d="M150 8c33 0 48 20 50 54l3 54v54c0 40-12 72-53 74-41-2-53-34-53-74v-54l3-54c2-34 17-54 50-54z" fill="var(--card2)" stroke-width="1.6"/>
+    <path d="M115 66c8-8 62-8 70 0l-5 34h-60z" stroke-width="1.4" fill="var(--card)"/>
+    <rect x="116" y="108" width="68" height="76" rx="12" stroke-width="1.4" fill="var(--card)"/>
+    <path d="M118 194h64l5 20c-14 7-60 7-74 0z" stroke-width="1.4" fill="var(--card)"/>
+    <path d="M104 150h12M184 150h12" stroke-width="1.2" opacity=".5"/>
+    <path d="M104 108h12M184 108h12" stroke-width="1.2" opacity=".5"/>
+  </g>
+  <g stroke-linecap="round" stroke-width="4.5">
+    <path d="M102 112v34" stroke="var(--ink3)"/><path d="M198 112v34" stroke="var(--ink3)"/>
+    <path d="M198 154v34" stroke="var(--ink3)"/>
+    <path d="M102 154v34" stroke="var(--bad)"/>
+  </g>
+  <path d="M96 171H58" stroke="var(--bad)" stroke-width="1.4"/><circle cx="96" cy="171" r="3" fill="var(--bad)" stroke="none"/>
+  <text x="54" y="167" text-anchor="end" fill="var(--bad)" stroke="none" font-size="13" font-weight="600" font-family="-apple-system, PingFang SC, sans-serif">左后车窗</text>
+  <text x="54" y="184" text-anchor="end" fill="var(--bad)" stroke="none" font-size="13" font-weight="600" font-family="-apple-system, PingFang SC, sans-serif">未关</text>
+  <path d="M204 131h30" stroke="var(--ink3)" stroke-width="1.2"/><circle cx="204" cy="131" r="2.5" fill="var(--ink3)" stroke="none"/>
+  <g transform="translate(236 119)" stroke="var(--ok)" stroke-width="1.8"><rect x="2" y="9" width="14" height="10" rx="2.5"/><path d="M5 9V6.5a4 4 0 0 1 8 0V9"/></g>
+  <text x="256" y="148" fill="var(--ok)" stroke="none" font-size="13" font-weight="600" font-family="-apple-system, PingFang SC, sans-serif">已锁</text>
+</svg>`;
+}
 function status() {
-  return `<div class="island"></div><div class="sb"><span class="num">9:41</span><span class="r">
+  return `<div class="sb"><span class="n" style="font-size:16px">9:41</span><span class="r">
     <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
-    <svg width="26" height="12" viewBox="0 0 26 12" aria-hidden="true"><rect x=".5" y=".5" width="22" height="11" rx="3.5" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="16" height="8" rx="2" fill="currentColor"/><rect x="24" y="4" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".4"/></svg></span></div>`;
+    <svg width="26" height="12" viewBox="0 0 26 12" aria-hidden="true"><rect x=".5" y=".5" width="22" height="11" rx="3.5" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="16" height="8" rx="2" fill="currentColor"/></svg></span></div>`;
 }
 function tabs(cur) {
   const t = [["home", "首页"], ["ctl", "车控"], ["route", "行程"], ["list", "日志"]];
-  return `<nav class="tabs" aria-label="主导航">${t.map(([k, l]) => `<div class="tab" ${k === cur ? 'aria-current="page"' : ""}><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-${k}"/></svg>${l}</div>`).join("")}</nav><div class="hi"></div>`;
+  return `<nav class="tabs" aria-label="主导航">${t.map(([k, l]) => `<div class="tab" ${k === cur ? 'aria-current="page"' : ""}><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-${k}"/></svg>${l}</div>`).join("")}</nav>`;
 }
-const row = (icon, title, sub, trailing) => `<div class="row ic">${icon}<div class="t"><b>${title}</b>${sub ? `<small>${sub}</small>` : ""}</div>${trailing || ""}</div>`;
-const plain = (title, sub, trailing) => `<div class="row"><div class="t"><b>${title}</b>${sub ? `<small>${sub}</small>` : ""}</div>${trailing || ""}</div>`;
+const row = (icon, k, v, sub) => `<div>${I(icon)}<div class="k">${k}${sub ? `<small>${sub}</small>` : ""}</div><span class="v">${v}</span></div>`;
 
 function home() {
-  return `<h1 class="lt">${D.car}</h1><p class="lsub"><span class="dot"></span>在线 · 2 分钟前</p>
-  <div class="grp">
-    <div class="row" style="padding:14px 16px"><div class="t"><div class="big num">${D.battery}<small>%</small></div><small style="color:var(--label2);font-size:15px;display:block;margin-top:2px">续航约 ${D.rangeKm} 公里</small></div><div class="batt" role="img" aria-label="电量 ${D.battery}%"><i></i></div></div>
-    ${plain("充电", "", `<span class="v">未连接 · 上限 ${D.limit}%</span>`)}
+  return `<div class="ttl"><h2>${D.car}</h2><span class="stat"><i></i>在线 · 2 分钟前</span></div>
+  <div class="card" style="padding-bottom:10px">${carSvg()}</div>
+  <div class="card"><div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px"><div class="big n">${D.battery}<small>%</small></div><div style="text-align:right;color:var(--ink2);font-size:14px;line-height:20px;padding-bottom:4px">续航约 <span class="n" style="font-size:20px;color:var(--ink);font-weight:600">${D.rangeKm}</span> 公里<br>未连接充电</div></div>${scale(D.battery, D.limit)}</div>
+  <div class="card rows">
+    ${row("lock", "车锁", "已锁")}
+    ${row("win", "门窗", `<span class="bad">1 处未关</span>`)}
+    ${row("snow", "空调", "关闭")}
+    ${row("temp", "车内 / 车外", `<span class="n" style="font-size:17px;color:var(--ink)">30° / 30°</span>`)}
   </div>
-  <div class="sh">注意</div>
-  <div class="grp">${row(sq("warn", "#ff9500"), "左后车窗未关", "需要在车上关闭，手机无法远程关窗", "")}</div>
-  <div class="sh">车辆</div>
-  <div class="grp">
-    ${row(sq("lock", "#8e8e93"), "车锁", "", `<span class="v">已锁</span>`)}
-    ${row(sq("door", "#ff9500"), "门窗", "", `<span class="v warn">1 处未关</span>`)}
-    ${row(sq("snow", "#007aff"), "空调", "", `<span class="v">关闭</span>`)}
-    ${row(sq("temp", "#5856d6"), "车内温度", "", `<span class="v num">30°</span>`)}
-    ${row(sq("temp", "#32ade6"), "车外温度", "", `<span class="v num">30°</span>`)}
-  </div>
-  <p class="sf">车休眠时显示上一次的数据，不会自动唤醒车辆。</p><p class="ex">示例数据</p>`;
+  <p class="foot">车休眠时显示上一次的数据，不会自动唤醒车辆。窗需要在车上关闭，手机无法远程关窗。</p><p class="ex">示例数据</p>`;
 }
 function control() {
-  return `<h1 class="lt">车控</h1>
-  <div class="sh">场景</div>
-  <div class="grp">${row(sq("play", "#34c759"), "出门模式", "开空调 21° 并读取电量", `<button class="cap fill" type="button">开始</button>`)}</div>
-  <div class="sh">空调</div>
-  <div class="grp">
-    ${row(sq("snow", "#007aff"), "空调", `正在唤醒车辆… <span class="num">12</span> 秒`, `<span class="spin" role="progressbar" aria-label="正在唤醒"></span>`)}
-    ${plain("目标温度", "", `<div class="step" role="group" aria-label="目标温度"><button type="button" aria-label="降低">−</button><button type="button" aria-label="升高">+</button></div>`)}
-    ${plain("当前设定", "", `<span class="v num" style="color:var(--label)">21°</span>`)}
+  return `<div class="ttl"><h2>车控</h2></div>
+  <button class="btn block" type="button" style="min-height:56px;font-size:17px">${I("play")}出门模式<span style="font-weight:500;opacity:.75;font-size:13px">开空调 21° 并读取电量</span></button>
+  <div class="lab">空调</div>
+  <div class="card"><div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">${I("snow", "width:22px;height:22px;color:var(--ink2)")}<div style="flex:1"><b style="font-weight:600">空调</b><div style="color:var(--ink2);font-size:13px">正在唤醒车辆… <span class="n">12</span> 秒</div></div><div class="sw" role="switch" aria-checked="false" aria-label="空调开关"></div></div>
+    <div class="dial"><button class="rd" type="button" aria-label="降低温度">−</button><div class="t n">21<sup>°</sup></div><button class="rd" type="button" aria-label="升高温度">+</button></div><div class="wait" role="progressbar" aria-label="正在唤醒"></div></div>
+  <div class="lab">车辆</div>
+  <div class="card rows">
+    <div>${I("lock")}<div class="k">锁车</div><span class="v ok">已锁</span></div>
+    <div>${I("bulb")}<div class="k">闪灯<small>需要 P 档</small></div><button class="btn sm" type="button">执行</button></div>
+    <div>${I("horn")}<div class="k">鸣笛<small>需要 P 档</small></div><button class="btn sm" type="button">执行</button></div>
   </div>
-  <div class="sh">车辆</div>
-  <div class="grp">
-    ${row(sq("lock", "#8e8e93"), "锁车", "", `<span class="v"><span class="ok">已锁</span></span>`)}
-    ${row(sq("bulb", "#ff9500"), "闪灯", "", `<button class="cap" type="button">执行</button>`)}
-    ${row(sq("horn", "#ff3b30"), "鸣笛", "", `<button class="cap" type="button">执行</button>`)}
-  </div>
-  <p class="sf">闪灯和鸣笛需要车辆在 P 档。</p>
-  <div class="sh">充电</div>
-  <div class="grp">
-    ${row(sq("bolt", "#34c759"), "充电上限", "", `<span class="v num" style="color:var(--label)">${D.limit}%</span>`)}
-    <div class="row" style="padding:2px 16px"><input class="rng" type="range" min="50" max="100" value="${D.limit}" aria-label="充电上限"></div>
-  </div>
-  <p class="sf">开锁、后备箱、车窗等高风险操作不在手机上提供。车休眠时控车会先唤醒，最长约 60 秒。</p><p class="ex">示例数据</p>`;
+  <div class="lab">充电</div>
+  <div class="card"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px"><span style="display:flex;gap:12px;align-items:center">${I("bolt", "width:22px;height:22px;color:var(--ink2)")}充电上限</span><span class="n" id="limv" style="font-size:26px;font-weight:600">${D.limit}%</span></div>
+    <div style="position:relative">${scale(D.limit, null, "limscale")}<input class="rng" id="limrng" type="range" min="50" max="100" value="${D.limit}" aria-label="充电上限"></div></div>
+  <p class="foot">开锁、后备箱、车窗等高风险操作不在手机上提供。车休眠时控车会先唤醒，最长约 60 秒。</p><p class="ex">示例数据</p>`;
+}
+function stripPlot() {
+  const x = d => 165 + d * 15, devs = D.trips.map(t => t.act - t.pred), mean = devs.reduce((a, b) => a + b, 0) / devs.length;
+  const ticks = [-10, -5, 0, 5, 10].map(v => `<line x1="${x(v)}" x2="${x(v)}" y1="${v === 0 ? 26 : 34}" y2="52" stroke="${v === 0 ? "var(--ink)" : "var(--ink3)"}" stroke-width="${v === 0 ? 1.6 : 1}"/><text x="${x(v)}" y="68" text-anchor="middle" font-size="12" fill="var(--ink2)" class="n">${v > 0 ? "+" + v : v}</text>`).join("");
+  const dots = devs.map((d, i) => `<circle cx="${x(d)}" cy="42" r="7" fill="var(--ink)" opacity=".9"/>`).join("");
+  return `<svg viewBox="0 0 330 78" width="100%" role="img" aria-label="各次行程的预计与实际偏差，平均慢 ${mean.toFixed(0)} 分钟" style="display:block">
+   <line x1="15" x2="315" y1="52" y2="52" stroke="var(--ink3)" stroke-width="1.2"/>${ticks}
+   <path d="M${x(mean)} 22l-6-9h12z" fill="var(--amber)"/><text x="${x(mean)}" y="9" text-anchor="middle" font-size="12" font-weight="600" fill="var(--amber-t)" class="n">平均 +${mean.toFixed(0)}</text>
+   <line x1="${x(mean)}" x2="${x(mean)}" y1="23" y2="52" stroke="var(--amber)" stroke-width="2"/>${dots}</svg>`;
 }
 function trips() {
-  const chev = I("chev", "width:14px;height:14px;color:var(--label3);flex:none");
-  return `<h1 class="lt">行程</h1>
+  const dv = t => { const d = t.act - t.pred; return d === 0 ? `<span class="ok" style="font-size:20px">准时</span>` : `<span class="${d > 0 ? "bad" : ""}" style="${d < 0 ? "color:var(--ink)" : ""}">${d > 0 ? "+" : "−"}${Math.abs(d)}<small>分</small></span>`; };
+  return `<div class="ttl"><h2>行程</h2></div>
   <div class="seg2" role="group" aria-label="范围"><span class="on">最近 7 天</span><span>30 天</span><span>全部</span></div>
-  <div class="sh">平均偏差</div>
-  <div class="grp"><div class="row" style="padding:14px 16px"><div class="t"><div class="big num" style="font-size:40px;line-height:44px">+4<small>分钟</small></div><small style="color:var(--label2);font-size:15px;display:block;margin-top:2px">车机预计普遍偏快 · 近 4 次</small></div></div></div>
-  <div class="sh">进行中</div>
-  <div class="grp">${plain("超市", "预计还有 11 分钟 · 已行驶 7 分钟", `<span class="cap" style="min-height:28px;display:inline-flex;align-items:center;font-size:13px;padding:0 12px">导航中</span>`)}</div>
-  <div class="sh">已完成</div>
-  <div class="grp">${D.trips.map(t => plain(t.dest, `${t.when} · 预计 ${t.pred} 分 · 实际 ${t.act} 分`, `<span class="v num ${dcls(t)}" style="font-weight:600">${delta(t)}</span>${chev}`)).join("")}</div>
-  <p class="sf">偏差 = 实际用时 − 车机预计。积累的行程越多，规律越清楚。</p><p class="ex">示例数据</p>`;
+  <div class="lab">预计与实际的偏差（分钟）</div>
+  <div class="card" style="padding:14px 16px 10px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);margin-bottom:4px"><span>实际更快</span><span>实际更慢</span></div>${stripPlot()}<p style="margin:6px 0 0;color:var(--ink2);font-size:13px">车机预计平均偏快约 4 分钟，近 4 次。</p></div>
+  <div class="lab">进行中</div>
+  <div class="card"><div class="trip" style="padding:0"><div><b style="font-weight:600">超市</b><small>已行驶 7 分钟</small></div><div style="text-align:right"><span class="n" style="font-size:28px;font-weight:600">11</span><small style="display:inline;color:var(--ink2)"> 分钟后到</small></div></div></div>
+  <div class="lab">已完成</div>
+  <div class="card">${D.trips.map(t => `<div class="trip"><div><b style="font-weight:600">${t.dest}</b><small>${t.when} · 预计 ${t.pred} 分 · 实际 ${t.act} 分</small></div><div class="dv n">${dv(t)}</div></div>`).join("")}</div>
+  <p class="foot">偏差 = 实际用时 − 车机预计。积累的行程越多，规律越清楚。</p><p class="ex">示例数据</p>`;
 }
 function log() {
-  const m = { ok: ["okc", "var(--green)", "成功"], bad: ["xc", "var(--red)", "失败"], deny: ["ban", "var(--orange)", "已拒绝"] };
-  return `<h1 class="lt">日志</h1>` + D.logs.map(g => `<div class="sh">${g.day}</div><div class="grp">${g.items.map(l => { const [ic, col, w] = m[l.s]; return `<div class="row ic">${I(ic, `width:26px;height:26px;color:${col};flex:none`)}<div class="t"><b>${l.n}</b><small>${w} · ${l.d}</small></div><span class="v num" style="font-size:15px">${l.t}</span></div>`; }).join("")}</div>`).join("") + `<p class="sf">每条控车都会记录，包含被拒绝的。</p><p class="ex">示例数据</p>`;
+  const col = { ok: "var(--ok)", bad: "var(--bad)", deny: "var(--amber-t)" };
+  return `<div class="ttl"><h2>日志</h2></div>
+  <div class="card" style="padding-top:6px;padding-bottom:6px">${D.logs.map(l => `<div class="tl"><span class="tm n">${l.tm}</span><div><b>${l.n}</b><small>${l.d}</small></div><span class="st" style="color:${col[l.ok]}">${l.w}</span></div>`).join("")}</div>
+  <p class="foot">每条控车都会记录，包含被拒绝的。</p><p class="ex">示例数据</p>`;
 }
 const PAGES = [["home", "首页", home], ["ctl", "车控", control], ["route", "行程", trips], ["list", "日志", log]];
+function bindRange(root) {
+  const r = root.querySelector("#limrng"); if (!r) return;
+  r.addEventListener("input", () => {
+    const v = +r.value, on = Math.round(v / 100 * N);
+    root.querySelectorAll("#limscale .ticks i").forEach((t, i) => t.classList.toggle("on", i < on));
+    root.querySelector("#limv").textContent = v + "%";
+  });
+}
 function render(scheme) {
   document.getElementById("phones").innerHTML = PAGES.map(([k, label, fn]) => `<figure class="cell"><div class="phone"><div class="screen" data-scheme="${scheme}">${status()}<div class="scroll">${fn()}</div>${tabs(k)}</div></div><figcaption>${label}</figcaption></figure>`).join("");
+  bindRange(document);
   document.querySelectorAll("button[data-scheme]").forEach(b => b.setAttribute("aria-pressed", b.dataset.scheme === scheme));
   try { localStorage.setItem("ui-scheme", scheme); } catch (e) {}
 }
