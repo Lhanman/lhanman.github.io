@@ -2,8 +2,8 @@
   "pages": [
     {
       "slug": "tesla-assistant-ui-preview",
-      "title": "特助手 UI 风格预览",
-      "description": "特助手已选定风格 A（新能源号牌）的移动端 UI 预览，含首页、车控、行程、日志四页，B、C 保留作对照，全部为演示数据。",
+      "title": "特助手 UI 预览",
+      "description": "参考苹果设计语言重做的特助手移动端 UI 预览：首页、车控、行程、日志四页，浅色和深色，全部为演示数据。",
       "tags": [
         "tesla",
         "设计",
@@ -12,7 +12,7 @@
       "project": "tesla-assistant",
       "created": "2026-10-19",
       "updated": "2026-10-19",
-      "path": "文档/tesla-assistant/特助手 UI 风格预览.html"
+      "path": "文档/tesla-assistant/特助手 UI 预览.html"
     },
     {
       "slug": "tesla-assistant-features",
