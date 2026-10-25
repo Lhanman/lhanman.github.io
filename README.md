@@ -13,10 +13,11 @@
 
 这些文件全部由 `dispatch-pages` 自动生成，不要手动修改；笔记的正文请在知识库里改，下一次同步会覆盖这里的副本。
 
-## 文档清单（10 篇）
+## 文档清单（11 篇）
 
 ### ashare-quant
 
+- [三个开源项目的数据源对比：TradingAgents、TradingAgents-CN、daily_stock_analysis](%E6%96%87%E6%A1%A3/ashare-quant/%E4%B8%89%E4%B8%AA%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%95%B0%E6%8D%AE%E6%BA%90%E5%AF%B9%E6%AF%94%EF%BC%9ATradingAgents%E3%80%81TradingAgents-CN%E3%80%81daily_stock_analysis.html) · [线上](https://lhanman.github.io/p/opensource-data-sources/) · 2026-10-26 — TradingAgents、TradingAgents-CN、daily_stock_analysis 三个开源项目取 A 股数据的来源与优先级，Tushare 在里面是必需还是可选，以及对 ashare-quant 的含义
 - [青霉素出海股速览](%E6%96%87%E6%A1%A3/ashare-quant/%E9%9D%92%E9%9C%89%E7%B4%A0%E5%87%BA%E6%B5%B7%E8%82%A1%E9%80%9F%E8%A7%88.html) · [线上](https://lhanman.github.io/p/penicillin-export-stocks/) · 2026-09-25 — A股青霉素出海公司：最近一周、日本梅毒事件复盘、买卖点、近一月A股主线与医药走势
 - [盘前简报安装指南](%E6%96%87%E6%A1%A3/ashare-quant/%E7%9B%98%E5%89%8D%E7%AE%80%E6%8A%A5%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97.html) · [线上](https://lhanman.github.io/p/ashare-brief-setup/) · 2026-09-25 — 盘前简报的 Telegram 机器人、定时任务和行情自动更新的安装步骤
 

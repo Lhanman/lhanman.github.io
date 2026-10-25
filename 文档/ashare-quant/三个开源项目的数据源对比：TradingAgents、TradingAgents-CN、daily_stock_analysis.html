@@ -1,0 +1,169 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>三个开源项目的数据源对比：TradingAgents、TradingAgents-CN、daily_stock_analysis</title><style>
+:root{color-scheme:light dark;
+--bg:#ffffff;--tp:#1f1e1d;--ts:#5f5e5a;--tm:#8a887f;--bd:#dedbd2;--s1:#f6f5f1;--s2:#ffffff;
+--gy-bg:#F1EFE8;--gy-tx:#444441;--gy-st:#888780;--gy-sub:#5F5E5A;
+--ok-bg:#EAF3DE;--ok-tx:#27500A;--ok-st:#639922;
+--wn-bg:#FAEEDA;--wn-tx:#633806;--wn-st:#BA7517;
+--ac-bg:#E6F1FB;--ac-tx:#0C447C;--ac-st:#378ADD;
+--tl-bg:#E1F5EE;--tl-tx:#085041;--tl-st:#1D9E75;--tl-sub:#0F6E56}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1a19;--tp:#ecebe6;--ts:#b4b2a9;--tm:#888780;--bd:#3b3a37;--s1:#252422;--s2:#201f1e;
+--gy-bg:#2c2c2a;--gy-tx:#d3d1c7;--gy-st:#888780;--gy-sub:#b4b2a9;
+--ok-bg:#173404;--ok-tx:#c0dd97;--ok-st:#639922;
+--wn-bg:#412402;--wn-tx:#fac775;--wn-st:#ba7517;
+--ac-bg:#042c53;--ac-tx:#b5d4f4;--ac-st:#378add;
+--tl-bg:#04342c;--tl-tx:#9fe1cb;--tl-st:#1d9e75;--tl-sub:#5dcaa5}}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--tp);font:16px/1.75 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.page{max-width:780px;margin:0 auto;padding:28px 18px 64px}
+h1{font-size:26px;line-height:1.35;font-weight:600;margin:0 0 8px}
+h2{font-size:20px;line-height:1.4;font-weight:600;margin:40px 0 12px}
+h3{font-size:16.5px;font-weight:600;margin:0 0 6px;line-height:1.5}
+p{margin:0 0 10px}
+.meta{font-size:13.5px;color:var(--ts);margin:0 0 18px}
+.chip{display:inline-block;font-size:13px;font-weight:500;padding:2px 10px;border-radius:7px;white-space:nowrap;line-height:1.6}
+.ok{background:var(--ok-bg);color:var(--ok-tx)}.wn{background:var(--wn-bg);color:var(--wn-tx)}.ac{background:var(--ac-bg);color:var(--ac-tx)}.gy{background:var(--gy-bg);color:var(--gy-tx)}.tl{background:var(--tl-bg);color:var(--tl-tx)}
+.card{border:1px solid var(--bd);border-radius:14px;padding:14px 16px;margin:0 0 12px;background:var(--s2)}
+.callout{border-radius:14px;background:var(--s1);padding:14px 16px;margin:0 0 12px}
+.callout p:last-child{margin:0}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:10px;margin:0 0 16px}
+.grid3 .card{margin:0}
+.kv{display:grid;grid-template-columns:104px 1fr;gap:2px 12px;font-size:15px;margin:8px 0 0}
+.kv dt{color:var(--ts);font-weight:500}
+.kv dd{margin:0 0 8px}
+@media (max-width:540px){.kv{grid-template-columns:1fr}.kv dt{margin-top:6px}.kv dd{margin:0 0 4px}}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px 4px;margin:4px 0 10px}
+.nd{display:inline-block;font-size:14px;padding:2px 10px;border-radius:8px;border:1.5px solid var(--gy-st);background:var(--gy-bg);color:var(--gy-tx);line-height:1.6}
+.nd.tu{border-color:var(--wn-st);background:var(--wn-bg);color:var(--wn-tx)}
+.nd.key{border-color:var(--ac-st);background:var(--ac-bg);color:var(--ac-tx)}
+.nd.loc{border-color:var(--ok-st);background:var(--ok-bg);color:var(--ok-tx)}
+.arw{color:var(--tm);font-size:15px}
+.lab{font-size:14px;color:var(--ts);margin:12px 0 2px;font-weight:500}
+.legend{font-size:13px;color:var(--ts);display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 0 0}
+.small{font-size:13.5px;color:var(--ts)}
+ol.n{padding-left:22px;margin:0 0 10px}ol.n li{margin:0 0 10px}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:var(--s1);padding:1px 6px;border-radius:5px}
+nav.toc{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:14px;margin:0 0 6px}
+nav.toc a{color:var(--ac-tx);text-decoration:none;background:var(--ac-bg);padding:2px 10px;border-radius:7px}
+ul.ev{padding-left:20px;margin:0 0 10px;font-size:14.5px}ul.ev li{margin:0 0 6px}
+svg text{font-family:inherit}
+</style></head><body><div class="page">
+<h1>三个开源项目用什么数据源，Tushare 是不是必要</h1>
+<p class="meta">2026-10-26 · ashare-quant 调研 · 依据本机只读副本，没有运行任何项目</p>
+<nav class="toc"><a href="#s1">结论</a><a href="#s2">优先级图</a><a href="#s3">逐个看</a><a href="#s4">复权的做法</a><a href="#s5">对我们意味着什么</a><a href="#s6">证据和版本</a></nav>
+
+<div class="grid3" style="margin-top:18px">
+<div class="card"><h3>TradingAgents（官方）</h3><span class="chip gy">Tushare：没有</span><p class="small" style="margin-top:8px">行情靠 yfinance，财报靠 SEC EDGAR，专为美股；A 股只能借 Yahoo。</p></div>
+<div class="card"><h3>TradingAgents-CN</h3><span class="chip wn">Tushare：可选</span><p class="small" style="margin-top:8px">A 股四选一：本地库、AKShare、Tushare、BaoStock；配置模板默认 AKShare。</p></div>
+<div class="card"><h3>daily_stock_analysis</h3><span class="chip wn">Tushare：可选</span><p class="small" style="margin-top:8px">A 股日线六七个源自动换；设了 token 才把 Tushare 提到最前。</p></div>
+</div>
+
+<h2 id="s1">一句话结论</h2>
+<div class="callout">
+<p><b>三个项目都不要求 Tushare。</b>官方 TradingAgents 里根本没有它；TradingAgents-CN 和 daily_stock_analysis 里它是可选项，设了 token（接口钥匙）才启用，默认走免费源。</p>
+<p><b>它们的默认免费路线主要靠东方财富类接口</b>（efinance、AKShare 的东财部分）。这条路在我们这台电脑上实测请求几次就会被封 IP，不能照搬；我们现在走的是 Baostock、新浪、腾讯。</p>
+<p><b>它们都是"每天分析一遍"的工具</b>，不做逐日重放的严格回测。"它们不需要 Tushare"推不出"我们不需要"。对我们来说，Tushare 是可选升级，不是前提。</p>
+</div>
+
+<h2 id="s2">取数优先级一图看懂</h2>
+<p class="small">箭头表示"前一个取不到，就换后一个"。</p>
+<div class="card">
+<h3>TradingAgents（官方）</h3>
+<div class="lab">行情和技术指标（可换成 Alpha Vantage，要 key）</div><div class="chain"><span class="nd ">yfinance</span></div>
+<div class="lab">财报</div><div class="chain"><span class="nd ">SEC EDGAR（美股申报原文）</span><span class="arw">→</span><span class="nd ">yfinance</span></div>
+<div class="lab">新闻、宏观、预测市场</div>
+<div class="chain"><span class="nd">yfinance 新闻</span><span class="nd key">FRED 宏观（要 key）</span><span class="nd">Polymarket</span></div>
+</div>
+<div class="card">
+<h3>TradingAgents-CN</h3>
+<div class="lab">A 股（代码里的默认顺序）</div><div class="chain"><span class="nd loc">LOCAL 本地库（MongoDB）</span><span class="arw">→</span><span class="nd ">AKShare</span><span class="arw">→</span><span class="nd tu">Tushare（要 token）</span><span class="arw">→</span><span class="nd ">BaoStock</span></div>
+<div class="lab">A 股（服务层的优先级，Tushare 排在 AKShare 前）</div><div class="chain"><span class="nd loc">LOCAL 本地库</span><span class="arw">→</span><span class="nd tu">Tushare（要 token）</span><span class="arw">→</span><span class="nd ">AKShare / QMT</span><span class="arw">→</span><span class="nd ">BaoStock</span></div>
+<div class="lab">港股</div><div class="chain"><span class="nd ">AKShare</span><span class="arw">→</span><span class="nd ">yfinance</span><span class="arw">→</span><span class="nd key">Finnhub（要 key）</span></div>
+<div class="lab">美股</div><div class="chain"><span class="nd key">Alpha Vantage（要 key）</span><span class="arw">→</span><span class="nd ">yfinance</span><span class="arw">→</span><span class="nd key">Finnhub（要 key）</span></div>
+</div>
+<div class="card">
+<h3>daily_stock_analysis</h3>
+<div class="lab">A 股日线（默认）</div><div class="chain"><span class="nd ">efinance（东财）</span><span class="arw">→</span><span class="nd ">AkShare</span><span class="arw">→</span><span class="nd tu">Tushare / Pytdx</span><span class="arw">→</span><span class="nd ">Baostock</span><span class="arw">→</span><span class="nd ">YFinance</span><span class="arw">→</span><span class="nd ">腾讯直连</span></div>
+<div class="lab">A 股日线（设了 Tushare token）</div><div class="chain"><span class="nd tu">Tushare</span><span class="arw">→</span><span class="nd ">efinance（东财）</span><span class="arw">→</span><span class="nd ">AkShare</span><span class="arw">→</span><span class="nd ">Pytdx</span><span class="arw">→</span><span class="nd ">Baostock</span><span class="arw">→</span><span class="nd ">YFinance</span><span class="arw">→</span><span class="nd ">腾讯直连</span></div>
+<div class="lab">实时行情</div><div class="chain"><span class="nd ">腾讯</span><span class="arw">→</span><span class="nd ">新浪</span><span class="arw">→</span><span class="nd ">efinance</span><span class="arw">→</span><span class="nd ">AkShare 东财</span></div>
+<div class="lab">指数（固定顺序）</div><div class="chain"><span class="nd ">腾讯</span><span class="arw">→</span><span class="nd ">AkShare</span><span class="arw">→</span><span class="nd key">TickFlow（付费 key）</span><span class="arw">→</span><span class="nd ">YFinance</span></div>
+<p class="small" style="margin-top:8px">实时行情还可以显式加入 Tushare（需要 2000 积分）和 TickFlow。</p>
+</div>
+<div class="legend"><span><span class="nd">灰</span> 免费</span><span><span class="nd tu">橙</span> Tushare</span><span><span class="nd key">蓝</span> 要 key 或付费</span><span><span class="nd loc">绿</span> 本地库</span></div>
+
+<h2 id="s3">逐个看</h2>
+<div class="card">
+<h3>TradingAgents（官方）<span class="chip gy" style="margin-left:8px">Apache-2.0</span></h3>
+<p class="small">多个大模型角色（基本面、新闻、技术、多空辩论、风控）分析一只股票，给五档评级。</p>
+<dl class="kv"><dt>行情</dt><dd>yfinance，可换成 Alpha Vantage</dd><dt>财报</dt><dd>SEC EDGAR（美股申报原文），再到 yfinance</dd><dt>新闻与宏观</dt><dd>yfinance 新闻；FRED 宏观数据；Polymarket 预测市场</dd><dt>A 股</dt><dd>只能借 Yahoo（把 .SH 换成 .SS 的后缀）；涨跌停、T+1、停牌、ST 全库没有</dd><dt>Tushare</dt><dd>没有。全库搜索 Tushare、AKShare、Baostock、efinance 都没有命中</dd></dl>
+</div>
+<div class="card">
+<h3>TradingAgents-CN<span class="chip wn" style="margin-left:8px">混合许可，只读参考</span></h3>
+<p class="small">官方版的中文增强版，自带网页服务，硬依赖 MongoDB 和 Redis；<code>app/</code>、<code>core/</code>、<code>frontend/</code> 是专有代码，禁止再分发和商用。</p>
+<dl class="kv"><dt>A 股行情</dt><dd>LOCAL（导入 MongoDB 的本地库）、AKShare、Tushare、BaoStock 四选一，失败自动换；还有 QMT（券商终端）适配器</dd><dt>优先级</dt><dd>配置模板写默认 akshare；代码默认顺序 LOCAL、AKShare、Tushare、BaoStock；服务层又把 Tushare 排在 AKShare 前；FAQ 写 MongoDB、Tushare、AKShare、BaoStock。三处说法不一致</dd><dt>新闻</dt><dd>Tushare 新闻源（新浪、东财、同花顺、华尔街见闻、财联社、第一财经等）、AKShare（东方财富、CCTV）、Google News、Reddit，可选 NewsAPI</dd><dt>港股和美股</dt><dd>港股 AKShare、yfinance、Finnhub；美股 Alpha Vantage、yfinance、Finnhub，美股财报另有 SimFin</dd><dt>Tushare</dt><dd>可选。只有设了 token 才会进可用列表。FAQ 里写的“TUSHARE_TOKEN（必需）”，意思是要用 Tushare 就得有 token，不是整个项目必须</dd><dt>没有它会缺</dt><dd>动态市盈率和市值（代码只认 Tushare 来源的字段）；资金流、融资融券（只有 Tushare 提供器里有）。BaoStock 的日线自带停牌状态和 ST 标记</dd></dl>
+</div>
+<div class="card">
+<h3>daily_stock_analysis<span class="chip wn" style="margin-left:8px">MIT</span></h3>
+<p class="small">每天分析自选股，把"决策仪表盘"推到企业微信、飞书、Telegram、邮件。默认零配置就能跑。</p>
+<dl class="kv"><dt>A 股日线</dt><dd>efinance（东财）、AkShare、Tushare 或 Pytdx、Baostock、YFinance、腾讯直连，按优先级自动换；设了 Tushare token，Tushare 提到最前</dd><dt>实时行情</dt><dd>腾讯、新浪、efinance、AkShare 东财；可选 Tushare（需要 2000 积分）、TickFlow（付费）</dd><dt>基本面</dt><dd>A 股由 AkShare 聚合：估值、成长、财报、机构、资金流、龙虎榜、板块；美港股用 yfinance</dd><dt>筹码分布</dt><dd>Tushare 的 cyq_chips 或 AkShare；项目自己写“接口不稳定，云端建议关闭”</dd><dt>新闻</dt><dd>搜索接口：SerpAPI（推荐）、Tavily、博查、Brave、MiniMax、Anspire、SearXNG；美股另有社交舆情接口</dd><dt>Tushare</dt><dd>可选。README 称它“提升历史行情稳定性”，同时承认免费源“稳定性不保证”。代码里用到日线、股票列表、指数、ETF、港股、实时和筹码接口</dd></dl>
+</div>
+<div class="card">
+<h3>附：Qlib 的社区数据集<span class="chip gy" style="margin-left:8px">chenditc/investment_data</span></h3>
+<p class="small">我们的 Q1 里程碑用 Qlib，所以顺带看了它的数据来源。</p>
+<dl class="kv"><dt>背景</dt><dd>Qlib 官方的 A 股数据包暂停，README 推荐这个社区数据集</dd><dt>来源</dt><dd>Wind、财汇（只到 2019 年）加 Tushare、AKShare、Baostock、Yahoo，合并后做校验和修正；README 没写明每日增量具体用哪几个源</dd><dt>Tushare</dt><dd>它的每日更新脚本要使用者自己提供 Tushare token（README 写明）</dd><dt>数据内容</dt><dd>含退市股的合并、涨跌停价的表；停牌 README 没提</dd></dl>
+</div>
+
+<h2 id="s4">复权：它们直接拿前复权价</h2>
+<p>三个项目里，凡是用 Tushare、AKShare、BaoStock 取 A 股历史日线的，主路径都直接拿<b>前复权价</b>（Tushare 的 <code>pro_bar</code> 加 adj=qfq，AKShare 的 adjust=qfq，BaoStock 的 adjustflag 取 2）。好处是不用自己处理复权。代价看下图：每有一次新的除权，过去所有日期的前复权价都会被改写一遍。</p>
+<div class="card">
+<svg viewBox="0 0 680 262" width="100%" role="img" aria-labelledby="qt qd">
+<title id="qt">前复权价会被改写的示意图</title>
+<desc id="qd">真实价格在两次除权日台阶式下降；今天看到的前复权价是一条 9.5 的平线；下次除权之后，同样的历史日期变成 9.0。</desc>
+<line x1="70" y1="40" x2="70" y2="222" style="stroke:var(--bd)" stroke-width="1"/>
+<line x1="70" y1="222" x2="640" y2="222" style="stroke:var(--bd)" stroke-width="1"/>
+<line x1="70" y1="60" x2="640" y2="60" style="stroke:var(--bd)" stroke-width="0.6" stroke-dasharray="3 4"/>
+<line x1="70" y1="95" x2="640" y2="95" style="stroke:var(--bd)" stroke-width="0.6" stroke-dasharray="3 4"/>
+<line x1="70" y1="130" x2="640" y2="130" style="stroke:var(--bd)" stroke-width="0.6" stroke-dasharray="3 4"/>
+<text x="62" y="60" text-anchor="end" dominant-baseline="central" font-size="12.5" style="fill:var(--ts)">10.0</text>
+<text x="62" y="95" text-anchor="end" dominant-baseline="central" font-size="12.5" style="fill:var(--ts)">9.5</text>
+<text x="62" y="130" text-anchor="end" dominant-baseline="central" font-size="12.5" style="fill:var(--ts)">9.0</text>
+<line x1="260" y1="44" x2="260" y2="222" style="stroke:var(--tm)" stroke-width="1" stroke-dasharray="2 4"/>
+<line x1="520" y1="44" x2="520" y2="222" style="stroke:var(--tm)" stroke-width="1" stroke-dasharray="2 4"/>
+<text x="260" y="240" text-anchor="middle" font-size="12.5" style="fill:var(--ts)">第一次除权日</text>
+<text x="520" y="240" text-anchor="middle" font-size="12.5" style="fill:var(--ts)">下次除权日（还没到）</text>
+<line x1="400" y1="44" x2="400" y2="222" style="stroke:var(--tl-st)" stroke-width="1.5"/>
+<text x="400" y="30" text-anchor="middle" font-size="13" font-weight="500" style="fill:var(--tl-tx)">今天</text>
+<polyline points="400,95 520,95 520,130 640,130" fill="none" style="stroke:var(--gy-st)" stroke-width="3" stroke-dasharray="3 5" stroke-linejoin="round"/>
+<polyline points="70,60 260,60 260,95 400,95" fill="none" style="stroke:var(--gy-st)" stroke-width="4" stroke-linejoin="round"/>
+<line x1="70" y1="95" x2="400" y2="95" style="stroke:var(--tl-st)" stroke-width="2.5"/>
+<line x1="70" y1="130" x2="640" y2="130" style="stroke:var(--wn-st)" stroke-width="2.5" stroke-dasharray="7 5"/>
+<text x="84" y="50" font-size="12.5" style="fill:var(--ts)">真实价 10.0</text>
+<text x="84" y="85" font-size="12.5" style="fill:var(--tl-tx)">今天看到的前复权价 9.5</text>
+<text x="84" y="120" font-size="12.5" style="fill:var(--wn-tx)">下次除权后的前复权价 9.0</text>
+</svg>
+
+<p class="small" style="margin:4px 0 0">灰色是真实价格，每次除权台阶式下降（图里假设每次每股分红 0.5 元）。青色是今天看到的前复权价，一条平线 9.5。橙色虚线是下次除权之后再看的前复权价，同样的历史日期变成了 9.0。</p>
+</div>
+<div class="callout"><p>做"今天分析一下"没问题。但我们的模拟盘每晚从起算日重放一遍，历史数字一变，存档的调仓单就对不上了。所以我们存"真实价加复权因子"，用的时候再乘，这一步不是在修脏数据。</p></div>
+
+<h2 id="s5">对我们意味着什么</h2>
+<ol class="n">
+<li><b>它们不是我们的参照系。</b>三个都是"每天分析一遍"的工具，不做逐日重放的严格回测，对历史数字会不会被改写没有要求。所以"它们不需要 Tushare"，推不出"我们不需要"。</li>
+<li><b>它们的免费默认路线我们走不通。</b>efinance 和 AKShare 的东财接口，在我们这台电脑上请求几次就会被封 IP（M1 实测），所以我们现在用 Baostock、新浪、腾讯。</li>
+<li><b>直接拿前复权价省事，但不适合我们。</b>见上一节，我们存真实价加因子，每晚重放的结果才不会变。</li>
+<li><b>Tushare 在它们那里的用处是"更稳、更全"。</b>daily_stock_analysis 自己写免费源稳定性不保证，建议配 token；TradingAgents-CN 的资金流、融资融券、动态估值只有 Tushare 能提供。资金流、融资融券明细我们的策略目前没用到；估值我们已有 Baostock 的每日数据。</li>
+<li><b>Qlib 这边是同样的情形。</b>社区数据集靠合并多个来源加校验，每日更新要使用者自己的 Tushare token。可见这个圈子里是靠多个来源互相校验来保证干净，而不是只信一个来源。</li>
+<li><b>可以借鉴的做法。</b>daily_stock_analysis 的新闻走搜索接口（SerpAPI、Tavily、博查、Brave、SearXNG），不依赖单一爬虫。我们的 AI1 要新闻，可以先走巨潮公告加这类搜索接口，不必为此买 Tushare 的新闻权限（单独收费，约 1000 元一年）。</li>
+<li><b>我的建议（待你决定）：先不买 Tushare。</b>先把"每晚自留原始快照加免费来源之间互相对账"做起来，零成本。观察 4 到 6 周，如果出现免费源解决不了的分歧，或者 Baostock 再出现整天故障（10-08、10-09 出现过），再买；500 元一年，随时可买，条款问清楚再买。</li>
+</ol>
+
+<h2 id="s6">证据位置和版本</h2>
+<ul class="ev">
+<li><b>TradingAgents</b>（e8f5503，2026-10-16，Apache-2.0）：<code>tradingagents/default_config.py</code> 的 data_vendors 配置；全库搜索 Tushare、AKShare、Baostock、efinance 均无命中。</li>
+<li><b>TradingAgents-CN</b>（51060a7，2026-09-22，混合许可）：<code>.env.example</code>（DEFAULT_CHINA_DATA_SOURCE）、<code>tradingagents/dataflows/data_source_manager.py</code>（默认顺序和 token 判断）、<code>app/services/data_sources/</code>（各适配器优先级）、<code>tradingagents/dataflows/providers/china/</code>、<code>tradingagents/dataflows/news/</code>、<code>tradingagents/dataflows/realtime_metrics.py</code>、<code>docs/02-user-guide/learning-08-faq/general-questions.md</code>。</li>
+<li><b>daily_stock_analysis</b>（ec66bf4，2026-10-21，MIT）：<code>data_provider/__init__.py</code>、<code>.env.example</code>、<code>docs/full-guide.md</code>（数据源配置）、<code>data_provider/tushare_fetcher.py</code>、<code>data_provider/fundamental_adapter.py</code>、README。</li>
+<li><b>Qlib 社区数据集</b>：github.com/chenditc/investment_data 的 README（网页）。</li>
+</ul>
+<div class="callout"><p><b>没做、没核实的：</b>各项目对数据再分发的条款（Tushare、AKShare）；各免费源的实际稳定性；Qlib 对停牌、ST、涨跌停的处理；TradingAgents-CN 的 LOCAL 数据导入方式；任何一个项目的实际运行。以上结论来自代码和文档，不来自运行。</p></div>
+</div></body></html>

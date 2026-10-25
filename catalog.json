@@ -1,6 +1,20 @@
 {
   "pages": [
     {
+      "slug": "opensource-data-sources",
+      "title": "三个开源项目的数据源对比：TradingAgents、TradingAgents-CN、daily_stock_analysis",
+      "description": "TradingAgents、TradingAgents-CN、daily_stock_analysis 三个开源项目取 A 股数据的来源与优先级，Tushare 在里面是必需还是可选，以及对 ashare-quant 的含义",
+      "tags": [
+        "量化",
+        "数据源",
+        "调研"
+      ],
+      "project": "ashare-quant",
+      "created": "2026-10-26",
+      "updated": "2026-10-26",
+      "path": "文档/ashare-quant/三个开源项目的数据源对比：TradingAgents、TradingAgents-CN、daily_stock_analysis.html"
+    },
+    {
       "slug": "ui-preview-artifact",
       "title": "特助手 UI 预览",
       "description": "特助手手机 App 界面预览：iOS 液态玻璃与 Android 毛玻璃，四个页面，示例数据",
