@@ -1,6 +1,21 @@
 {
   "pages": [
     {
+      "slug": "ui-directions",
+      "title": "特助手 界面方向",
+      "description": "特助手首页、指令进行中提示、日志详情的多套界面做法对比（示例数据）",
+      "tags": [
+        "设计",
+        "App",
+        "首页",
+        "日志"
+      ],
+      "project": "tesla-assistant",
+      "created": "2026-10-26",
+      "updated": "2026-10-26",
+      "path": "文档/tesla-assistant/特助手 界面方向.html"
+    },
+    {
       "slug": "opensource-data-sources",
       "title": "三个开源项目的数据源对比：TradingAgents、TradingAgents-CN、daily_stock_analysis",
       "description": "TradingAgents、TradingAgents-CN、daily_stock_analysis 三个开源项目取 A 股数据的来源与优先级，Tushare 在里面是必需还是可选，以及对 ashare-quant 的含义",

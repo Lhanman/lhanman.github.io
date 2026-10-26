@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="特助手首页、指令进行中提示、日志详情的多套界面做法对比（示例数据）">
+<link rel="index" href="../../index.html">
+<meta charset="utf-8">
+<title>特助手 界面方向</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700;800&display=swap">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+/* 布局：三个部分（首页 / 指令进行中的提示 / 日志详情），每部分并排放几套做法的手机示意屏，供挑选。
+   去掉了上一版的圆角卡片、胶囊、圆点加文案。数字沿用 App 现有的 Barlow，中文用系统黑体，琥珀、绿、红保留。 */
+:root {
+  --pg-bg:#E9ECEF; --pg-ink:#101319; --pg-ink2:#586070; --pg-line:rgba(16,19,25,.14); --pg-soft:#F4F6F7;
+  --ok:#0F7A3C; --bad:#C8321F; --amber:#E69A00; --amber-text:#8A5300;
+  --A-bg:#F6F6F4; --A-ink:#0E1012; --A-ink2:#5F656C; --A-line:rgba(14,16,18,.2); --A-alert:#E8412E; --A-alert-ink:#1A0704;
+  --B-bg:#FAFAFB; --B-ink:#0F1217; --B-ink2:#5A6270; --B-alert:#C8321F;
+  --C-bg:#E3E8EE; --C-ink:#0F1722; --C-ink2:#52606F; --C-line:rgba(15,23,34,.6);
+  --num:"Barlow Condensed","Barlow",ui-sans-serif,sans-serif;
+  --sans:"Noto Sans SC",-apple-system,"PingFang SC","Hiragino Sans GB",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --pg-bg:#090B0E; --pg-ink:#EEF1F5; --pg-ink2:#97A0AE; --pg-line:rgba(255,255,255,.14); --pg-soft:#12161C;
+  --ok:#47DC92; --bad:#FF7466; --amber:#FFB224; --amber-text:#FFC85A;
+  --A-bg:#0B0C0E; --A-ink:#F1F2EF; --A-ink2:#8E949B; --A-line:rgba(241,242,239,.22); --A-alert:#FF6A57; --A-alert-ink:#1A0704;
+  --B-bg:#101319; --B-ink:#F2F4F7; --B-ink2:#9AA3B1; --B-alert:#FF7466;
+  --C-bg:#0C1118; --C-ink:#E6ECF3; --C-ink2:#8795A6; --C-line:rgba(230,236,243,.62); color-scheme:dark; } }
+:root[data-theme="dark"] {
+  --pg-bg:#090B0E; --pg-ink:#EEF1F5; --pg-ink2:#97A0AE; --pg-line:rgba(255,255,255,.14); --pg-soft:#12161C;
+  --ok:#47DC92; --bad:#FF7466; --amber:#FFB224; --amber-text:#FFC85A;
+  --A-bg:#0B0C0E; --A-ink:#F1F2EF; --A-ink2:#8E949B; --A-line:rgba(241,242,239,.22); --A-alert:#FF6A57; --A-alert-ink:#1A0704;
+  --B-bg:#101319; --B-ink:#F2F4F7; --B-ink2:#9AA3B1; --B-alert:#FF7466;
+  --C-bg:#0C1118; --C-ink:#E6ECF3; --C-ink2:#8795A6; --C-line:rgba(230,236,243,.62); color-scheme:dark; }
+* { box-sizing:border-box; }
+body { background:var(--pg-bg); color:var(--pg-ink); font-family:var(--sans); margin:0; padding-block:28px 72px; line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); }
+::selection { background:var(--amber); color:#1a1200; }
+.wrap { max-width:1180px; margin:0 auto; display:flex; flex-direction:column; gap:64px; }
+h1 { font-size:28px; margin:0 0 8px; text-wrap:balance; font-weight:800; }
+h2 { font-size:21px; margin:0 0 6px; text-wrap:balance; font-weight:800; }
+h3 { font-size:16px; margin:0 0 2px; font-weight:700; }
+p { margin:0; } .lede { color:var(--pg-ink2); font-size:14.5px; max-width:64ch; }
+.sec { display:flex; flex-direction:column; gap:20px; }
+.row { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr)); gap:30px 24px; align-items:start; }
+.opt { display:flex; flex-direction:column; gap:12px; min-width:0; }
+.opt .cap { font-size:13px; color:var(--pg-ink2); max-width:44ch; }
+.seg { display:flex; gap:2px; flex-wrap:wrap; border-bottom:1px solid var(--pg-line); }
+.seg button { font:inherit; font-size:14px; padding:8px 14px; border:0; border-bottom:2px solid transparent; background:transparent; color:var(--pg-ink2); cursor:pointer; margin-bottom:-1px; }
+.seg button[aria-pressed="true"] { color:var(--pg-ink); border-bottom-color:var(--amber); font-weight:700; }
+button:focus-visible { outline:2px solid var(--amber); outline-offset:2px; }
+.tags { font-size:12.5px; color:var(--pg-ink2); }
+.tags b { color:var(--pg-ink); font-weight:700; }
+.act { font:inherit; font-size:14px; font-weight:700; padding:9px 16px; border:1.5px solid var(--pg-ink); background:transparent; color:var(--pg-ink); border-radius:4px; cursor:pointer; }
+.act:hover { background:var(--pg-ink); color:var(--pg-bg); }
+.tools { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+.verdict { border-top:1px solid var(--pg-line); padding-top:18px; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); gap:18px 28px; font-size:13.5px; color:var(--pg-ink2); }
+.verdict b { color:var(--pg-ink); }
+
+/* 手机 */
+.ph { width:100%; max-width:372px; margin:0 auto; border:1px solid var(--pg-line); border-radius:28px; overflow:hidden; position:relative; min-height:640px; }
+.A { background:var(--A-bg); color:var(--A-ink); } .B { background:var(--B-bg); color:var(--B-ink); } .C { background:var(--C-bg); color:var(--C-ink); }
+.n { font-family:var(--num); font-variant-numeric:tabular-nums; letter-spacing:0; }
+
+/* ---------- 首页 A 读数 ---------- */
+.A { padding:20px 0 30px; display:flex; flex-direction:column; }
+.A .hd { display:flex; justify-content:space-between; align-items:baseline; padding:0 18px 14px; }
+.A .hd b { font-size:24px; font-weight:800; } .A .hd span { font-size:13px; color:var(--A-ink2); }
+.A .alert { background:var(--A-alert); color:var(--A-alert-ink); padding:11px 18px; font-weight:800; font-size:15px; display:flex; justify-content:space-between; }
+.A .alert + .alert { border-top:1px solid rgba(0,0,0,.25); }
+.A .r { display:grid; grid-template-columns:44px 1fr; gap:0 10px; padding:15px 18px; border-top:1px solid var(--A-line); }
+.A .r > label { font-size:12.5px; color:var(--A-ink2); padding-top:5px; }
+.A .track { position:relative; height:58px; border:1.5px solid var(--A-ink); }
+.A .fill { position:absolute; inset:0 auto 0 0; background:var(--A-ink); }
+.A.chg .fill { background:var(--ok); }
+.A .lim { position:absolute; top:-7px; bottom:-7px; width:2px; background:var(--amber); }
+.A .lim i { position:absolute; top:-15px; left:50%; transform:translateX(-50%); font-style:normal; font-size:11px; color:var(--A-ink2); font-family:var(--num); }
+.A .bignum { position:absolute; top:50%; transform:translateY(-52%); left:10px; font-size:56px; font-weight:700; line-height:1; }
+.A .bignum small { font-size:22px; font-weight:500; margin-left:2px; }
+.A .sub { display:flex; justify-content:space-between; margin-top:9px; font-size:13.5px; color:var(--A-ink2); } .A .sub b { color:var(--A-ink); font-weight:600; }
+.A .t3 { display:flex; gap:22px; align-items:flex-end; } .A .t3 div { display:flex; flex-direction:column; } .A .t3 small { font-size:11.5px; color:var(--A-ink2); } .A .t3 .n { font-size:40px; font-weight:600; line-height:1; }
+.A .kv { display:grid; grid-template-columns:1fr auto; gap:7px 12px; font-size:15px; } .A .kv span:nth-child(odd) { color:var(--A-ink2); } .A .kv .n { font-size:19px; font-weight:600; }
+.A .kv .bad { background:var(--A-alert); color:var(--A-alert-ink); font-weight:800; padding:0 6px; margin-right:-6px; }
+.A .wk { display:flex; align-items:flex-end; gap:6px; height:36px; margin-top:10px; } .A .wk i { flex:1; background:var(--A-line); } .A .wk i.t { background:var(--A-ink); }
+
+/* ---------- 首页 B 句子 ---------- */
+.B { padding:28px 22px 36px; display:flex; flex-direction:column; gap:26px; }
+.B .nm { font-size:14px; color:var(--B-ink2); display:flex; justify-content:space-between; }
+.B .s1 { font-size:35px; font-weight:800; line-height:1.28; text-wrap:balance; }
+.B .s2 { font-size:23px; font-weight:700; line-height:1.4; text-wrap:balance; }
+.B .n { font-weight:700; font-size:1.55em; line-height:.9; } .B .s2 .n { font-size:1.4em; }
+.B .u { font-weight:500; color:var(--B-ink2); }
+.B .bad { color:var(--B-alert); }
+.B .bad .n { text-decoration:underline; text-decoration-thickness:3px; text-underline-offset:5px; }
+.B .tires { display:grid; grid-template-columns:repeat(2,minmax(0,92px)); gap:2px 28px; margin-top:12px; }
+.B .tires div { display:flex; align-items:baseline; gap:8px; font-size:12.5px; color:var(--B-ink2); } .B .tires .n { font-size:30px; color:var(--B-ink); font-weight:600; }
+.B .tires .low .n { color:var(--B-alert); }
+.B .fine { font-size:13.5px; color:var(--B-ink2); line-height:1.9; }
+
+/* ---------- 首页 C 标注 ---------- */
+.C { padding:18px 0 28px; }
+.C svg { display:block; width:100%; height:auto; }
+.C .t { font-family:var(--sans); fill:var(--C-ink); } .C .t2 { fill:var(--C-ink2); }
+.C .nn { font-family:var(--num); fill:var(--C-ink); font-weight:600; font-variant-numeric:tabular-nums; }
+.C .ln { stroke:var(--C-line); stroke-width:1; fill:none; }
+.C .body { stroke:var(--C-ink); stroke-width:1.5; fill:none; }
+.C .warnbox { fill:var(--bad); } .C .warntxt { fill:#150604; }
+.C .list { padding:6px 18px 0; display:grid; grid-template-columns:1fr auto; gap:6px 12px; font-size:14.5px; } .C .list span:nth-child(odd) { color:var(--C-ink2); } .C .list .n { font-size:18px; font-weight:600; }
+
+/* ---------- 进行中的提示 ---------- */
+.pg { padding:44px 18px 18px; display:flex; flex-direction:column; gap:12px; min-height:640px; background:var(--pg-soft); color:var(--pg-ink); }
+.pg .ttl { font-size:24px; font-weight:800; margin-bottom:6px; }
+.pg .bar { height:16px; background:color-mix(in srgb,var(--pg-ink) 9%,transparent); } .pg .bar.s { width:62%; } .pg .bar.m { width:80%; }
+.pg .ctl { display:flex; justify-content:space-between; align-items:baseline; border-top:1px solid var(--pg-line); padding:15px 0 14px; font-size:16px; position:relative; }
+.pg .ctl .n { font-size:26px; font-weight:600; }
+.pg .ctl .fl { position:absolute; left:0; bottom:-1px; height:2px; background:var(--pg-ink); width:0; }
+.tabs { position:absolute; left:0; right:0; bottom:0; display:flex; border-top:1px solid var(--pg-line); background:var(--pg-soft); }
+.tabs button { flex:1; font:inherit; font-size:13.5px; padding:14px 0 16px; border:0; background:transparent; color:var(--pg-ink2); cursor:pointer; }
+.tabs button[aria-pressed="true"] { color:var(--pg-ink); font-weight:800; box-shadow:inset 0 2px 0 var(--pg-ink); }
+.ov { position:absolute; z-index:5; pointer-events:none; }
+.ov > * { pointer-events:auto; }
+/* N1 顶边线 */
+.n1line { position:absolute; left:0; right:0; top:0; height:3px; background:transparent; overflow:hidden; }
+.n1line i { position:absolute; inset:0 auto 0 0; width:30%; background:var(--pg-ink); animation:sweep 1.1s cubic-bezier(.5,0,.3,1) infinite; }
+.n1line.ok i,.n1line.bad i { animation:none; width:100%; } .n1line.ok i { background:var(--ok); } .n1line.bad i { background:var(--bad); }
+@keyframes sweep { from { transform:translateX(-100%); } to { transform:translateX(340%); } }
+.n1txt { position:absolute; left:0; right:0; top:3px; background:var(--pg-ink); color:var(--pg-bg); padding:9px 18px; font-size:14px; font-weight:700; display:flex; justify-content:space-between; transform:translateY(-110%); transition:transform .3s cubic-bezier(.2,.9,.2,1); }
+.n1txt.show { transform:none; } .n1txt.bad { background:var(--bad); color:#150604; }
+/* N2 角标 */
+.n2 { right:14px; top:14px; min-width:84px; background:var(--pg-ink); color:var(--pg-bg); padding:8px 12px 9px; border-radius:4px; transition:background .3s,transform .3s; transform:translateY(-130%); cursor:pointer; text-align:right; }
+.n2.show { transform:none; } .n2 .n { font-size:34px; font-weight:600; line-height:1; display:block; } .n2 small { font-size:11.5px; opacity:.8; display:block; }
+.n2.ok { background:var(--ok); color:#04170b; } .n2.bad { background:var(--bad); color:#150604; }
+.n2 ul { margin:8px 0 0; padding:8px 0 0; list-style:none; border-top:1px solid color-mix(in srgb,currentColor 35%,transparent); font-size:12px; text-align:left; display:flex; flex-direction:column; gap:3px; }
+/* N3 通知条目 */
+.n3 { right:12px; top:12px; width:232px; background:var(--pg-bg); border:1px solid var(--pg-ink); border-radius:6px; padding:10px 12px 12px; transform:translateX(120%); transition:transform .35s cubic-bezier(.2,.9,.2,1); position:absolute; overflow:hidden; }
+.n3.show { transform:none; } .n3 .l1 { display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:14px; font-weight:700; } .n3 .l1 .n { font-size:24px; font-weight:600; }
+.n3 .l2 { font-size:12px; color:var(--pg-ink2); margin-top:1px; } .n3 .pr { position:absolute; left:0; bottom:0; height:3px; background:var(--pg-ink); transition:width .2s linear; }
+.n3.ok .pr { background:var(--ok); width:100% !important; } .n3.bad .pr { background:var(--bad); width:100% !important; } .n3.bad { border-color:var(--bad); }
+/* ---------- 日志详情 ---------- */
+.lg { padding:44px 22px 28px; background:var(--pg-soft); color:var(--pg-ink); display:flex; flex-direction:column; gap:18px; min-height:640px; }
+.lg .who { font-size:14px; color:var(--pg-ink2); } .lg .who b { display:block; color:var(--pg-ink); font-size:20px; font-weight:800; }
+.lg .big { font-size:96px; font-weight:600; line-height:.85; } .lg .big small { font-size:30px; font-weight:500; margin-left:4px; color:var(--pg-ink2); }
+.lg .say { font-size:19px; font-weight:700; line-height:1.4; text-wrap:balance; } .lg .say .n { font-size:1.5em; line-height:.8; }
+.lg .trace { margin-top:auto; font-size:12px; color:var(--pg-ink2); display:flex; justify-content:space-between; gap:10px; align-items:center; border-top:1px solid var(--pg-line); padding-top:12px; }
+.lg .trace code { font-family:ui-monospace,Menlo,monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+.lg .trace button { font:inherit; font-size:12.5px; font-weight:700; background:transparent; border:0; color:var(--pg-ink); text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+.tl { display:grid; grid-template-columns:54px 1fr; gap:0; font-size:15px; } .tl > div { padding:9px 0; border-top:1px solid var(--pg-line); } .tl .n { font-size:21px; font-weight:500; color:var(--pg-ink2); line-height:1.25; }
+.tl .hot { font-weight:800; } .tl .hot.n { color:var(--pg-ink); } .tl small { color:var(--pg-ink2); font-weight:400; margin-left:8px; }
+.hb { display:flex; flex-direction:column; gap:14px; } .hb .it { display:grid; grid-template-columns:1fr auto; gap:5px 10px; align-items:baseline; font-size:15px; }
+.hb .it .n { font-size:22px; font-weight:600; } .hb .tk { grid-column:1/-1; height:8px; background:color-mix(in srgb,var(--pg-ink) 8%,transparent); } .hb .tk i { display:block; height:100%; background:var(--pg-ink2); opacity:.55; }
+.hb .it.top { font-weight:800; } .hb .it.top .tk i { background:var(--amber); opacity:1; }
+@media (prefers-reduced-motion: reduce) { .n1line i { animation:none; width:50%; } .n1txt,.n2,.n3 { transition:none; } }
+</style>
+
+<div class="wrap">
+  <header class="sec">
+    <h1>首页、指令提示、日志详情：三套做法</h1>
+    <p class="lede">上一版把所有信息都装进圆角块、圆点和小标签里，所以像模板。这一版换了三种不同的版面语言，每一部分都并排给出几个选项。数字全是示例，不是你车的真实记录。</p>
+    <div class="tools"><div class="seg" id="stSeg" role="group" aria-label="切换示例状态">
+      <button data-s="park" aria-pressed="true">停着</button><button data-s="charge" aria-pressed="false">充电中</button><button data-s="alert" aria-pressed="false">车没锁、门没关</button><button data-s="tire" aria-pressed="false">右后胎压低</button>
+    </div></div>
+  </header>
+
+  <section class="sec" aria-labelledby="h1h">
+    <div><h2 id="h1h">一、首页</h2><p class="lede">三套都放了胎压，都把"车温"从一行小字改成了看得出差距的画法。上方的按钮可以切换状态，三套同步变化。</p></div>
+    <div class="row">
+      <div class="opt"><h3>A　读数</h3><p class="cap">像仪表读数：没有卡片，一行一项，靠细线对齐。电量就是一根横条，数字直接印在条上。有问题的项整行反白成红底，一眼看到，不靠小圆点。</p><div class="ph A" id="vA"></div></div>
+      <div class="opt"><h3>B　句子</h3><p class="cap">用一句话告诉你状态："还剩 78%，够跑 412 公里。"重要的数字放大，其余是小字。没有图标、没有格子。有问题的那句变红加粗，最大。</p><div class="ph B" id="vB"></div></div>
+      <div class="opt"><h3>C　标注</h3><p class="cap">俯视的车是画面本身，信息按位置标在车上：胎压在四个轮子旁，车温在车厢旁，电量在车头。门没关，车图上那扇门真的是开着的。</p><div class="ph C" id="vC"></div></div>
+    </div>
+    <div class="verdict">
+      <p><b>我的看法：</b>想要最干净、信息最密，选 A。想要最像"一个好用的小工具"，选 B，但每一种语言都要写一套句子模板，十种语言的成本最高。想要一眼就记住的样子，选 C，它最特别，也最费画工。</p>
+      <p><b>胎压：</b>官方遥测有 <code>TpmsPressureFl/Fr/Rl/Rr</code>（单位 bar），我们的配置里没订阅，所以现在读不到。加上之后国行车是否真的上报，要同步一次才知道，所以我建议你回来之后再加，并先看一次再画满。</p>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="h2h">
+    <div><h2 id="h2h">二、指令进行中的提示</h2><p class="lede">四个都是挂在整个 App 最上层的，切换 tab 不会消失。点"发一条指令"，四个同时开始；下面的 tab 可以切，看它们是否留着。</p></div>
+    <div class="tools"><button class="act" id="go">发一条指令</button><button class="act" id="goFail">模拟失败</button>
+      <div class="seg" id="tabSeg" role="group" aria-label="切换页面"><button data-p="home" aria-pressed="true">首页</button><button data-p="ctl" aria-pressed="false">车控</button><button data-p="trip" aria-pressed="false">行程</button></div></div>
+    <div class="row">
+      <div class="opt"><h3>N1　顶边线</h3><p class="cap">屏幕最上沿一根细线在跑，没有任何文字。结束时线变绿，落下一条一行字的窄条，几秒后收起。最安静。</p><div class="ph" id="n1"></div></div>
+      <div class="opt"><h3>N2　右上角计时块</h3><p class="cap">右上角一个方角小块，里面是不断走的秒数和指令名。完成变绿、失败变红，点一下展开最近几条。像一块小仪表。</p><div class="ph" id="n2"></div></div>
+      <div class="opt"><h3>N3　通知条目</h3><p class="cap">你说的通知栏样子：从右上角滑进来的一条，写指令名和秒数，底边一根线推进。多条指令会叠起来，像通知中心。</p><div class="ph" id="n3"></div></div>
+      <div class="opt"><h3>N4　就地变形</h3><p class="cap">在车控页，被点的那一行自己变成走秒的数字，不多出任何东西；切到别的页，退化成 N1 的顶边线。</p><div class="ph" id="n4"></div></div>
+    </div>
+    <div class="verdict">
+      <p><b>我的看法：</b>N4 加 N1 搭配最好：在车控页看到的是控件本身在变，离开页面还有一根线陪着，结束时才有字。想要"有记录可翻"，换成 N3。</p>
+      <p><b>系统级通知：</b>还可以做 iOS 的实时活动（锁屏和灵动岛）和 Android 的常驻通知，这样退出 App 也看得到进度。这要加 iOS 扩展和推送，工程量大，可以做第二期。</p>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="h3h">
+    <div><h2 id="h3h">三、日志详情：一条指令慢在哪</h2><p class="lede">同一条示例指令（车在休眠，先唤醒再发），三种看法。每种只留下找瓶颈需要的东西。</p></div>
+    <div class="row">
+      <div class="opt"><h3>L1　一句话加一把尺</h3><p class="cap">先给总时间，再用一句话点出最慢的一段，下面一把尺子，只标出最长的两段，其余并成一段。</p><div class="ph" id="l1"></div></div>
+      <div class="opt"><h3>L2　时刻表</h3><p class="cap">像读行车记录：几点几秒发生了什么，一行一件事。最慢的那一步加粗。不用看图就懂。</p><div class="ph" id="l2"></div></div>
+      <div class="opt"><h3>L3　长度对比</h3><p class="cap">每一步一根按比例的横条，名字和秒数在条上方，只有最长的一根是琥珀色。适合扫一眼找瓶颈。</p><div class="ph" id="l3"></div></div>
+    </div>
+    <div class="verdict">
+      <p><b>我的看法：</b>你要"直观易懂"，我选 L2。它不依赖看图，第二天回来看也一目了然。L1 最干净，只是细节少。</p>
+      <p><b>数据来源：</b>排队、唤醒、取令牌、发给车辆四段服务端已经在记；手机到服务器这一段，只有刚发出的指令能量到。要上线才看得到。</p>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+var $=function(s,r){return (r||document).querySelector(s)};
+var D={
+ park:{batt:78,range:412,limit:90,chg:false,kw:0,added:0,inside:24,target:22,out:18,climate:true,locked:true,doorOpen:false,sentry:false,odo:'12,480',ver:'2025.38.5',tire:[2.8,2.8,2.9,2.8]},
+ charge:{batt:78,range:412,limit:90,chg:true,kw:7.2,added:14,inside:21,target:22,out:16,climate:false,locked:true,doorOpen:false,sentry:false,odo:'12,480',ver:'2025.38.5',tire:[2.8,2.8,2.9,2.8]},
+ alert:{batt:18,range:96,limit:80,chg:false,kw:0,added:0,inside:29,target:22,out:31,climate:true,locked:false,doorOpen:true,sentry:true,odo:'12,480',ver:'2025.38.5',tire:[2.8,2.8,2.9,2.8]},
+ tire:{batt:78,range:412,limit:90,chg:false,kw:0,added:0,inside:24,target:22,out:18,climate:true,locked:true,doorOpen:false,sentry:false,odo:'12,480',ver:'2025.38.5',tire:[2.8,2.8,2.9,2.1]}
+};
+var NM=['左前','右前','左后','右后'];
+function lowIdx(d){var a=[];d.tire.forEach(function(v,i){if(v<2.4)a.push(i)});return a}
+function climText(d){var g=d.inside-d.target;if(!d.climate)return null;return Math.abs(g)<1?'已到设定温度':(g>0?'正在降到 ':'正在升到 ')+d.target+'°'}
+function X(t){return (10+(t-10)/25*320).toFixed(1)}
+
+/* A */
+function vA(d){
+ var low=d.batt<30,al='';
+ if(!d.locked)al+='<div class="alert"><span>车没锁</span></div>';
+ if(d.doorOpen)al+='<div class="alert"><span>右前门没关</span></div>';
+ lowIdx(d).forEach(function(i){al+='<div class="alert"><span>'+NM[i]+'胎压偏低</span><span class="n">'+d.tire[i].toFixed(1)+' bar</span></div>'});
+ if(d.batt<20)al+='<div class="alert"><span>电量低于 20%</span></div>';
+ var scale='<svg viewBox="0 0 340 40" width="100%" role="img" aria-label="温度尺 10 到 35 度，车内 '+d.inside+'，设定 '+d.target+'，车外 '+d.out+'"><line x1="10" x2="330" y1="16" y2="16" stroke="var(--A-line)" stroke-width="1.5"/>';
+ for(var t=10;t<=35;t+=5){scale+='<line x1="'+X(t)+'" x2="'+X(t)+'" y1="'+(t%10===0?10:12)+'" y2="'+(t%10===0?22:20)+'" stroke="var(--A-ink2)"/>';if(t%10===0||t===35)scale+='<text x="'+X(t)+'" y="36" font-size="11" text-anchor="middle" fill="var(--A-ink2)" font-family="Barlow Condensed">'+t+'°</text>'}
+ var a=Math.min(d.inside,d.target),b=Math.max(d.inside,d.target);
+ scale+='<line x1="'+X(a)+'" x2="'+X(b)+'" y1="16" y2="16" stroke="var(--A-ink)" stroke-width="5"/>';
+ scale+='<rect x="'+(X(d.inside)-2.5)+'" y="5" width="5" height="22" fill="var(--A-ink)"/>';
+ scale+='<rect x="'+(X(d.target)-2.5)+'" y="5" width="5" height="22" fill="var(--A-bg)" stroke="var(--A-ink)" stroke-width="1.5"/>';
+ scale+='<line x1="'+X(d.out)+'" x2="'+X(d.out)+'" y1="24" y2="30" stroke="var(--amber)" stroke-width="2.5"/></svg>';
+ var tires='<svg viewBox="0 0 340 176" width="100%" role="img" aria-label="四个轮胎气压"><rect x="140" y="8" width="60" height="160" rx="26" fill="none" stroke="var(--A-ink)" stroke-width="1.5"/><rect x="152" y="52" width="36" height="66" rx="8" fill="none" stroke="var(--A-line)"/>';
+ [[133,32],[201,32],[133,118],[201,118]].forEach(function(p){tires+='<rect x="'+p[0]+'" y="'+p[1]+'" width="6" height="30" fill="var(--A-ink)"/>'});
+ d.tire.forEach(function(v,i){var left=i%2===0,x=left?118:222,y=i<2?58:144,isLow=v<2.4;
+  if(isLow)tires+='<rect x="'+(left?x-60:x-6)+'" y="'+(y-26)+'" width="66" height="32" fill="var(--A-alert)"/>';
+  tires+='<text x="'+x+'" y="'+y+'" text-anchor="'+(left?'end':'start')+'" font-size="30" font-weight="600" font-family="Barlow Condensed" fill="'+(isLow?'var(--A-alert-ink)':'var(--A-ink)')+'">'+v.toFixed(1)+'</text>'});
+ tires+='<text x="330" y="168" text-anchor="end" font-size="11" fill="var(--A-ink2)" font-family="Barlow Condensed">bar · 车头朝上</text></svg>';
+ var wk=[40,62,30,78,48,22,88].map(function(h,i){return '<i class="'+(i===6?'t':'')+'" style="height:'+h+'%"></i>'}).join('');
+ var fillW=d.batt+'%';
+ return '<div class="hd"><b>我的 Model 3</b><span>在线 · 刚刚</span></div>'+al+
+ '<div class="r"><label>电量</label><div><div class="track"><div class="fill" style="width:'+fillW+'"></div><div class="lim" style="left:'+d.limit+'%"><i>'+d.limit+'</i></div>'+
+   '<div class="bignum n" style="'+(low?'left:calc('+fillW+' + 10px);color:var(--A-ink)':'color:var(--A-bg)')+'">'+d.batt+'<small>%</small></div></div>'+
+   '<div class="sub"><span>'+(d.chg?'<b>'+d.kw+' kW</b> 充电中':'续航 <b>'+d.range+' km</b>')+'</span><span>'+(d.chg?'再充 '+d.added+'% 到 '+d.limit+'%':'上限 '+d.limit+'%')+'</span></div></div></div>'+
+ '<div class="r"><label>温度</label><div><div class="t3"><div><small>车内</small><span class="n">'+d.inside+'°</span></div><div><small>设定</small><span class="n">'+(d.climate?d.target+'°':'空调关')+'</span></div><div><small>车外</small><span class="n">'+d.out+'°</span></div></div>'+scale+'</div></div>'+
+ '<div class="r"><label>胎压</label><div>'+tires+'</div></div>'+
+ '<div class="r"><label>状态</label><div class="kv"><span>车锁</span><span'+(!d.locked?' class="bad"':'')+'>'+(d.locked?'已锁':'未锁')+'</span><span>门窗</span><span'+(d.doorOpen?' class="bad"':'')+'>'+(d.doorOpen?'右前门未关':'全部关闭')+'</span><span>哨兵</span><span>'+(d.sentry?'开':'关')+'</span><span>里程</span><span class="n">'+d.odo+' km</span><span>软件</span><span class="n">'+d.ver+'</span></div></div>'+
+ '<div class="r"><label>今日</label><div class="kv"><span>36 km · 2 趟</span><span>比日均多 12%</span></div><div></div><div class="wk" aria-hidden="true">'+wk+'</div></div>';
+}
+/* B */
+function vB(d){
+ var bad=lowIdx(d), s1;
+ if(d.chg)s1='<p class="s1"><span class="n">'+d.batt+'</span><span class="u">%</span>，正在充电。<br><span class="n">'+d.kw+'</span> 千瓦，再充 <span class="n">'+d.added+'</span>% 到 <span class="n">'+d.limit+'</span>%。</p>';
+ else if(d.batt<20)s1='<p class="s1 bad">只剩 <span class="n">'+d.batt+'</span>%，<br>只够跑 <span class="n">'+d.range+'</span> 公里。</p>';
+ else s1='<p class="s1">还剩 <span class="n">'+d.batt+'</span>%，<br>够跑 <span class="n">'+d.range+'</span> 公里。</p>';
+ var c=climText(d);
+ var s2=d.climate?'<p class="s2">车里 <span class="n">'+d.inside+'</span>°，<span style="white-space:nowrap">空调'+c.replace(/^正在/,'在').replace(/(\d+)°/,'<span class="n">$1</span>°')+'</span>；车外<span class="n">'+d.out+'</span>°。</p>'
+  :'<p class="s2">车里 <span class="n">'+d.inside+'</span>°，空调没开；车外 <span class="n">'+d.out+'</span>°。</p>';
+ var tt='';
+ d.tire.forEach(function(v,i){tt+='<div class="'+(v<2.4?'low':'')+'"><span>'+NM[i]+'</span><span class="n">'+v.toFixed(1)+'</span></div>'});
+ var s3=bad.length?'<div><p class="s2 bad">'+NM[bad[0]]+'轮胎偏低，<span class="n">'+d.tire[bad[0]].toFixed(1)+'</span> bar。</p><div class="tires">'+tt+'</div></div>':'<div><p class="s2">四个轮胎都正常。</p><div class="tires">'+tt+'</div></div>';
+ var s4=(!d.locked||d.doorOpen)?'<p class="s2 bad">'+(d.locked?'':'车没锁，')+(d.doorOpen?'右前门没关。':'')+'</p>':'<p class="s2">车已锁好，门窗都关着。</p>';
+ return '<div class="nm"><span>我的 Model 3</span><span>在线 · 刚刚</span></div>'+s1+s2+s3+s4+
+  '<p class="s2" style="font-weight:500;color:var(--B-ink2)">今天开了 <span class="n" style="color:var(--B-ink)">36</span> 公里，比平时多 12%。</p>'+
+  '<p class="fine">里程 <span class="n" style="font-size:1.2em">'+d.odo+'</span> km　哨兵'+(d.sentry?'开':'关')+'　软件 '+d.ver+'</p>';
+}
+/* C */
+function vC(d){
+ var s='<svg viewBox="0 0 372 470" role="img" aria-label="俯视车图，信息标注在对应位置">';
+ s+='<text x="18" y="30" class="t" font-size="22" font-weight="800">我的 Model 3</text><text x="354" y="30" class="t t2" font-size="13" text-anchor="end">在线 · 刚刚</text>';
+ s+='<text x="186" y="82" class="nn" font-size="50" text-anchor="middle">'+d.batt+'<tspan font-size="22">%</tspan></text>';
+ s+='<text x="186" y="102" class="t t2" font-size="13" text-anchor="middle">'+(d.chg?d.kw+' kW 充电中 · 再充 '+d.added+'%':'续航 '+d.range+' km · 上限 '+d.limit+'%')+'</text>';
+ s+='<path class="ln" d="M186 108V132"/>';
+ s+='<path class="body" d="M146 168a40 40 0 0 1 40-36a40 40 0 0 1 40 36V396a38 38 0 0 1-38 36h-4a38 38 0 0 1-38-36Z" transform="translate(0 0)"/>';
+ s+='<path class="ln" d="M160 214q26-14 52 0l6 36h-64Z"/><rect class="ln" x="162" y="262" width="48" height="66" rx="8"/>';
+ [[130,170],[216,170],[130,330],[216,330]].forEach(function(p){s+='<rect x="'+p[0]+'" y="'+p[1]+'" width="12" height="44" fill="var(--C-ink)"/>'});
+ /* 车门：左侧关着，右前门按状态 */
+ s+='<path class="ln" d="M146 232V300"/>';
+ s+=d.doorOpen?'<path d="M226 232L262 296" stroke="var(--bad)" stroke-width="2.5"/>':'<path class="ln" d="M226 232V300"/>';
+ /* 胎压 */
+ d.tire.forEach(function(v,i){var left=i%2===0,x=left?112:260,y=i<2?200:360,isLow=v<2.4;
+  if(isLow)s+='<rect x="'+(left?x-58:x-4)+'" y="'+(y-26)+'" width="62" height="34" class="warnbox"/>';
+  s+='<text x="'+x+'" y="'+y+'" text-anchor="'+(left?'end':'start')+'" class="nn" font-size="30" '+(isLow?'style="fill:#150604"':'')+'>'+v.toFixed(1)+'</text>';
+  s+='<text x="'+x+'" y="'+(y+15)+'" text-anchor="'+(left?'end':'start')+'" class="t t2" font-size="11" '+(isLow?'style="fill:var(--bad)"':'')+'>'+(isLow?'偏低 bar':'bar')+'</text>';
+  s+='<path class="ln" d="M'+(left?114:258)+' '+(y-8)+'H'+(left?124:248)+'" />'});
+ /* 车温 */
+ s+='<path class="ln" d="M210 288H300"/><text x="306" y="286" class="nn" font-size="30">'+d.inside+'°</text><text x="306" y="302" class="t t2" font-size="11">'+(d.climate?'设定 '+d.target+'°':'空调关')+'</text>';
+ /* 车锁 */
+ s+='<path class="ln" d="M146 262H80"/>';
+ if(!d.locked)s+='<rect x="18" y="246" width="58" height="30" class="warnbox"/><text x="47" y="266" text-anchor="middle" class="t warntxt" font-size="14" font-weight="800">未锁</text>';
+ else s+='<text x="74" y="266" text-anchor="end" class="t" font-size="14" font-weight="700">已锁</text>';
+ /* 开着的门 */
+ if(d.doorOpen)s+='<path class="ln" d="M240 252L302 241"/><rect x="302" y="226" width="56" height="30" class="warnbox"/><text x="330" y="246" text-anchor="middle" class="t warntxt" font-size="13" font-weight="800">门没关</text>';
+ /* 充电口 */
+ s+='<path class="ln" d="M142 424H92"/><text x="86" y="422" text-anchor="end" class="t t2" font-size="12">'+(d.chg?'充电 '+d.kw+' kW':'充电口 关')+'</text>';
+ s+='</svg>';
+ return s+'<div class="list"><span>哨兵</span><span>'+(d.sentry?'开':'关')+'</span><span>里程</span><span class="n">'+d.odo+' km</span><span>软件</span><span class="n">'+d.ver+'</span><span>今日</span><span>36 km · 2 趟 · 比日均多 12%</span></div>';
+}
+var cur='park';
+function paintHome(){$('#vA').innerHTML=vA(D[cur]);$('#vA').classList.toggle('chg',D[cur].chg);$('#vB').innerHTML=vB(D[cur]);$('#vC').innerHTML=vC(D[cur])}
+$('#stSeg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;cur=b.dataset.s;
+ [].forEach.call($('#stSeg').children,function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});paintHome()});
+paintHome();
+
+/* 进行中的提示 */
+var page='home',sim={ph:'idle',t0:0,s:0,fail:false,hist:[['设置温度 22°','2.4 秒'],['闪灯','1.1 秒']]};
+var ids=['n1','n2','n3','n4'];
+function pageHTML(id){
+ var body=page==='ctl'
+  ? '<div class="ttl">车控</div><div class="ctl"><span>空调</span><span class="n">开</span></div><div class="ctl" id="'+id+'row"><span>温度</span><span class="n" id="'+id+'val">22°</span><i class="fl" id="'+id+'fl"></i></div><div class="ctl"><span>座椅加热</span><span class="n">左 2 档</span></div><div class="ctl"><span>充电上限</span><span class="n">90%</span></div>'
+  : page==='trip'
+  ? '<div class="ttl">行程</div><div class="bar m"></div><div class="bar s"></div><div class="bar m"></div><div class="bar s"></div><div class="bar m"></div>'
+  : '<div class="ttl">首页</div><div class="bar m"></div><div class="bar s"></div><div class="bar m"></div><div class="bar s"></div><div class="bar m"></div><div class="bar s"></div>';
+ return '<div class="pg">'+body+'</div><div class="tabs">'+[['home','首页'],['ctl','车控'],['trip','行程']].map(function(t){return '<button data-p="'+t[0]+'" aria-pressed="'+(t[0]===page)+'">'+t[1]+'</button>'}).join('')+'</div>'+
+  (id==='n1'||id==='n4'?'<div class="ov n1line" id="'+id+'ln"><i></i></div><div class="n1txt" id="'+id+'tx"></div>':'')+
+  (id==='n2'?'<div class="ov n2" id="n2b" tabindex="0" role="status"></div>':'')+
+  (id==='n3'?'<div class="ov n3" id="n3b" role="status"></div>':'');
+}
+function mountNotif(){ids.forEach(function(id){var el=$('#'+id);el.innerHTML=pageHTML(id);
+ el.querySelector('.tabs').addEventListener('click',function(e){var b=e.target.closest('button');if(b)setPage(b.dataset.p)})});draw()}
+function setPage(p){page=p;[].forEach.call($('#tabSeg').children,function(x){x.setAttribute('aria-pressed',x.dataset.p===p?'true':'false')});mountNotif()}
+$('#tabSeg').addEventListener('click',function(e){var b=e.target.closest('button');if(b)setPage(b.dataset.p)});
+function sec(){return (sim.s/1000).toFixed(1)}
+function draw(){
+ var run=sim.ph==='run',ok=sim.ph==='ok',bad=sim.ph==='fail',any=run||ok||bad,sc=sec();
+ ['n1','n4'].forEach(function(id){var ln=$('#'+id+'ln'),tx=$('#'+id+'tx');if(!ln)return;
+  var inplace=id==='n4'&&page==='ctl';
+  ln.className='ov n1line '+(ok?'ok':bad?'bad':'');ln.style.visibility=(any&&!inplace)?'visible':'hidden';
+  tx.className='n1txt'+(bad?' bad':'')+(((ok||bad)&&!inplace)?' show':'');tx.innerHTML=bad?'<span>没有完成：车辆没有响应</span><span class="n">'+sc+' 秒</span>':'<span>设置温度 22° 完成</span><span class="n">'+sc+' 秒</span>';
+  if(id==='n4'){var v=$('#n4val'),fl=$('#n4fl');if(v){v.textContent=run?sc+' 秒':(ok?'22°':(bad?'没成功':'22°'));v.style.color=ok?'var(--ok)':bad?'var(--bad)':'';fl.style.width=run?Math.min(92,sim.s/32)+'%':(any?'100%':'0');fl.style.background=ok?'var(--ok)':bad?'var(--bad)':'var(--pg-ink)'}}});
+ var b2=$('#n2b');if(b2){b2.className='ov n2'+(any?' show':'')+(ok?' ok':bad?' bad':'');
+  var open=b2.dataset.open==='1';
+  b2.innerHTML='<span class="n">'+(run?sc:(ok?'完成':'失败'))+'</span><small>'+(bad?'车辆没有响应':'设置温度 22°')+(ok?' · '+sc+' 秒':'')+'</small>'+(open?'<ul><li>设置温度 22° · 2.4 秒</li><li>闪灯 · 1.1 秒</li></ul>':'')}
+ var b3=$('#n3b');if(b3){b3.className='ov n3'+(any?' show':'')+(ok?' ok':bad?' bad':'');
+  b3.innerHTML='<div class="l1"><span>设置温度 22°</span><span class="n">'+(run?sc+' 秒':(ok?'完成':'失败'))+'</span></div><div class="l2">'+(run?'已发送，等待车辆':(ok?'用时 '+sc+' 秒':'车辆没有响应，可以重试'))+'</div><i class="pr" style="width:'+Math.min(92,sim.s/32)+'%"></i>'}
+}
+document.addEventListener('click',function(e){var b=e.target.closest('#n2b');if(b){b.dataset.open=b.dataset.open==='1'?'0':'1';draw()}});
+var tm=null,hide=null;
+function start(fail){clearInterval(tm);clearTimeout(hide);sim.ph='run';sim.t0=Date.now();sim.s=0;sim.fail=fail;draw();
+ tm=setInterval(function(){sim.s=Date.now()-sim.t0;if(sim.s>=2400){clearInterval(tm);sim.ph=fail?'fail':'ok';draw();if(!fail)hide=setTimeout(function(){sim.ph='idle';draw()},3200)}else draw()},100)}
+$('#go').addEventListener('click',function(){start(false)});$('#goFail').addEventListener('click',function(){start(true)});
+mountNotif();
+
+/* 日志详情 */
+var SEG=[['排队',10],['唤醒车辆',5200],['取访问令牌',10],['发给车辆',2300],['手机与服务器之间',380]];
+var TOT=SEG.reduce(function(a,s){return a+s[1]},0);
+function f1(ms){return (ms/1000).toFixed(ms<100?2:1)}
+var head='<div class="who"><b>设置温度 22°</b>今天 08:12 · 小明 · 已发送</div>';
+var trace='<div class="trace"><code>排查号 0af7651916cd43dd8448eb211c80319c</code><button data-copy>复制</button></div>';
+$('#l1').innerHTML='<div class="lg">'+head+'<div class="big n">'+f1(TOT)+'<small>秒</small></div><p class="say">其中 <span class="n">5.2</span> 秒是在唤醒车辆，车在休眠，要等它醒来。</p>'+
+ '<svg viewBox="0 0 320 96" width="100%" role="img" aria-label="时间尺：唤醒 5.2 秒，发给车辆 2.3 秒，其余 0.4 秒"><line x1="0" x2="320" y1="40" y2="40" stroke="var(--pg-line)" stroke-width="1.5"/>'+
+ [0,2,4,6,8].map(function(t){var x=t/8*320;return '<line x1="'+x+'" x2="'+x+'" y1="40" y2="48" stroke="var(--pg-ink2)"/><text x="'+Math.min(Math.max(x,6),314)+'" y="62" font-size="12" text-anchor="middle" fill="var(--pg-ink2)" font-family="Barlow Condensed">'+t+'</text>'}).join('')+
+ '<rect x="0.4" y="26" width="'+(5.21/7.9*320*7.9/8)+'" height="14" fill="var(--amber)"/><rect x="'+(5.21/8*320)+'" y="26" width="'+(2.3/8*320)+'" height="14" fill="var(--pg-ink)"/><rect x="'+(7.51/8*320)+'" y="26" width="'+(0.39/8*320)+'" height="14" fill="var(--pg-ink2)"/>'+
+ '<text x="0" y="18" font-size="13" font-weight="700" fill="var(--pg-ink)">唤醒 5.2</text><text x="'+(5.21/8*320)+'" y="18" font-size="13" font-weight="700" fill="var(--pg-ink)">发给车辆 2.3</text><text x="320" y="86" font-size="12" text-anchor="end" fill="var(--pg-ink2)">其余 0.4（排队、令牌、网络）</text></svg>'+trace+'</div>';
+var acc=0,rows='';
+var STEP=[['收到指令',0,'排队 0.01'],['开始唤醒车辆',0.01,''],['车辆醒来',5.21,'等了 5.2 秒'],['发给车辆',5.22,''],['车辆确认',7.52,'签名与传输 2.3 秒'],['手机收到结果',7.9,'网络 0.4 秒']];
+STEP.forEach(function(r,i){var hot=i===2;rows+='<div class="n'+(hot?' hot':'')+'">'+r[1].toFixed(2)+'</div><div class="'+(hot?'hot':'')+'">'+r[0]+(r[2]?'<small>'+r[2]+'</small>':'')+'</div>'});
+$('#l2').innerHTML='<div class="lg">'+head+'<div class="tl">'+rows+'</div><div class="say">一共 <span class="n">7.9</span> 秒，最慢的是等车醒来。</div>'+trace+'</div>';
+var hb='';var mx=Math.max.apply(null,SEG.map(function(s){return s[1]}));
+SEG.forEach(function(s){hb+='<div class="it'+(s[1]===mx?' top':'')+'"><span>'+s[0]+'</span><span class="n">'+f1(s[1])+' 秒</span><div class="tk"><i style="width:'+Math.max(1.5,s[1]/mx*100)+'%"></i></div></div>'});
+$('#l3').innerHTML='<div class="lg">'+head+'<div class="say">一共 <span class="n">7.9</span> 秒</div><div class="hb">'+hb+'</div>'+trace+'</div>';
+document.addEventListener('click',function(e){var b=e.target.closest('[data-copy]');if(!b)return;
+ try{navigator.clipboard.writeText('0af7651916cd43dd8448eb211c80319c').then(function(){b.textContent='已复制'},function(){})}catch(x){}setTimeout(function(){b.textContent='复制'},1400)});
+})();
+</script>
+</body>
+</html>
