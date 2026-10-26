@@ -13,7 +13,7 @@
 
 这些文件全部由 `dispatch-pages` 自动生成，不要手动修改；笔记的正文请在知识库里改，下一次同步会覆盖这里的副本。
 
-## 文档清单（11 篇）
+## 文档清单（12 篇）
 
 ### ashare-quant
 
@@ -30,6 +30,7 @@
 
 ### tesla-assistant
 
+- [特助手 首页方案](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E9%A6%96%E9%A1%B5%E6%96%B9%E6%A1%88.html) · [线上](https://lhanman.github.io/p/home-proposal/) · 2026-10-26 — 特助手首页、发送指令胶囊、日志耗时详情的设计方案（示例数据）
 - [特助手 UI 预览](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20UI%20%E9%A2%84%E8%A7%88%EF%BC%88ui-preview-artifact%EF%BC%89.html) · [线上](https://lhanman.github.io/p/ui-preview-artifact/) · 2026-10-19 — 特助手手机 App 界面预览：iOS 液态玻璃与 Android 毛玻璃，四个页面，示例数据
 - [特助手 UI 预览](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20UI%20%E9%A2%84%E8%A7%88.html) · [线上](https://lhanman.github.io/p/tesla-assistant-ui-preview/) · 2026-10-19 — 特助手移动端 UI 预览：首页默认是平面示意图，可导入特斯拉 App 截图并在本机抠出车身，统一的仪表刻度语言，浅色和深色，全部为演示数据。
 - [特助手 功能清单与矩阵](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E5%8A%9F%E8%83%BD%E6%B8%85%E5%8D%95%E4%B8%8E%E7%9F%A9%E9%98%B5.html) · [线上](https://lhanman.github.io/p/tesla-assistant-features/) · 2026-10-18 — 特助手的功能清单、属性矩阵、入口矩阵和调研与实测结论

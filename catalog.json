@@ -15,6 +15,20 @@
       "path": "文档/ashare-quant/三个开源项目的数据源对比：TradingAgents、TradingAgents-CN、daily_stock_analysis.html"
     },
     {
+      "slug": "home-proposal",
+      "title": "特助手 首页方案",
+      "description": "特助手首页、发送指令胶囊、日志耗时详情的设计方案（示例数据）",
+      "tags": [
+        "设计",
+        "App",
+        "首页"
+      ],
+      "project": "tesla-assistant",
+      "created": "2026-10-26",
+      "updated": "2026-10-26",
+      "path": "文档/tesla-assistant/特助手 首页方案.html"
+    },
+    {
       "slug": "ui-preview-artifact",
       "title": "特助手 UI 预览",
       "description": "特助手手机 App 界面预览：iOS 液态玻璃与 Android 毛玻璃，四个页面，示例数据",

@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="特助手首页、发送指令胶囊、日志耗时详情的设计方案（示例数据）">
+<link rel="index" href="../../index.html">
+<title>特助手 首页方案</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+/* 布局：三段竖排，每段一个手机尺寸的示意屏（首页 / 指令胶囊 / 耗时详情），段末列出数据来源。
+   配色沿用 App 现有令牌（琥珀主色、绿/红语义色、玻璃面板），不引入新色相；车温用冷暖渐变作为这页唯一的新色。 */
+:root {
+  --bg:#EDEFF3; --ink:#12151B; --ink2:#5B6472; --card:#FFFFFF; --card2:#F6F7F9; --line:rgba(18,21,27,.09);
+  --ok:#14803F; --bad:#D23A2A; --amber:#F5A300; --amber-text:#8A5300; --route:#3B5BFF;
+  --cool:#4C8DFF; --warm:#FF9A3D; --glow:rgba(255,255,255,.9); --shadow:0 1px 2px rgba(18,21,27,.06),0 8px 24px rgba(18,21,27,.06);
+  --pill:rgba(255,255,255,.82); --tick-off:rgba(18,21,27,.14);
+  --font:ui-rounded,-apple-system,"PingFang SC","SF Pro Text","Noto Sans SC",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0A0C10; --ink:#F2F4F8; --ink2:#98A1B0; --card:#14181F; --card2:#1A1F28; --line:rgba(255,255,255,.09);
+  --ok:#47DC92; --bad:#FF7466; --amber:#FFB224; --amber-text:#FFC85A; --route:#7C9BFF;
+  --cool:#6BA3FF; --warm:#FFAB57; --glow:rgba(255,255,255,.10); --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  --pill:rgba(30,36,46,.86); --tick-off:rgba(255,255,255,.16); color-scheme:dark; } }
+:root[data-theme="dark"] {
+  --bg:#0A0C10; --ink:#F2F4F8; --ink2:#98A1B0; --card:#14181F; --card2:#1A1F28; --line:rgba(255,255,255,.09);
+  --ok:#47DC92; --bad:#FF7466; --amber:#FFB224; --amber-text:#FFC85A; --route:#7C9BFF;
+  --cool:#6BA3FF; --warm:#FFAB57; --glow:rgba(255,255,255,.10); --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  --pill:rgba(30,36,46,.86); --tick-off:rgba(255,255,255,.16); color-scheme:dark; }
+body { background:var(--bg); color:var(--ink); font-family:var(--font); margin:0; padding-block:28px 64px;
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); line-height:1.5; }
+* { box-sizing:border-box; }
+.wrap { max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:44px; }
+h1 { font-size:26px; margin:0 0 6px; letter-spacing:.2px; text-wrap:balance; }
+h2 { font-size:19px; margin:0 0 4px; text-wrap:balance; }
+p { margin:0; } .lede { color:var(--ink2); font-size:14px; max-width:60ch; }
+.tag { display:inline-block; font-size:11px; letter-spacing:.06em; padding:2px 8px; border-radius:99px; background:var(--card2); color:var(--ink2); border:1px solid var(--line); }
+.tag.ok { color:var(--ok); } .tag.new { color:var(--amber-text); }
+.sec { display:grid; grid-template-columns:minmax(0,1fr); gap:18px; }
+.cols { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr)); gap:22px; align-items:start; }
+.seg { display:inline-flex; gap:4px; padding:3px; border-radius:99px; background:var(--card2); border:1px solid var(--line); flex-wrap:wrap; }
+.seg button { font:inherit; font-size:13px; padding:6px 13px; border-radius:99px; border:0; background:transparent; color:var(--ink2); cursor:pointer; }
+.seg button[aria-pressed="true"] { background:var(--card); color:var(--ink); box-shadow:var(--shadow); font-weight:600; }
+button:focus-visible { outline:2px solid var(--route); outline-offset:2px; }
+.note { font-size:12.5px; color:var(--ink2); display:flex; flex-direction:column; gap:6px; }
+.note li { list-style:none; display:flex; gap:8px; align-items:baseline; } .note ul { margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+/* 手机屏 */
+.phone { width:100%; max-width:390px; margin:0 auto; border-radius:34px; background:var(--bg); border:1px solid var(--line); box-shadow:var(--shadow); padding:16px 12px 92px; position:relative; overflow:hidden; display:flex; flex-direction:column; gap:10px; }
+.phone .screenbg { position:absolute; inset:0; background:radial-gradient(120% 60% at 50% -10%, color-mix(in srgb,var(--route) 9%,transparent), transparent 70%); pointer-events:none; }
+.phone > * { position:relative; }
+.hd { display:flex; align-items:center; gap:8px; padding:4px 4px 2px; }
+.hd .name { font-size:27px; font-weight:700; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.chip { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; padding:0 11px; height:30px; border-radius:99px; background:var(--card); border:1px solid var(--line); }
+.dot { width:8px; height:8px; border-radius:50%; background:var(--ok); }
+.card { background:var(--card); border:1px solid var(--line); border-radius:22px; box-shadow:var(--shadow); }
+/* 英雄区 */
+.hero { padding:16px 18px 18px; overflow:hidden; position:relative; transition:background .4s; }
+.hero .glow { position:absolute; left:50%; top:46px; width:260px; height:110px; transform:translateX(-50%); border-radius:50%; filter:blur(40px); background:var(--glow); transition:background .5s; }
+.hero.charging .glow { background:color-mix(in srgb,var(--ok) 55%,transparent); }
+.car { display:block; margin:0 auto; width:min(100%,300px); height:auto; position:relative; color:var(--ink); }
+.big { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-top:6px; }
+.pct { font-size:68px; font-weight:700; line-height:.95; font-variant-numeric:tabular-nums; letter-spacing:-1px; }
+.pct small { font-size:24px; font-weight:500; color:var(--ink2); margin-left:2px; letter-spacing:0; }
+.side { text-align:right; font-size:13px; color:var(--ink2); display:flex; flex-direction:column; gap:3px; }
+.side b { font-size:22px; color:var(--ink); font-variant-numeric:tabular-nums; }
+.side .ch { color:var(--ok); font-weight:600; }
+.ticks { display:flex; justify-content:space-between; align-items:flex-end; height:26px; margin-top:14px; position:relative; }
+.ticks i { width:3px; border-radius:2px; background:var(--tick-off); height:16px; }
+.ticks i.on { background:var(--ink); } .ticks i.on.lowc { background:var(--bad); } .charging .ticks i.on { background:var(--ok); }
+.ticks i.lim { height:26px; background:var(--amber); }
+.alerts { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.alert { font-size:12.5px; font-weight:600; padding:5px 11px; border-radius:99px; color:var(--bad); background:color-mix(in srgb,var(--bad) 12%,transparent); display:inline-flex; gap:6px; align-items:center; }
+.alert::before { content:""; width:7px; height:7px; border-radius:50%; background:currentColor; }
+/* 车温 */
+.climate { padding:16px 18px; display:flex; flex-direction:column; gap:14px; }
+.climate .top { display:flex; justify-content:space-between; align-items:flex-end; gap:10px; }
+.lab { font-size:12px; color:var(--ink2); letter-spacing:.06em; }
+.temp { font-size:50px; font-weight:700; line-height:1; font-variant-numeric:tabular-nums; }
+.temp sup { font-size:22px; font-weight:500; vertical-align:top; position:relative; top:4px; margin-left:1px; color:var(--ink2); }
+.state { font-size:13.5px; font-weight:600; text-align:right; } .state span { display:block; font-size:12px; font-weight:400; color:var(--ink2); }
+.thermo { position:relative; height:34px; }
+.thermo .track { position:absolute; left:0; right:0; top:14px; height:6px; border-radius:6px; background:linear-gradient(90deg,var(--cool),color-mix(in srgb,var(--cool) 40%,var(--warm)) 45%,var(--warm)); opacity:.85; }
+.mk { position:absolute; top:0; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:3px; font-size:11px; color:var(--ink2); font-variant-numeric:tabular-nums; transition:left .5s; }
+.mk::after { content:""; display:block; }
+.mk.in .pin { width:16px; height:16px; border-radius:50%; background:var(--ink); border:3px solid var(--card); box-shadow:0 0 0 1px var(--line); margin-top:9px; }
+.mk.tg .pin { width:16px; height:16px; border-radius:50%; border:2.5px solid var(--ink); background:var(--card); margin-top:9px; }
+.mk.out .pin { width:2px; height:12px; background:var(--ink2); margin-top:11px; border-radius:2px; }
+.scale { display:flex; justify-content:space-between; font-size:11px; color:var(--ink2); margin-top:-2px; font-variant-numeric:tabular-nums; }
+.legend { display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color:var(--ink2); }
+.legend span::before { content:""; display:inline-block; vertical-align:-2px; margin-right:6px; }
+.legend .a::before { width:10px; height:10px; border-radius:50%; background:var(--ink); } .legend .b::before { width:10px; height:10px; border-radius:50%; border:2px solid var(--ink); } .legend .c::before { width:2px; height:10px; background:var(--ink2); }
+/* 状态格 */
+.grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.tile { padding:12px 12px 13px; border-radius:18px; background:var(--card); border:1px solid var(--line); display:flex; flex-direction:column; gap:8px; min-width:0; }
+.tile .ico { width:22px; height:22px; color:var(--ink2); } .tile .v { font-size:15px; font-weight:650; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-variant-numeric:tabular-nums; }
+.tile .k { font-size:11.5px; color:var(--ink2); }
+.tile.warn { background:color-mix(in srgb,var(--bad) 10%,var(--card)); border-color:color-mix(in srgb,var(--bad) 30%,var(--line)); } .tile.warn .ico,.tile.warn .v { color:var(--bad); }
+.use { padding:14px 18px 16px; display:flex; flex-direction:column; gap:12px; }
+.use .row { display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+.use .km { font-size:34px; font-weight:700; font-variant-numeric:tabular-nums; } .use .km small { font-size:15px; color:var(--ink2); font-weight:500; }
+.wk { display:flex; gap:7px; align-items:flex-end; height:46px; } .wk i { flex:1; border-radius:6px; background:var(--tick-off); } .wk i.t { background:var(--amber); }
+.tabbar { position:absolute !important; left:50%; bottom:14px; transform:translateX(-50%); display:flex; gap:4px; padding:6px; border-radius:99px; background:var(--pill); border:1px solid var(--line); box-shadow:var(--shadow); backdrop-filter:blur(14px); }
+.tabbar span { font-size:12px; padding:7px 13px; border-radius:99px; color:var(--ink2); } .tabbar span.on { background:var(--card2); color:var(--ink); font-weight:650; }
+/* 指令胶囊 */
+.capsule { position:absolute !important; left:12px; right:12px; bottom:68px; display:flex; align-items:center; gap:12px; padding:10px 14px 10px 12px; border-radius:99px; background:var(--pill); border:1px solid var(--line); box-shadow:var(--shadow); backdrop-filter:blur(16px); transform:translateY(24px); opacity:0; pointer-events:none; transition:transform .35s cubic-bezier(.2,.9,.3,1.1),opacity .25s; }
+.capsule.show { transform:none; opacity:1; pointer-events:auto; }
+.ring { width:26px; height:26px; flex:none; position:relative; }
+.ring svg { width:26px; height:26px; display:block; } .ring .arc { transform-origin:50% 50%; animation:spin 1s linear infinite; }
+.capsule.ok .arc,.capsule.bad .arc { animation:none; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.cap-t { min-width:0; flex:1; display:flex; flex-direction:column; line-height:1.25; } .cap-t b { font-size:14px; font-weight:650; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .cap-t span { font-size:12px; color:var(--ink2); font-variant-numeric:tabular-nums; }
+.cap-a { font:inherit; font-size:13px; font-weight:600; color:var(--ink); background:var(--card2); border:1px solid var(--line); padding:6px 12px; border-radius:99px; cursor:pointer; }
+.capsule.ok .ring { color:var(--ok); } .capsule.bad .ring { color:var(--bad); } .capsule .ring { color:var(--ink); }
+.old { padding:10px 14px; border-radius:16px; background:var(--card); border:1px solid var(--line); display:flex; flex-direction:column; gap:6px; font-size:12px; color:var(--ink2); }
+.flow { height:5px; border-radius:5px; background:linear-gradient(90deg,var(--amber) 0 30%,transparent 30%) , color-mix(in srgb,var(--amber) 25%,transparent); background-size:60px 100%,auto; animation:flow 1.2s linear infinite; }
+@keyframes flow { from { background-position:-60px 0,0 0; } to { background-position:60px 0,0 0; } }
+.dim { opacity:.55; }
+.sheet { padding:18px 18px 20px; border-radius:26px; display:flex; flex-direction:column; gap:14px; }
+.sheet h3 { margin:0; font-size:18px; } .sheet .meta { font-size:12.5px; color:var(--ink2); }
+.wf { display:flex; height:22px; border-radius:8px; overflow:hidden; gap:2px; } .wf i { display:block; min-width:3px; }
+.s1{background:#8A94A6}.s2{background:var(--cool)}.s3{background:#9B7BFF}.s4{background:var(--amber)}.s5{background:var(--ok)}
+.seglist { display:flex; flex-direction:column; } .seglist div { display:grid; grid-template-columns:12px 1fr auto; gap:10px; align-items:center; padding:9px 0; border-top:1px solid var(--line); font-size:14px; }
+.seglist div:first-child { border-top:0; } .seglist em { width:10px; height:10px; border-radius:3px; display:block; } .seglist span.n { font-variant-numeric:tabular-nums; font-weight:650; }
+.seglist small { display:block; font-size:11.5px; color:var(--ink2); font-weight:400; }
+.tot { display:flex; justify-content:space-between; align-items:baseline; font-size:13px; color:var(--ink2); } .tot b { font-size:30px; color:var(--ink); font-variant-numeric:tabular-nums; }
+.kv { display:flex; justify-content:space-between; gap:10px; font-size:13px; align-items:center; } .kv code { font-family:ui-monospace,Menlo,monospace; font-size:12px; color:var(--ink2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+@media (prefers-reduced-motion: reduce) { .ring .arc,.flow { animation:none; } .capsule,.mk { transition:none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>首页、指令胶囊、耗时详情</h1>
+    <p class="lede">下面所有数字都是示例数据，不是你车的真实记录。每段末尾标明：用的是现有数据，还是需要新增遥测字段才能做。</p>
+  </header>
+
+  <section class="sec" aria-labelledby="h-home">
+    <div>
+      <h2 id="h-home">一、首页：先看到最重要的一件事</h2>
+      <p class="lede">原来的首页是「电量一块 + 一排同样大小的文字行 + 行程」，所有信息一样重。新方案按"现在最该知道什么"排序：车在不在充电、电够不够、舱里热不热、有没有没处理好的事。</p>
+    </div>
+    <div class="seg" role="group" aria-label="切换示例状态" id="homeSeg">
+      <button data-s="park" aria-pressed="true">停着</button>
+      <button data-s="charge" aria-pressed="false">充电中</button>
+      <button data-s="alert" aria-pressed="false">有异常</button>
+    </div>
+    <div class="cols">
+      <div class="phone" id="home" aria-live="polite"><div class="screenbg"></div></div>
+      <div class="note">
+        <ul>
+          <li><span class="tag">布局</span><span>最上面是一块英雄区：车图、环境光、超大电量数字。电量数字比现在大，续航和充电信息放在它右边，不再分两处。</span></li>
+          <li><span class="tag">异常上浮</span><span>没锁、车门没关、低电量这类"没处理好的事"，在英雄区下面变成红色标签，平时不出现，出现了一眼就看到。</span></li>
+          <li><span class="tag">车温重做</span><span>原来是一行小字"21° / 18°"。现在车内温度做成第二块大数字，下面一条冷暖渐变的温度尺，同时标出：车内现在多少、空调设到多少、车外多少。离设定值还差多远，不用算。</span></li>
+          <li><span class="tag">次要信息</span><span>锁、门窗、哨兵、里程、座椅加热、软件版本，缩成三列小格，统一图标加一个值。异常的格子整格变红。</span></li>
+          <li><span class="tag">统一</span><span>只用 App 现有的玻璃面板、琥珀色主色、绿红语义色。琥珀色只留给"可操作/已选中"，不再拿来表示"加载中"。</span></li>
+        </ul>
+        <p><span class="tag ok">现有数据</span> 电量、续航、充电限值、车内外温度、设定温度、空调开关、锁、门窗、哨兵、里程、座椅加热、软件版本。</p>
+        <p><span class="tag new">需新增字段</span> 充电功率（遥测里有电压和电流，可以算出来，不用改车）；充满还要多久、胎压、导航目的地与到达时间，需要在遥测配置里加字段，车醒着时同步一次才生效，我建议你这趟回来之后再做。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="h-cap">
+    <div>
+      <h2 id="h-cap">二、发送指令的加载提示：指令胶囊</h2>
+      <p class="lede">原来是控车卡片底部一条橙色流动条。新方案是一颗悬浮在底栏上方的玻璃胶囊，颜色中性，跟底栏同一种材质。它不属于某一张卡片，所以在任何页面发指令都一样。</p>
+    </div>
+    <div class="seg" role="group" aria-label="模拟一次指令" id="capSeg">
+      <button data-c="ok">正常（约 2 秒）</button>
+      <button data-c="wake">车在休眠（先唤醒）</button>
+      <button data-c="fail">失败</button>
+    </div>
+    <div class="cols">
+      <div class="phone" id="capPhone"><div class="screenbg"></div>
+        <div class="hd"><div class="name">车控</div><span class="chip"><i class="dot"></i>在线</span></div>
+        <div class="card climate dim"><div class="top"><div><div class="lab">空调设定</div><div class="temp">22<sup>°C</sup></div></div><div class="state">空调已开<span>点按钮后车才会动</span></div></div></div>
+        <div class="grid dim"><div class="tile"><div class="k">车锁</div><div class="v">已锁</div></div><div class="tile"><div class="k">座椅加热</div><div class="v">左 2 档</div></div><div class="tile"><div class="k">方向盘</div><div class="v">关</div></div></div>
+        <div class="capsule" id="cap" role="status" aria-live="polite">
+          <div class="ring"><svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="10" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="3"/><path class="arc" d="M13 3 a10 10 0 0 1 10 10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path id="capmark" d="" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="cap-t"><b id="capT">设置温度 22°</b><span id="capS">已发送 0 秒</span></div>
+          <button class="cap-a" id="capA" hidden>详情</button>
+        </div>
+        <div class="tabbar" aria-hidden="true"><span>首页</span><span class="on">车控</span><span>行程</span><span>日志</span><span>我的</span></div>
+      </div>
+      <div class="note">
+        <div class="old" aria-hidden="true"><span>现在的样子（示意）</span><div class="flow"></div><span>等待车辆响应…</span></div>
+        <ul>
+          <li><span class="tag">三个阶段</span><span><b>发送中</b>：圆环转，旁边写指令名和已过去的秒数。<b>完成</b>：圆环变成绿色对勾，写"完成 · 2.4 秒"，2.5 秒后自己收起，右边有"详情"。<b>失败</b>：红色，写原因，一直留着直到你点掉。</span></li>
+          <li><span class="tag">休眠</span><span>车在休眠时，指令前面有唤醒这一步，最长约 60 秒。胶囊会换成"车辆休眠，正在唤醒"，让你知道慢在哪里，不是卡住了。</span></li>
+          <li><span class="tag">颜色</span><span>进行中用文字同色（中性），完成用绿，失败用红。琥珀色不出现。</span></li>
+          <li><span class="tag">可访问性</span><span>开启"减少动态效果"时圆环不转，改成只显示秒数；读屏会播报阶段变化。</span></li>
+        </ul>
+        <p><span class="tag ok">现有数据</span> 全部来自客户端自己的计时和现有的唤醒状态，不需要改服务端。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="h-log">
+    <div>
+      <h2 id="h-log">三、日志详情：一条指令慢在哪</h2>
+      <p class="lede">日志列表里的每一行可以点开。详情里把这条指令的总耗时拆成几段，一眼看出瓶颈。</p>
+    </div>
+    <div class="cols">
+      <div class="phone"><div class="screenbg"></div>
+        <div class="card sheet">
+          <div><h3>设置温度 22°</h3><div class="meta">今天 08:12 · 小明 · 已发送</div></div>
+          <div class="tot"><span>总耗时</span><b>7.9 秒</b></div>
+          <div class="wf" role="img" aria-label="耗时分段：排队 0.01 秒，车辆唤醒 5.2 秒，取令牌 0.01 秒，签名与 Tesla 与车 2.3 秒，网络 0.4 秒">
+            <i class="s1" style="flex:1"></i><i class="s2" style="flex:520"></i><i class="s3" style="flex:1"></i><i class="s4" style="flex:230"></i><i class="s5" style="flex:40"></i>
+          </div>
+          <div class="seglist">
+            <div><em class="s1"></em><span>排队<small>同一账号的指令一次只发一条</small></span><span class="n">0.01 秒</span></div>
+            <div><em class="s2"></em><span>车辆在线检查 / 唤醒<small>车在休眠，等它醒来</small></span><span class="n">5.2 秒</span></div>
+            <div><em class="s3"></em><span>取访问令牌<small>本地数据库</small></span><span class="n">0.01 秒</span></div>
+            <div><em class="s4"></em><span>签名代理 → Tesla → 车<small>这一段服务端分不开，合在一起</small></span><span class="n">2.3 秒</span></div>
+            <div><em class="s5"></em><span>手机 ↔ 服务器网络<small>手机量到的总时间，减去服务端总时间</small></span><span class="n">0.4 秒</span></div>
+          </div>
+          <div class="kv"><span>排查号</span><code id="trace">0af7651916cd43dd8448eb211c80319c</code><button class="cap-a" id="copy">复制</button></div>
+        </div>
+      </div>
+      <div class="note">
+        <ul>
+          <li><span class="tag">现状</span><span>服务端其实已经把排队、在线检查、发送、总计这几段时间存进了控车日志，也存了排查号。但日志接口没把它们返回给手机，日志行也点不开，所以你看不到。</span></li>
+          <li><span class="tag">要改</span><span>日志接口多返回这几项；服务端把"发送"再拆成取令牌和签名代理两段；手机端日志行可点开，显示上面的详情。</span></li>
+          <li><span class="tag">分不开的</span><span>签名代理到 Tesla 再到车这一段，用的是官方的签名程序，我们量得到总时间，量不到里面各步。如果以后要拆，需要读签名程序自己的日志。</span></li>
+          <li><span class="tag">手机一侧</span><span>手机侧的网络耗时只有刚发出去的那条指令能测到；从日志里点开的历史记录，这一段显示"未记录"，其余四段都有。</span></li>
+        </ul>
+        <p><span class="tag new">需要上线</span> 这一项要改服务端并发布。按你之前的要求，路上不动线上，回来后再发。</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  var $=function(s,r){return (r||document).querySelector(s)};
+  var D={
+    park:{batt:78,range:412,limit:90,chg:false,inside:24,target:22,out:18,climate:true,locked:true,closed:true,sentry:false,odo:'12,480',seat:'左 2 档',ver:'2025.38.5',alerts:[]},
+    charge:{batt:78,range:412,limit:90,chg:true,kw:'7.2',added:14,inside:21,target:22,out:16,climate:false,locked:true,closed:true,sentry:false,odo:'12,480',seat:'关',ver:'2025.38.5',alerts:[]},
+    alert:{batt:18,range:96,limit:80,chg:false,inside:29,target:22,out:31,climate:true,locked:false,closed:false,sentry:true,odo:'12,480',seat:'左 3 档',ver:'2025.38.5',alerts:['未上锁','右前门未关','电量低于 20%']}
+  };
+  var icon={
+    lock:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+    door:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18V9l4-4h8l4 4v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/><path d="M4 10h16"/></svg>',
+    eye:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>',
+    road:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 21M16 3l4 18M12 4v3M12 11v3M12 18v3"/></svg>',
+    seat:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h3a2 2 0 0 1 2 2l1 6h3a2 2 0 0 1 2 2v3H8Z"/><path d="M6 20h14"/></svg>',
+    chip:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2.5"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg>'
+  };
+  var car='<svg class="car" viewBox="0 0 300 96" role="img" aria-label="车辆示意图（沿用现有渲染图）"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity=".9"><path d="M18 66c0-8 6-12 16-14l34-9c14-10 30-16 52-16h38c20 0 36 8 50 22l30 6c10 2 14 6 14 14v4c0 3-2 5-5 5h-14"/><path d="M42 71H25c-4 0-7-2-7-5"/><path d="M95 71h112"/><path d="M96 43c10-7 22-11 40-11h28l-6 20H88Z" opacity=".55"/><circle cx="68" cy="71" r="15"/><circle cx="68" cy="71" r="6" opacity=".5"/><circle cx="228" cy="71" r="15"/><circle cx="228" cy="71" r="6" opacity=".5"/></g></svg>';
+  function pos(t){return Math.max(2,Math.min(98,(t-10)/(35-10)*100))}
+  function renderHome(k){
+    var d=D[k], low=d.batt<20, ticks='';
+    var on=Math.round(d.batt/100*25), lim=Math.round(d.limit/100*25);
+    for(var i=0;i<25;i++){ticks+='<i class="'+(i<on?'on'+(low?' lowc':''):'')+(i===lim?' lim':'')+'"></i>';}
+    var chargeSide=d.chg?'<b>'+d.kw+' kW</b><span class="ch">正在充电 · 已充 +'+d.added+'%</span><span>目标 '+d.limit+'%</span>':'<b>'+d.range+' km</b><span>预计续航</span><span>充电上限 '+d.limit+'%</span>';
+    var diff=d.inside-d.target, st;
+    if(!d.climate){st=['空调关闭','车内 '+d.inside+'°C']}
+    else if(Math.abs(diff)<1){st=['已达到设定','保持 '+d.target+'°C']}
+    else {st=[(diff>0?'正在降温':'正在升温')+'至 '+d.target+'°','还差 '+Math.abs(diff).toFixed(0)+'°C']}
+    var tiles=[
+      ['lock',d.locked?'已锁':'未上锁','车锁',!d.locked],
+      ['door',d.closed?'全部关闭':'右前门未关','门窗',!d.closed],
+      ['eye',d.sentry?'开':'关','哨兵',false],
+      ['road',d.odo+' km','总里程',false],
+      ['seat',d.seat,'座椅加热',false],
+      ['chip',d.ver,'软件版本',false]
+    ].map(function(t){return '<div class="tile'+(t[3]?' warn':'')+'">'+icon[t[0]]+'<div><div class="v">'+t[1]+'</div><div class="k">'+t[2]+'</div></div></div>'}).join('');
+    var al=d.alerts.length?'<div class="alerts">'+d.alerts.map(function(a){return '<span class="alert">'+a+'</span>'}).join('')+'</div>':'';
+    $('#home').innerHTML='<div class="screenbg"></div>'+
+      '<div class="hd"><div class="name">我的 Model 3</div><span class="chip"><i class="dot"></i>在线 · 刚刚</span></div>'+
+      '<div class="card hero'+(d.chg?' charging':'')+'"><div class="glow"></div>'+car+
+        '<div class="big"><div class="pct">'+d.batt+'<small>%</small></div><div class="side">'+chargeSide+'</div></div>'+
+        '<div class="ticks" aria-hidden="true">'+ticks+'</div>'+al+'</div>'+
+      '<div class="card climate"><div class="top"><div><div class="lab">车内温度</div><div class="temp">'+d.inside+'<sup>°C</sup></div></div><div class="state">'+st[0]+'<span>'+st[1]+'</span></div></div>'+
+        '<div class="thermo" role="img" aria-label="温度尺：车内 '+d.inside+'度，设定 '+d.target+'度，车外 '+d.out+'度"><div class="track"></div>'+
+          '<div class="mk out" style="left:'+pos(d.out)+'%"><span class="pin"></span></div>'+
+          '<div class="mk tg" style="left:'+pos(d.target)+'%"><span class="pin"></span></div>'+
+          '<div class="mk in" style="left:'+pos(d.inside)+'%"><span class="pin"></span></div></div>'+
+        '<div class="scale"><span>10°</span><span>35°</span></div>'+
+        '<div class="legend"><span class="a">车内 '+d.inside+'°</span><span class="b">设定 '+d.target+'°</span><span class="c">车外 '+d.out+'°</span></div></div>'+
+      '<div class="grid">'+tiles+'</div>'+
+      '<div class="card use"><div class="row"><div><div class="lab">今日用车</div><div class="km">36<small> km · 2 趟</small></div></div><div class="lab" style="text-align:right">比近 7 天日均<br><b style="color:var(--ink);font-size:15px">多 12%</b></div></div>'+
+        '<div class="wk" aria-hidden="true"><i style="height:40%"></i><i style="height:62%"></i><i style="height:30%"></i><i style="height:78%"></i><i style="height:48%"></i><i style="height:22%"></i><i class="t" style="height:88%"></i></div></div>'+
+      '<div class="tabbar" aria-hidden="true"><span class="on">首页</span><span>车控</span><span>行程</span><span>日志</span><span>我的</span></div>';
+  }
+  var seg=$('#homeSeg');
+  seg.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+    [].forEach.call(seg.querySelectorAll('button'),function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});renderHome(b.dataset.s)});
+  renderHome('park');
+
+  /* 指令胶囊演示 */
+  var cap=$('#cap'),capT=$('#capT'),capS=$('#capS'),capA=$('#capA'),mark=$('#capmark'),timer=null,hide=null,t0=0;
+  function setState(c,title,sub,showAct){cap.className='capsule show '+c;capT.textContent=title;capS.textContent=sub;capA.hidden=!showAct;
+    mark.setAttribute('d',c==='ok'?'M8 13.5l3.2 3.2L18 10':c==='bad'?'M9 9l8 8M17 9l-8 8':'')}
+  function stop(){clearInterval(timer);clearTimeout(hide)}
+  function run(kind){
+    stop();t0=Date.now();
+    var wake=kind==='wake';
+    setState('',wake?'车辆休眠，正在唤醒':'设置温度 22°',wake?'唤醒通常需要几秒，最长约 60 秒 · 0 秒':'已发送 0 秒',false);
+    timer=setInterval(function(){var s=Math.floor((Date.now()-t0)/1000);
+      capS.textContent=wake?'唤醒通常需要几秒，最长约 60 秒 · '+s+' 秒':'已发送 '+s+' 秒';
+      if(wake&&s>=3){clearInterval(timer);finish('ok','7.9')}
+    },250);
+    if(!wake)hide=setTimeout(function(){clearInterval(timer);finish(kind==='fail'?'bad':'ok','2.4')},2200);
+  }
+  function finish(r,sec){
+    if(r==='ok'){setState('ok','设置温度 22° · 已完成','用时 '+sec+' 秒',true);hide=setTimeout(function(){cap.className='capsule'},2500)}
+    else setState('bad','没有完成：车辆没有响应','等了 '+sec+' 秒 · 可以重试',true);
+  }
+  $('#capSeg').addEventListener('click',function(e){var b=e.target.closest('button');if(b)run(b.dataset.c)});
+  $('#copy').addEventListener('click',function(){var b=this,t=$('#trace').textContent;
+    function done(){b.textContent='已复制';setTimeout(function(){b.textContent='复制'},1400)}
+    try{navigator.clipboard.writeText(t).then(done,function(){})}catch(e){}});
+})();
+</script>
+</body>
+</html>
