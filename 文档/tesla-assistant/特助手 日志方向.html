@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="特助手日志页按首页读数风格重做的三套方向">
+<link rel="index" href="../../index.html">
+<title>特助手 日志方向</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700;800&display=swap">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+/* 日志页的三套做法，都用首页 V3 的语言：整宽行、1px 细线、左侧小标签列、Barlow 数字、方角；
+   异常整行红底反白，琥珀只给能点的东西；演练（没真发）沿用休眠的斜影线，表示「这不是真的」。
+   详情页（L3 长度对比）三套共用，只改头部：去掉「·」，拆成三个读数。 */
+:root {
+  --pg-bg:#E9ECEF; --pg-ink:#101319; --pg-ink2:#586070; --pg-line:rgba(16,19,25,.14);
+  --amber:#E69A00;
+  --A-bg:#F6F6F4; --A-ink:#0E1012; --A-ink2:#5F656C; --A-line:rgba(14,16,18,.2); --A-alert:#E8412E; --A-alert-ink:#1A0704; --A-ghost:rgba(14,16,18,.08); --A-rule:rgba(14,16,18,.32); --A-ok:#14803F;
+  --num:"Barlow Condensed",ui-sans-serif,sans-serif;
+  --sans:"Noto Sans SC",-apple-system,"PingFang SC","Hiragino Sans GB",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --pg-bg:#090B0E; --pg-ink:#EEF1F5; --pg-ink2:#97A0AE; --pg-line:rgba(255,255,255,.14); --amber:#FFB224;
+  --A-bg:#0B0C0E; --A-ink:#F1F2EF; --A-ink2:#8E949B; --A-line:rgba(241,242,239,.22); --A-alert:#FF6A57; --A-alert-ink:#1A0704; --A-ghost:rgba(241,242,239,.1); --A-rule:rgba(241,242,239,.36); --A-ok:#47DC92; color-scheme:dark; } }
+:root[data-theme="dark"] {
+  --pg-bg:#090B0E; --pg-ink:#EEF1F5; --pg-ink2:#97A0AE; --pg-line:rgba(255,255,255,.14); --amber:#FFB224;
+  --A-bg:#0B0C0E; --A-ink:#F1F2EF; --A-ink2:#8E949B; --A-line:rgba(241,242,239,.22); --A-alert:#FF6A57; --A-alert-ink:#1A0704; --A-ghost:rgba(241,242,239,.1); --A-rule:rgba(241,242,239,.36); --A-ok:#47DC92; color-scheme:dark; }
+* { box-sizing:border-box; }
+body { background:var(--pg-bg); color:var(--pg-ink); font-family:var(--sans); margin:0; padding-block:28px 72px; line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); }
+::selection { background:var(--amber); color:#1a1200; }
+.wrap { max-width:1180px; margin:0 auto; display:flex; flex-direction:column; gap:40px; }
+h1 { font-size:28px; margin:0 0 8px; font-weight:800; text-wrap:balance; } h2 { font-size:20px; margin:0 0 4px; font-weight:800; }
+p { margin:0; } .lede { color:var(--pg-ink2); font-size:14.5px; max-width:70ch; } .lede b { color:var(--pg-ink); }
+.row { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr)); gap:34px 28px; align-items:start; }
+.opt { display:flex; flex-direction:column; gap:12px; min-width:0; } .opt .cap { font-size:13px; color:var(--pg-ink2); max-width:50ch; } .opt .cap b { color:var(--pg-ink); }
+.tools { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+.tools button { font:inherit; font-size:13px; font-weight:700; padding:7px 12px; border:1.5px solid var(--pg-ink); background:transparent; color:var(--pg-ink); border-radius:3px; cursor:pointer; }
+.tools button:hover, .tools button[aria-pressed="true"] { background:var(--pg-ink); color:var(--pg-bg); }
+button:focus-visible, .tap:focus-visible { outline:2px solid var(--amber); outline-offset:-2px; }
+.verdict { border-top:1px solid var(--pg-line); padding-top:16px; font-size:13.5px; color:var(--pg-ink2); max-width:84ch; } .verdict b { color:var(--pg-ink); }
+.verdict ol { margin:8px 0 0; padding-left:1.4em; } .verdict li { margin:5px 0; }
+
+/* 手机框 */
+.ph { width:100%; max-width:360px; margin:0 auto; border:1px solid var(--pg-line); border-radius:24px; overflow:hidden; background:var(--A-bg); color:var(--A-ink); padding-bottom:14px; }
+.n { font-family:var(--num); font-variant-numeric:tabular-nums; }
+.hd { display:flex; justify-content:space-between; align-items:baseline; padding:18px 18px 12px; } .hd b { font-size:28px; font-weight:800; } .hd span { font-size:13px; font-weight:700; }
+.hd span::after { content:""; display:inline-block; margin-left:5px; border:4px solid transparent; border-top:5px solid var(--A-ink); vertical-align:1px; }
+.foot { font-size:11.5px; color:var(--A-ink2); padding:12px 18px 0; border-top:1px solid var(--A-line); }
+.bad { background:var(--A-alert); color:var(--A-alert-ink) !important; }
+.hatch { background-image:repeating-linear-gradient(135deg,var(--A-ghost) 0 1px,transparent 1px 8.5px); }
+.tap { cursor:pointer; } .tap:hover { background-color:var(--A-ghost); } .tap.bad:hover { filter:brightness(1.04); background-color:var(--A-alert); }
+.chev { width:7px; height:7px; border-right:1.5px solid var(--A-ink2); border-top:1.5px solid var(--A-ink2); transform:rotate(45deg); flex:none; margin-left:2px; }
+.bad .chev { border-color:var(--A-alert-ink); }
+.who { font-size:12px; color:var(--A-ink2); } .bad .who { color:var(--A-alert-ink); opacity:.8; }
+.st { font-size:12.5px; font-weight:800; white-space:nowrap; }
+.sk { background:var(--A-ghost); display:block; }
+.empty { padding:40px 18px; border-top:1px solid var(--A-line); font-size:14px; color:var(--A-ink2); } .empty b { display:block; font-size:18px; color:var(--A-ink); margin-bottom:4px; }
+
+/* ===== A 流水：日期一行，时刻放在左侧标签列 ===== */
+.A .day { display:grid; grid-template-columns:auto 1fr; gap:10px; padding:16px 18px 6px; border-top:1px solid var(--A-line); align-items:baseline; }
+.A .day b { font-size:15px; font-weight:800; } .A .day .sum { display:flex; justify-content:flex-end; gap:8px; font-size:12px; color:var(--A-ink2); align-items:baseline; } .A .day .sum .bad { padding:0 5px; font-weight:800; }
+.A .e { display:grid; grid-template-columns:52px 1fr auto; gap:10px; padding:11px 18px; border-top:1px solid var(--A-line); align-items:center; }
+.A .e .t { font-size:17px; font-weight:500; color:var(--A-ink2); } .A .e.bad .t { color:var(--A-alert-ink); }
+.A .e .nm { font-size:15.5px; font-weight:700; line-height:1.3; }
+.A .e .rt { display:flex; align-items:center; gap:8px; } .A .e .sec { font-size:22px; font-weight:600; line-height:1; } .A .e .sec small { font-family:var(--sans); font-size:11px; font-weight:500; margin-left:1px; }
+
+/* ===== B 耗时尺：顶上汇总，每条下面一根同一刻度的耗时条 ===== */
+.B .sumrow { display:grid; grid-template-columns:44px 1fr; gap:12px; padding:14px 18px; border-top:1px solid var(--A-line); }
+.B .sumrow > label, .B .lbl { font-size:12px; color:var(--A-ink2); padding-top:3px; }
+.B .cells { display:flex; gap:22px; flex-wrap:wrap; } .B .cell small { display:block; font-size:11px; color:var(--A-ink2); }
+.B .cell .n { font-size:34px; font-weight:600; line-height:1; } .B .cell .n.bad { padding:0 5px; margin-left:-5px; } .B .cell .n i { font-family:var(--sans); font-style:normal; font-size:12px; font-weight:500; margin-left:2px; }
+.B .scale { display:grid; grid-template-columns:44px 1fr 38px; gap:12px; padding:6px 18px 6px; border-top:1px solid var(--A-line); align-items:end; }
+.B .ticks { position:relative; height:16px; } .B .ticks span { position:absolute; bottom:0; white-space:nowrap; font-size:10px; color:var(--A-ink2); transform:translateX(-50%); font-family:var(--num); }
+.B .ticks span::after { content:""; position:absolute; left:50%; top:13px; width:1px; height:5px; background:var(--A-rule); }
+.B .ticks span:first-child { transform:none; } .B .ticks span:last-child { transform:translateX(-100%); } .B .ticks span:last-child::after { left:100%; } .B .ticks span:first-child::after { left:0; }
+.B .dayh { display:grid; grid-template-columns:44px 1fr; gap:12px; padding:9px 18px 4px; border-top:1px solid var(--A-line); font-size:12px; color:var(--A-ink2); }
+.B .dayh b { color:var(--A-ink); font-weight:800; font-size:13px; }
+.B .e { display:grid; grid-template-columns:44px 1fr 38px; gap:4px 12px; padding:10px 18px 11px; border-top:1px solid var(--A-line); align-items:baseline; }
+.B .e .t { font-size:15px; color:var(--A-ink2); font-weight:500; grid-row:1 / span 2; } .B .e.bad .t { color:var(--A-alert-ink); }
+.B .e .top { display:flex; gap:8px; align-items:baseline; min-width:0; } .B .e .nm { font-size:15px; font-weight:700; }
+.B .e .sec { font-size:20px; font-weight:600; text-align:right; line-height:1; }
+.B .bar { grid-column:2; position:relative; height:6px; background:var(--A-ghost); align-self:center; }
+.B .bar i { position:absolute; left:0; top:0; bottom:0; background:var(--A-ink2); transition:width .6s cubic-bezier(.3,.9,.3,1); }
+.B .e.bad .bar { background:rgba(26,7,4,.18); } .B .e.bad .bar i { background:var(--A-alert-ink); }
+.B .bar.none { background:none; border-top:1.5px dashed var(--A-rule); height:0; }
+.B .e .st2 { grid-column:3; grid-row:1 / span 2; align-self:center; text-align:right; font-size:12px; font-weight:800; }
+
+/* ===== C 纸带：每天一条 24 小时纸带，下面是对齐的账目 ===== */
+.C .day { padding:14px 18px 10px; border-top:1px solid var(--A-line); }
+.C .day .h { display:flex; justify-content:space-between; align-items:baseline; } .C .day .h b { font-size:15px; font-weight:800; } .C .day .h span { font-size:12px; color:var(--A-ink2); } .C .day .h span .bad { padding:0 5px; font-weight:800; }
+.C .tape { position:relative; height:34px; margin-top:8px; border-top:1.5px solid var(--A-ink); border-bottom:1px solid var(--A-rule);
+  background-image:repeating-linear-gradient(90deg,var(--A-rule) 0 1px,transparent 1px calc(100% / 24)); background-size:100% 6px; background-repeat:no-repeat; }
+.C .tape i { position:absolute; top:0; width:3px; height:24px; background:var(--A-ink); transform:translateX(-50%); }
+.C .tape i.bad { background:var(--A-alert); height:30px; width:4px; } .C .tape i.dry { background:var(--A-bg); border:1.5px solid var(--A-ink); }
+.C .tape i.den { height:14px; }
+.C .hrs { display:flex; justify-content:space-between; font-size:10px; color:var(--A-ink2); margin-top:3px; }
+.C .e { display:grid; grid-template-columns:46px 1fr auto 40px; gap:10px; padding:9px 18px; border-top:1px solid var(--A-line); align-items:baseline; }
+.C .e .t { font-size:16px; font-weight:500; color:var(--A-ink2); } .C .e.bad .t { color:var(--A-alert-ink); }
+.C .e .nm { font-size:14.5px; font-weight:700; min-width:0; } .C .e .who { text-align:right; }
+.C .e .sec { font-size:18px; font-weight:600; text-align:right; } .C .e .st { font-size:11.5px; text-align:right; }
+
+/* ===== 详情（三套共用）===== */
+.D { padding:22px 22px 0; }
+.D h3 { font-size:24px; margin:0; font-weight:800; }
+.D .meta { display:grid; grid-template-columns:repeat(3,auto); justify-content:start; gap:6px 26px; margin-top:12px; padding-top:12px; border-top:1px solid var(--A-line); }
+.D .meta small { display:block; font-size:11px; color:var(--A-ink2); } .D .meta div > span { font-size:16px; font-weight:700; } .D .meta .bad { padding:0 5px; margin-left:-5px; }
+.D .tot { margin-top:18px; font-size:19px; font-weight:700; } .D .tot .n { font-size:56px; font-weight:600; margin-right:4px; line-height:1; }
+.D .seg { margin-top:14px; } .D .seg .h { display:flex; justify-content:space-between; align-items:baseline; font-size:14.5px; } .D .seg .h .n { font-size:22px; font-weight:600; }
+.D .seg.long .h > span:first-child { font-weight:800; }
+.D .seg .b { height:8px; background:var(--A-ghost); margin-top:4px; position:relative; } .D .seg .b i { position:absolute; inset:0 auto 0 0; background:var(--A-ink2); }
+.D .seg.long .b i { background:var(--amber); }
+.D .tr { margin-top:20px; padding:12px 0 6px; border-top:1px solid var(--A-line); display:flex; justify-content:space-between; font-size:12px; color:var(--A-ink2); }
+.D .tr code { font-size:12px; } .D .tr b { color:var(--A-ink); text-decoration:underline; }
+.D .why { margin-top:14px; padding:10px 12px; font-size:13.5px; font-weight:700; }
+@media (prefers-reduced-motion: reduce) { .B .bar i { transition:none; } }
+</style>
+
+<div class="wrap">
+<header>
+  <h1>日志：三套做法</h1>
+  <p class="lede">现在的日志页还是一块圆角玻璃卡片，右侧结果是彩色字，和首页不是一套语言。下面三套都换成首页的写法：<b>整宽行、细线、左侧标签列、窄体数字、方角</b>；失败整行红底反白并写明「失败」；被拒绝写字不变色；<b>演练</b>（只走流程没真发）盖上和休眠一样的斜影线。三套的数据相同，按钮同步切换。</p>
+  <div class="tools" id="states">
+    <button data-s="mixed" aria-pressed="true">有失败</button><button data-s="ok">全部成功</button><button data-s="loading">加载中</button><button data-s="empty">没有记录</button><button data-s="theme">深色 / 浅色</button>
+  </div>
+</header>
+
+<section class="row">
+  <div class="opt"><h2>A　流水</h2>
+    <div class="ph A"><div class="hd"><b>日志</b><span>我的 Model 3</span></div><div id="A"></div><div class="foot">每条控车都会记录，包含被拒绝的。</div></div>
+    <p class="cap"><b>最朴素的一版。</b>按天分组，日期行右边写条数和失败数；每条的时刻放在首页那样的左侧标签列，中间是指令名和操作人（两行，不用「·」），右边是总耗时。一眼能看出谁、什么时候、成没成、花了多久。</p></div>
+
+  <div class="opt"><h2>B　耗时尺</h2>
+    <div class="ph B"><div class="hd"><b>日志</b><span>我的 Model 3</span></div><div id="B"></div><div class="foot">每条控车都会记录，包含被拒绝的。</div></div>
+    <p class="cap"><b>把详情页的「长度对比」提到列表上。</b>顶上一行汇总（共几条、失败几条、一般要几秒），像首页的「今日」行；每条下面一根细条，所有条共用 0–15 秒的同一把尺，慢的那条自然长出来。没耗时数据的旧记录和演练画虚线，不画条。</p></div>
+
+  <div class="opt"><h2>C　纸带</h2>
+    <div class="ph C"><div class="hd"><b>日志</b><span>我的 Model 3</span></div><div id="C"></div><div class="foot">每条控车都会记录，包含被拒绝的。</div></div>
+    <p class="cap"><b>借行车记录仪的纸带。</b>每天一条 0–24 点的纸带，每次控车是一根竖线：失败是红色长线，被拒绝是短线，演练是空心线，一天什么时候在用车一目了然。下面是对齐成四列的账目，更紧凑，一屏能看十多条。</p></div>
+</section>
+
+<section class="row">
+  <div class="opt"><h2>详情（三套共用）</h2>
+    <div class="ph" id="D"></div>
+    <p class="cap">保留你选过的 L3 长度对比，只改头部：原来「07:41 · 小明 · 失败」挤在一行，改成<b>时间、操作人、结果</b>三个读数（小标签在上），失败的结果红底反白。下面切到「全部成功」可以看成功时的样子。</p></div>
+  <div class="opt verdict" style="align-self:center">
+    <b>我的推荐：B 耗时尺。</b>
+    <ol>
+      <li>你在详情页选了长度对比，B 让列表和详情是同一把尺，点进去只是把一根条拆成几段，前后连得上。</li>
+      <li>日志最常回答的两个问题是「刚才那条成没成」和「为什么这么慢」，B 的红底行和长条正好对应这两件事。</li>
+      <li>顶上的汇总和首页的「今日」行同构，切 tab 时两页像一套东西。</li>
+    </ol>
+    <p style="margin-top:10px">A 更省事、更安静；C 最有辨识度，但纸带在条目少、集中在一两个时段时会很空。三套都共用：骨架屏用同样的行结构，加载失败、没有记录、只读账号这些状态照旧，读屏把一条读成「08:12，打开空调，小明，成功，3.2 秒」。</p>
+  </div>
+</section>
+</div>
+
+<script>
+const DATA = {
+  mixed: [
+    { day:"今天", items:[
+      { t:"08:12", h:8.2, nm:"打开空调", who:"小明", st:"ok", sec:3.2 },
+      { t:"08:10", h:8.17, nm:"设定温度", who:"小明", st:"ok", sec:2.1 },
+      { t:"07:58", h:7.97, nm:"开锁", who:"小明", st:"denied", sec:null },
+      { t:"07:41", h:7.68, nm:"闪灯", who:"Lhan", st:"bad", sec:14.8 } ]},
+    { day:"昨天", items:[
+      { t:"22:05", h:22.08, nm:"停止充电", who:"Lhan", st:"ok", sec:4.6 },
+      { t:"18:30", h:18.5, nm:"开始充电", who:"Lhan", st:"dry", sec:null },
+      { t:"18:02", h:18.03, nm:"锁车", who:"小明", st:"ok", sec:2.8 } ]},
+    { day:"10月26日 周一", items:[
+      { t:"09:15", h:9.25, nm:"保温模式", who:"Lhan", st:"ok", sec:6.9 } ]}
+  ]
+};
+DATA.ok = DATA.mixed.map(d => ({ day:d.day, items:d.items.filter(i => i.st === "ok").map(i => ({...i})) }));
+const ST = { ok:"成功", bad:"失败", denied:"已拒绝", dry:"演练" };
+const fmt = s => s == null ? "" : s.toFixed(1);
+const cls = i => (i.st === "bad" ? " bad" : "") + (i.st === "dry" ? " hatch" : "");
+let state = "mixed";
+
+function skeleton(rows, lw) {
+  return Array.from({length:rows}, (_, k) => `<div style="display:grid;grid-template-columns:${lw}px 1fr 40px;gap:10px;padding:13px 18px;border-top:1px solid var(--A-line);align-items:center">
+    <span class="sk" style="height:15px;width:38px"></span><span style="display:grid;gap:6px"><span class="sk" style="height:15px;width:${90 + (k % 3) * 22}px"></span><span class="sk" style="height:11px;width:44px"></span></span><span class="sk" style="height:18px"></span></div>`).join("");
+}
+const empty = `<div class="empty"><b>还没有控车记录</b>在车控页发出第一条指令后，这里会按时间列出来。</div>`;
+
+function renderA(days) {
+  return days.map(d => {
+    const fails = d.items.filter(i => i.st === "bad").length;
+    return `<div class="day"><b>${d.day}</b><div class="sum"><span><span class="n" style="font-size:15px">${d.items.length}</span> 条</span>${fails ? `<span class="bad">失败 ${fails}</span>` : ""}</div></div>` +
+    d.items.map(i => `<div class="e tap${cls(i)}" tabindex="0"><span class="t n">${i.t}</span><div><div class="nm">${i.nm}</div><div class="who">${i.who}</div></div>
+      <div class="rt">${i.st === "ok" ? `<span class="sec n">${fmt(i.sec)}<small>秒</small></span>` : i.st === "bad" ? `<span class="st">失败</span><span class="sec n">${fmt(i.sec)}<small>秒</small></span>` : `<span class="st" style="color:var(--A-ink2)">${ST[i.st]}</span>`}<span class="chev"></span></div></div>`).join("");
+  }).join("");
+}
+
+function renderB(days) {
+  const all = days.flatMap(d => d.items);
+  const fails = all.filter(i => i.st === "bad").length;
+  const secs = all.filter(i => i.sec != null && i.st === "ok").map(i => i.sec).sort((a, b) => a - b);
+  const med = secs.length ? secs[Math.floor((secs.length - 1) / 2)] : null;
+  const MAX = 15;
+  let html = `<div class="sumrow"><label>汇总</label><div class="cells">
+    <div class="cell"><small>共</small><span class="n">${all.length}<i>条</i></span></div>
+    <div class="cell"><small>失败</small><span class="n${fails ? " bad" : ""}">${fails}<i>条</i></span></div>
+    <div class="cell"><small>一般要</small><span class="n">${med == null ? "—" : fmt(med)}<i>秒</i></span></div></div></div>
+    <div class="scale"><span></span><div class="ticks"><span>0</span><span style="left:33.3%">5</span><span style="left:66.6%">10</span><span style="left:100%">15 秒</span></div><span></span></div>`;
+  html += days.map(d => `<div class="dayh"><span></span><b>${d.day}</b></div>` + d.items.map(i => {
+    const w = i.sec == null ? 0 : Math.max(1.5, Math.min(100, i.sec / MAX * 100));
+    const right = i.st === "ok" || i.st === "bad" ? `<span class="sec n" style="grid-column:3;grid-row:1">${fmt(i.sec)}</span>` : `<span class="st2" style="color:var(--A-ink2)">${ST[i.st]}</span>`;
+    return `<div class="e tap${cls(i)}" tabindex="0"><span class="t n">${i.t}</span><div class="top"><span class="nm">${i.nm}</span><span class="who">${i.who}</span>${i.st === "bad" ? `<span class="st">失败</span>` : ""}</div>${right}
+      <div class="bar${i.sec == null ? " none" : ""}"><i data-w="${w}" style="width:0"></i></div></div>`;
+  }).join("")).join("");
+  return html;
+}
+
+function renderC(days) {
+  return days.map(d => {
+    const fails = d.items.filter(i => i.st === "bad").length;
+    const marks = d.items.map(i => `<i class="${i.st === "bad" ? "bad" : i.st === "dry" ? "dry" : i.st === "denied" ? "den" : ""}" style="left:${(i.h / 24 * 100).toFixed(2)}%" title="${i.t} ${i.nm}"></i>`).join("");
+    return `<div class="day"><div class="h"><b>${d.day}</b><span><span class="n" style="font-size:14px">${d.items.length}</span> 条 ${fails ? `<span class="bad">失败 ${fails}</span>` : ""}</span></div>
+      <div class="tape">${marks}</div><div class="hrs n"><span>0</span><span>6</span><span>12</span><span>18</span><span>24</span></div></div>` +
+      d.items.map(i => `<div class="e tap${cls(i)}" tabindex="0"><span class="t n">${i.t}</span><span class="nm">${i.nm}</span><span class="who">${i.who}</span>
+        ${i.st === "ok" ? `<span class="sec n">${fmt(i.sec)}</span>` : `<span class="st"${i.st === "bad" ? "" : ' style="color:var(--A-ink2)"'}>${ST[i.st]}</span>`}</div>`).join("");
+  }).join("");
+}
+
+function renderD() {
+  const fail = state !== "ok";
+  const segs = fail
+    ? [["排队", 0.02], ["车辆在线检查 / 唤醒", 12.9], ["取访问令牌", 0.08], ["签名代理 → Tesla → 车", 1.8], ["手机与服务器之间", null]]
+    : [["排队", 0.01], ["车辆在线检查 / 唤醒", 0.4], ["取访问令牌", 0.06], ["签名代理 → Tesla → 车", 2.6], ["手机与服务器之间", null]];
+  const max = Math.max(...segs.map(s => s[1] || 0));
+  const total = fail ? 14.8 : 3.2;
+  const s2 = v => v < 0.1 ? v.toFixed(2) : v.toFixed(1);
+  return `<div class="D"><h3>${fail ? "闪灯" : "打开空调"}</h3>
+    <div class="meta"><div><small>时间</small><span class="n" style="font-size:20px">${fail ? "07:41" : "08:12"}</span></div><div><small>操作人</small><span>${fail ? "Lhan" : "小明"}</span></div>
+      <div><small>结果</small><span class="${fail ? "bad" : ""}" ${fail ? "" : 'style="color:var(--A-ok)"'}>${fail ? "失败" : "成功"}</span></div></div>
+    <div class="tot">一共 <span class="n">${total.toFixed(1)}</span>秒</div>
+    ${segs.map(([nm, v]) => `<div class="seg${v === max ? " long" : ""}"><div class="h"><span>${nm}</span>${v == null ? `<span style="color:var(--A-ink2);font-size:14px">未记录</span>` : `<span class="n">${s2(v)}</span>`}</div>
+      ${v == null ? "" : `<div class="b"><i style="width:${Math.max(1.5, v / max * 100)}%"></i></div>`}</div>`).join("")}
+    <div class="tr"><span>排查号　<code>7f3c91e0a2b4</code></span><b>复制</b></div></div>`;
+}
+
+function render() {
+  const A = document.getElementById("A"), B = document.getElementById("B"), C = document.getElementById("C");
+  if (state === "loading") { A.innerHTML = skeleton(6, 52); B.innerHTML = skeleton(6, 44); C.innerHTML = skeleton(7, 46); }
+  else if (state === "empty") { A.innerHTML = B.innerHTML = C.innerHTML = empty; }
+  else { const d = DATA[state]; A.innerHTML = renderA(d); B.innerHTML = renderB(d); C.innerHTML = renderC(d); }
+  document.getElementById("D").innerHTML = renderD();
+  requestAnimationFrame(() => requestAnimationFrame(() => document.querySelectorAll("#B .bar i").forEach(i => i.style.width = i.dataset.w + "%")));
+}
+document.getElementById("states").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.s === "theme") {
+    const root = document.documentElement;
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark"; return;
+  }
+  state = b.dataset.s;
+  document.querySelectorAll("#states button[data-s]:not([data-s=theme])").forEach(x => x.setAttribute("aria-pressed", x === b));
+  render();
+});
+render();
+</script>
+</body>
+</html>

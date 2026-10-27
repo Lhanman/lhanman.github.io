@@ -13,7 +13,7 @@
 
 这些文件全部由 `dispatch-pages` 自动生成，不要手动修改；笔记的正文请在知识库里改，下一次同步会覆盖这里的副本。
 
-## 文档清单（14 篇）
+## 文档清单（15 篇）
 
 ### ashare-quant
 
@@ -30,6 +30,7 @@
 
 ### tesla-assistant
 
+- [特助手 日志方向](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E6%97%A5%E5%BF%97%E6%96%B9%E5%90%91.html) · [线上](https://lhanman.github.io/p/log-directions/) · 2026-10-28 — 特助手日志页按首页读数风格重做的三套方向
 - [特助手 车窗与哨兵](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E8%BD%A6%E7%AA%97%E4%B8%8E%E5%93%A8%E5%85%B5.html) · [线上](https://lhanman.github.io/p/ui-directions-4/) · 2026-10-27 — 状态区车窗四种做法与哨兵图标两态的设计方案
 - [特助手 界面方向](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E7%95%8C%E9%9D%A2%E6%96%B9%E5%90%91.html) · [线上](https://lhanman.github.io/p/ui-directions/) · 2026-10-26 — 特助手首页、指令进行中提示、日志详情的多套界面做法对比（示例数据）
 - [特助手 首页方案](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E9%A6%96%E9%A1%B5%E6%96%B9%E6%A1%88.html) · [线上](https://lhanman.github.io/p/home-proposal/) · 2026-10-26 — 特助手首页、发送指令胶囊、日志耗时详情的设计方案（示例数据）

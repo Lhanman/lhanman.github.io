@@ -1,6 +1,18 @@
 {
   "pages": [
     {
+      "slug": "log-directions",
+      "title": "特助手 日志方向",
+      "description": "特助手日志页按首页读数风格重做的三套方向",
+      "tags": [
+        "特助手"
+      ],
+      "project": "tesla-assistant",
+      "created": "2026-10-28",
+      "updated": "2026-10-28",
+      "path": "文档/tesla-assistant/特助手 日志方向.html"
+    },
+    {
       "slug": "ui-directions-4",
       "title": "特助手 车窗与哨兵",
       "description": "状态区车窗四种做法与哨兵图标两态的设计方案",
