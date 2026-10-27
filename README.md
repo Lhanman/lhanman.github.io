@@ -13,7 +13,7 @@
 
 这些文件全部由 `dispatch-pages` 自动生成，不要手动修改；笔记的正文请在知识库里改，下一次同步会覆盖这里的副本。
 
-## 文档清单（13 篇）
+## 文档清单（14 篇）
 
 ### ashare-quant
 
@@ -30,6 +30,7 @@
 
 ### tesla-assistant
 
+- [特助手 车窗与哨兵](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E8%BD%A6%E7%AA%97%E4%B8%8E%E5%93%A8%E5%85%B5.html) · [线上](https://lhanman.github.io/p/ui-directions-4/) · 2026-10-27 — 状态区车窗四种做法与哨兵图标两态的设计方案
 - [特助手 界面方向](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E7%95%8C%E9%9D%A2%E6%96%B9%E5%90%91.html) · [线上](https://lhanman.github.io/p/ui-directions/) · 2026-10-26 — 特助手首页、指令进行中提示、日志详情的多套界面做法对比（示例数据）
 - [特助手 首页方案](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E9%A6%96%E9%A1%B5%E6%96%B9%E6%A1%88.html) · [线上](https://lhanman.github.io/p/home-proposal/) · 2026-10-26 — 特助手首页、发送指令胶囊、日志耗时详情的设计方案（示例数据）
 - [特助手 UI 预览](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20UI%20%E9%A2%84%E8%A7%88%EF%BC%88ui-preview-artifact%EF%BC%89.html) · [线上](https://lhanman.github.io/p/ui-preview-artifact/) · 2026-10-19 — 特助手手机 App 界面预览：iOS 液态玻璃与 Android 毛玻璃，四个页面，示例数据

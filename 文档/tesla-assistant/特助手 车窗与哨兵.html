@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="状态区车窗四种做法与哨兵图标两态的设计方案">
+<link rel="index" href="../../index.html">
+<meta charset="utf-8">
+<title>特助手 车窗与哨兵</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700;800&display=swap">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+/* 状态区 A（机械件）的修订：车窗给四种做法，哨兵改成 Solar 图标库里的"眼睛"小图标（睁眼实心 = 开，闭眼线框 = 关），和车锁并排，不再单独占一行。
+   车窗数据只有三种状态（关 / 部分打开 / 打开），没有开度百分比，所以四种做法都只表达三态。点窗户可以在三态间切换。 */
+:root {
+  --pg-bg:#E9ECEF; --pg-ink:#101319; --pg-ink2:#586070; --pg-line:rgba(16,19,25,.14); --amber:#E69A00;
+  --A-bg:#F6F6F4; --A-ink:#0E1012; --A-ink2:#5F656C; --A-line:rgba(14,16,18,.2); --A-alert:#E8412E; --A-alert-ink:#1A0704; --A-ghost:rgba(14,16,18,.08);
+  --num:"Barlow Condensed",ui-sans-serif,sans-serif; --sans:"Noto Sans SC",-apple-system,"PingFang SC","Hiragino Sans GB",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --pg-bg:#090B0E; --pg-ink:#EEF1F5; --pg-ink2:#97A0AE; --pg-line:rgba(255,255,255,.14); --amber:#FFB224;
+  --A-bg:#0B0C0E; --A-ink:#F1F2EF; --A-ink2:#8E949B; --A-line:rgba(241,242,239,.22); --A-alert:#FF6A57; --A-alert-ink:#1A0704; --A-ghost:rgba(241,242,239,.1); color-scheme:dark; } }
+:root[data-theme="dark"] {
+  --pg-bg:#090B0E; --pg-ink:#EEF1F5; --pg-ink2:#97A0AE; --pg-line:rgba(255,255,255,.14); --amber:#FFB224;
+  --A-bg:#0B0C0E; --A-ink:#F1F2EF; --A-ink2:#8E949B; --A-line:rgba(241,242,239,.22); --A-alert:#FF6A57; --A-alert-ink:#1A0704; --A-ghost:rgba(241,242,239,.1); color-scheme:dark; }
+* { box-sizing:border-box; }
+body { background:var(--pg-bg); color:var(--pg-ink); font-family:var(--sans); margin:0; padding-block:28px 72px; line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); }
+::selection { background:var(--amber); color:#1a1200; }
+.wrap { max-width:1180px; margin:0 auto; display:flex; flex-direction:column; gap:40px; }
+h1 { font-size:28px; margin:0 0 8px; font-weight:800; text-wrap:balance; } h2 { font-size:20px; margin:0 0 4px; font-weight:800; } h3 { font-size:16px; margin:0 0 2px; font-weight:700; }
+p { margin:0; } .lede { color:var(--pg-ink2); font-size:14.5px; max-width:68ch; }
+.row { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr)); gap:34px 22px; align-items:start; }
+.opt { display:flex; flex-direction:column; gap:12px; min-width:0; } .opt .cap { font-size:13px; color:var(--pg-ink2); max-width:44ch; } .opt .cap b { color:var(--pg-ink); }
+.research { border-top:1px solid var(--pg-line); padding-top:18px; display:grid; gap:10px; font-size:13.5px; color:var(--pg-ink2); max-width:84ch; } .research b { color:var(--pg-ink); } .research a { color:var(--pg-ink); }
+.verdict { border-top:1px solid var(--pg-line); padding-top:16px; font-size:13.5px; color:var(--pg-ink2); max-width:84ch; } .verdict b { color:var(--pg-ink); }
+button:focus-visible { outline:2px solid var(--amber); outline-offset:2px; }
+
+.ph { width:100%; max-width:300px; margin:0 auto; border:1px solid var(--pg-line); border-radius:22px; overflow:hidden; background:var(--A-bg); color:var(--A-ink); padding-bottom:4px; }
+.n { font-family:var(--num); font-variant-numeric:tabular-nums; }
+.hd { display:flex; justify-content:space-between; align-items:baseline; padding:14px 16px 8px; } .hd b { font-size:20px; font-weight:800; } .hd span { font-size:12px; color:var(--A-ink2); } .hd .bad-t { background:var(--A-alert); color:var(--A-alert-ink); font-weight:800; padding:0 6px; }
+.blk { padding:12px 16px; border-top:1px solid var(--A-line); } .blk > small { display:block; font-size:11.5px; color:var(--A-ink2); margin-bottom:7px; }
+.odo { display:flex; gap:3px; align-items:flex-end; } .odo span { width:30px; height:46px; background:var(--A-ink); color:var(--A-bg); font-family:var(--num); font-size:40px; font-weight:600; line-height:46px; text-align:center; } .odo span.l { background:var(--A-bg); color:var(--A-ink); outline:1.5px solid var(--A-ink); outline-offset:-1.5px; } .odo em { font-style:normal; font-size:13px; color:var(--A-ink2); margin-left:6px; padding-bottom:4px; }
+/* 车锁 + 哨兵并排 */
+.lockrow { display:flex; gap:8px; align-items:stretch; }
+.latch { position:relative; flex:1; height:36px; border:1.5px solid var(--A-ink); display:flex; align-items:center; }
+.latch i { position:absolute; top:3px; bottom:3px; width:38%; left:3px; background:var(--A-ink); transition:left .4s cubic-bezier(.3,.9,.3,1), background .3s; }
+.latch b { position:relative; z-index:1; width:100%; display:flex; justify-content:space-between; padding:0 10px; font-size:13px; font-weight:800; } .latch b span:first-child { color:var(--A-bg); } .latch b span:last-child { color:var(--A-ink2); font-weight:500; }
+.latch.open i { left:calc(62% - 3px); background:var(--A-alert); } .latch.open b span:first-child { color:var(--A-ink2); font-weight:500; } .latch.open b span:last-child { color:var(--A-alert-ink); font-weight:800; }
+.sen { width:36px; height:36px; border:1.5px solid var(--A-line); background:transparent; color:var(--A-ink2); padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .25s,color .25s,border-color .25s; }
+.sen svg { width:22px; height:22px; } .sen .on { display:none; } .sen[aria-pressed="true"] { background:var(--A-ink); border-color:var(--A-ink); color:var(--A-bg); } .sen[aria-pressed="true"] .on { display:block; } .sen[aria-pressed="true"] .off { display:none; }
+.sencap { font-size:10.5px; color:var(--A-ink2); text-align:center; margin-top:2px; width:36px; }
+/* 车门（共用） */
+.doors { display:grid; grid-template-columns:repeat(6,1fr); gap:5px; } .door { display:flex; flex-direction:column; align-items:center; gap:5px; font-size:11px; color:var(--A-ink2); }
+.door .h { position:relative; width:100%; height:22px; border-bottom:2px solid var(--A-ink); } .door .h i { position:absolute; left:0; bottom:-2px; width:100%; height:2px; background:var(--A-ink); transform-origin:left bottom; transition:transform .4s cubic-bezier(.3,.9,.3,1), background .3s, height .3s; }
+.door.open .h i { transform:rotate(-38deg); background:var(--A-alert); height:4px; } .door.open { color:var(--A-alert); font-weight:800; }
+/* 玻璃线：三态（0 关 = 在顶，1 部分打开 = 在中，2 打开 = 在底，红） */
+.pane { position:relative; border:1.5px solid var(--A-ink); cursor:pointer; background:var(--A-ghost); } .pane i { position:absolute; left:0; right:0; height:3px; background:var(--A-ink); top:0; transition:top .35s cubic-bezier(.3,.9,.3,1), background .25s; }
+.pane[data-s="1"] i { top:calc(50% - 1.5px); background:var(--A-alert); } .pane[data-s="2"] i { top:calc(100% - 3px); background:var(--A-alert); } .pane[data-s="1"], .pane[data-s="2"] { border-color:var(--A-alert); }
+/* W-A 一行窗 */
+.wa { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; } .wa > div { display:flex; flex-direction:column; align-items:center; gap:4px; font-size:11px; color:var(--A-ink2); } .wa .pane { width:100%; height:26px; } .wa > div.x { color:var(--A-alert); font-weight:800; }
+/* W-B 刻度条 */
+.wb { display:flex; align-items:center; gap:10px; } .wb .cells { flex:1; display:grid; grid-template-columns:repeat(4,1fr); gap:3px; } .wb .cell { height:14px; border:1.5px solid var(--A-ink); position:relative; cursor:pointer; overflow:hidden; } .wb .cell i { position:absolute; inset:0 0 auto 0; height:100%; background:var(--A-ink); transition:height .3s, background .25s; }
+.wb .cell[data-s="1"] { border-color:var(--A-alert); } .wb .cell[data-s="1"] i { height:50%; background:var(--A-alert); } .wb .cell[data-s="2"] { border-color:var(--A-alert); } .wb .cell[data-s="2"] i { height:0; }
+.wb .cell[data-s="2"]::after { content:""; position:absolute; inset:0; background:repeating-linear-gradient(135deg,var(--A-alert) 0 2px,transparent 2px 5px); }
+.wb .val { font-size:13px; font-weight:800; min-width:64px; text-align:right; } .wb .val.x { background:var(--A-alert); color:var(--A-alert-ink); padding:0 6px; }
+.wbl { display:grid; grid-template-columns:repeat(4,1fr); gap:3px; margin:4px 74px 0 0; font-size:10.5px; color:var(--A-ink2); text-align:center; }
+/* W-C 门窗合一 */
+.wc { display:grid; grid-template-columns:repeat(6,1fr); gap:5px; } .wc .u { display:flex; flex-direction:column; align-items:center; gap:4px; font-size:11px; color:var(--A-ink2); } .wc .u .pane { width:100%; height:22px; } .wc .u .nopane { width:100%; height:22px; }
+.wc .u.x { color:var(--A-alert); font-weight:800; }
+/* W-D 只报例外 */
+.wd { display:flex; justify-content:space-between; align-items:baseline; font-size:14px; } .wd b { font-weight:800; } .wd span { color:var(--A-ink2); }
+.wd.x { background:var(--A-alert); color:var(--A-alert-ink); padding:8px 10px; margin:-2px -4px 0; } .wd.x span { color:var(--A-alert-ink); opacity:.85; }
+.wdp { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:8px; } .wdp .pane { height:18px; } .wdp .pane[hidden] { display:none; }
+.hint { font-size:11.5px; color:var(--pg-ink2); text-align:center; margin-top:2px; }
+</style>
+
+<div class="wrap">
+<header>
+  <h1>车窗的四种做法，和哨兵的新图标</h1>
+  <p class="lede">状态区确定用 A（机械件）。这页只改你提到的两处：车窗，以及哨兵不再单独占一行。下面四个手机块里，点任何一扇窗可以在 关 → 部分打开 → 打开 之间切换，点哨兵图标看开关两态，点车锁看锁舌。</p>
+</header>
+
+<section class="research">
+  <h2>先说调研结果</h2>
+  <p><b>网上能查到的很少。</b>我搜了特斯拉官方和第三方应用、宝马、奔驰、蔚来、Rivian、Polestar，大多数没有公开的界面描述，只有零星几条：Rivian 把车窗控制放在锁车按钮旁边，主界面是一排状态小图标，下拉再看详情（<a href="https://rivian.com/stories/app-2-0">Rivian App 2.0</a>）；特斯拉社区有人希望在 App 里直接看到车窗状态并远程关窗（<a href="https://teslatap.com/desired-features/windows-status-and-closing-from-app/">TeslaTap 心愿单</a>），第三方 Tessie 能控制车窗（<a href="https://home-assistant.io/integrations/tessie">Home Assistant 集成说明</a>）。宝马、奔驰、蔚来 App 的车窗界面我没搜到可靠描述，下面这几类是我凭印象归纳的，没有在搜索里证实：</p>
+  <p>① 车辆俯视线稿，开着的门窗在图上高亮；② 一行"车窗已关闭 / 1 扇未关"的文字；③ 一排状态小图标。我们自己的情况更简单：<b>车窗数据只有"关 / 部分打开 / 打开"三态，没有开度百分比，也没有天窗信息</b>（四个窗：左前、右前、左后、右后）。所以不用做大图，目标是"全关时几乎不占地方，有窗没关时一眼看到是哪一扇"。</p>
+  <p><b>哨兵图标：</b>项目的 Solar 图标库里本来就用"眼睛"表示哨兵（盾牌留给"允许远程控车"）。图标库里有睁眼实心、睁眼线框、闭眼实心、闭眼线框四种，所以不需要另找：<b>开 = 睁眼实心，反白小方块；关 = 闭眼线框，灰</b>。</p>
+</section>
+
+<section class="row">
+  <div class="opt"><h3>W-A 一行窗</h3>
+    <div class="ph" data-v="a">
+      <div class="hd"><b>状态</b><span class="sum">全部正常</span></div>
+      <div class="blk"><small>总里程</small><div class="odo"><span>0</span><span>6</span><span>9</span><span>1</span><span class="l">4</span><em>km</em></div></div>
+      <div class="blk"><small>车锁 · 哨兵</small><div class="lockrow"></div></div>
+      <div class="blk"><small>车门 · 前后备厢</small><div class="doors"></div></div>
+      <div class="blk"><small>车窗</small><div class="wa"></div></div>
+    </div>
+    <p class="cap"><b>窗户像一格格玻璃：</b>每扇窗一个小窗框，玻璃线在顶 = 关，在中间 = 部分打开，在底 = 全开（后两种变红）。和车门那一行同样的节奏，高度从原来的 44 降到 26。</p></div>
+
+  <div class="opt"><h3>W-B 刻度条</h3>
+    <div class="ph" data-v="b">
+      <div class="hd"><b>状态</b><span class="sum">全部正常</span></div>
+      <div class="blk"><small>总里程</small><div class="odo"><span>0</span><span>6</span><span>9</span><span>1</span><span class="l">4</span><em>km</em></div></div>
+      <div class="blk"><small>车锁 · 哨兵</small><div class="lockrow"></div></div>
+      <div class="blk"><small>车门 · 前后备厢</small><div class="doors"></div></div>
+      <div class="blk"><small>车窗</small><div class="wb"><div class="cells"></div><span class="val">全关</span></div><div class="wbl"><span>左前</span><span>右前</span><span>左后</span><span>右后</span></div></div>
+    </div>
+    <p class="cap"><b>最薄：</b>四格连成一根细条，14 高，和首页电量条同一种语言：实心 = 关，半实 = 部分打开，空的红影线 = 全开。右边一句话"全关 / 1 扇没关"。占地最小，信息最全。</p></div>
+
+  <div class="opt"><h3>W-C 门窗合一</h3>
+    <div class="ph" data-v="c">
+      <div class="hd"><b>状态</b><span class="sum">全部正常</span></div>
+      <div class="blk"><small>总里程</small><div class="odo"><span>0</span><span>6</span><span>9</span><span>1</span><span class="l">4</span><em>km</em></div></div>
+      <div class="blk"><small>车锁 · 哨兵</small><div class="lockrow"></div></div>
+      <div class="blk"><small>车门 · 车窗 · 前后备厢</small><div class="wc"></div></div>
+    </div>
+    <p class="cap"><b>把窗并进门里：</b>一扇车门就是一个单元，上面是它的玻璃线，下面是它的门铰链，开了就翻起。整个车窗区块消失，省一整块高度。代价：前后备厢没有玻璃，单元上半空着；一格里信息多了一点。</p></div>
+
+  <div class="opt"><h3>W-D 只报例外</h3>
+    <div class="ph" data-v="d">
+      <div class="hd"><b>状态</b><span class="sum">全部正常</span></div>
+      <div class="blk"><small>总里程</small><div class="odo"><span>0</span><span>6</span><span>9</span><span>1</span><span class="l">4</span><em>km</em></div></div>
+      <div class="blk"><small>车锁 · 哨兵</small><div class="lockrow"></div></div>
+      <div class="blk"><small>车门 · 前后备厢</small><div class="doors"></div></div>
+      <div class="blk"><div class="wd"><b>车窗</b><span>全关</span></div><div class="wdp"></div></div>
+    </div>
+    <p class="cap"><b>平时一行字：</b>全关时只有"车窗 全关"一行，没有任何图形；一旦有窗没关，这一行变整行红底反白，写明"左后窗 部分打开"，下面才展开那四扇窗的玻璃线。认知成本最低，也最像你说的"减少认知成本"的思路。</p></div>
+</section>
+
+<div class="hint">点任意窗：关 → 部分打开 → 打开；点眼睛：开关哨兵；点锁：开关车锁</div>
+
+<div class="verdict"><b>我的倾向：W-B（刻度条）。</b>它和首页电量条是同一种"条"的语言，一根细条就包含四扇窗的三态；加上哨兵缩成车锁旁的小图标，状态区整体比上一版少约三分之一高度。如果你想要更极端地简洁，选 W-D；想要门和窗的对应关系更直观，选 W-C。</div>
+</div>
+
+<script>
+(function(){
+  var EYE_ON = '<svg class="on" viewBox="0 0 24 24"><g fill="currentColor"><path d="M9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"/><path fill-rule="evenodd" d="M2 12C2 13.6394 2.42496 14.1915 3.27489 15.2957C4.97196 17.5004 7.81811 20 12 20C16.1819 20 19.028 17.5004 20.7251 15.2957C21.575 14.1915 22 13.6394 22 12C22 10.3606 21.575 9.80853 20.7251 8.70433C19.028 6.49956 16.1819 4 12 4C7.81811 4 4.97196 6.49956 3.27489 8.70433C2.42496 9.80853 2 10.3606 2 12ZM12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25Z" clip-rule="evenodd"/></g></svg>';
+  var EYE_OFF = '<svg class="off" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M12 14C5 14 2 7 2 7M22 7C22 7 21.0586 9.19661 19 11.1288C18.0872 11.9856 16.9547 12.7904 15.5872 13.3287C14.5334 13.7435 13.34 14 12 14M12 14V16.5M15.5872 13.3287L17 15.5M19 11.1288L20.5 12.6288M8.41281 13.3287L7 15.5M5 11.1288L3.5 12.6288"/></svg>';
+  var DN = ['左前','右前','左后','右后','前备','后备'], WN = ['左前','右前','左后','右后'];
+  var S = { locked:true, sentry:true, door:[0,0,0,0,0,0], win:[0,0,0,0] }; // 窗：0 关 1 部分 2 开
+  var phones = [].slice.call(document.querySelectorAll('.ph'));
+
+  function lockRow(el){
+    el.innerHTML = '<div class="latch"><i></i><b><span>已锁</span><span>未锁</span></b></div>'
+      + '<div><button class="sen" aria-pressed="true" aria-label="哨兵模式">' + EYE_ON + EYE_OFF + '</button><div class="sencap">哨兵</div></div>';
+    el.querySelector('.latch').addEventListener('click', function(){ S.locked = !S.locked; render(); });
+    el.querySelector('.sen').addEventListener('click', function(){ S.sentry = !S.sentry; render(); });
+  }
+  function doorsHTML(){ return DN.map(function(n,i){ return '<div class="door" data-i="'+i+'"><div class="h"><i></i></div><span>'+n+'</span></div>'; }).join(''); }
+  function paneHTML(i){ return '<div class="pane" data-w="'+i+'" data-s="0"><i></i></div>'; }
+
+  phones.forEach(function(ph){
+    var v = ph.dataset.v;
+    lockRow(ph.querySelector('.lockrow'));
+    var d = ph.querySelector('.doors'); if (d) { d.innerHTML = doorsHTML(); [].forEach.call(d.children, function(c,i){ c.addEventListener('click', function(){ S.door[i] = S.door[i] ? 0 : 1; render(); }); }); }
+    if (v === 'a') ph.querySelector('.wa').innerHTML = WN.map(function(n,i){ return '<div data-w="'+i+'">'+paneHTML(i)+'<span>'+n+'</span></div>'; }).join('');
+    if (v === 'b') ph.querySelector('.cells').innerHTML = WN.map(function(n,i){ return '<div class="cell" data-w="'+i+'" data-s="0"><i></i></div>'; }).join('');
+    if (v === 'c') ph.querySelector('.wc').innerHTML = DN.map(function(n,i){
+      var win = i < 4 ? paneHTML(i) : '<div class="nopane"></div>';
+      return '<div class="u" data-i="'+i+'">'+win+'<div class="door" style="gap:3px" data-i="'+i+'"><div class="h"><i></i></div><span>'+n+'</span></div></div>'; }).join('');
+    if (v === 'd') ph.querySelector('.wdp').innerHTML = WN.map(function(n,i){ return paneHTML(i); }).join('');
+    ph.addEventListener('click', function(e){
+      var t = e.target.closest('[data-w]'); if (!t) return;
+      var i = +t.dataset.w; S.win[i] = (S.win[i] + 1) % 3; render();
+    });
+    // 车门单元（合一版里门在 .u 内）点击
+    [].forEach.call(ph.querySelectorAll('.wc .door'), function(c){ c.addEventListener('click', function(e){ e.stopPropagation(); var i=+c.dataset.i; S.door[i] = S.door[i] ? 0 : 1; render(); }); });
+  });
+
+  function render(){
+    var badWin = S.win.filter(function(x){return x;}).length, badDoor = S.door.filter(function(x){return x;}).length, bad = badWin + badDoor + (S.locked ? 0 : 1);
+    phones.forEach(function(ph){
+      var v = ph.dataset.v;
+      var sum = ph.querySelector('.sum'); sum.textContent = bad ? bad + ' 项需要注意' : '全部正常'; sum.className = 'sum' + (bad ? ' bad-t' : '');
+      ph.querySelector('.latch').classList.toggle('open', !S.locked);
+      var sen = ph.querySelector('.sen'); sen.setAttribute('aria-pressed', S.sentry); ph.querySelector('.sencap').textContent = S.sentry ? '哨兵 开' : '哨兵 关';
+      [].forEach.call(ph.querySelectorAll('.door'), function(c){ c.classList.toggle('open', !!S.door[+c.dataset.i]); });
+      [].forEach.call(ph.querySelectorAll('.pane'), function(p){ p.dataset.s = S.win[+p.dataset.w]; });
+      [].forEach.call(ph.querySelectorAll('.cell'), function(p){ p.dataset.s = S.win[+p.dataset.w]; });
+      var names = []; S.win.forEach(function(x,i){ if (x) names.push(WN[i] + '窗' + (x === 1 ? ' 部分打开' : ' 开')); });
+      if (v === 'a') [].forEach.call(ph.querySelectorAll('.wa > div'), function(c){ c.classList.toggle('x', !!S.win[+c.dataset.w]); });
+      if (v === 'b') { var val = ph.querySelector('.val'); val.textContent = badWin ? badWin + ' 扇没关' : '全关'; val.className = 'val' + (badWin ? ' x' : ''); }
+      if (v === 'c') [].forEach.call(ph.querySelectorAll('.wc .u'), function(c){ var i=+c.dataset.i; c.classList.toggle('x', !!S.door[i] || (i<4 && !!S.win[i])); });
+      if (v === 'd') {
+        var wd = ph.querySelector('.wd'); wd.className = 'wd' + (badWin ? ' x' : ''); wd.querySelector('span').textContent = badWin ? names.join(' · ') : '全关';
+        [].forEach.call(ph.querySelectorAll('.wdp .pane'), function(p){ p.hidden = !badWin; });
+      }
+    });
+  }
+  render();
+})();
+</script>
+</body>
+</html>

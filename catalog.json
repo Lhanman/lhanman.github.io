@@ -1,6 +1,21 @@
 {
   "pages": [
     {
+      "slug": "ui-directions-4",
+      "title": "特助手 车窗与哨兵",
+      "description": "状态区车窗四种做法与哨兵图标两态的设计方案",
+      "tags": [
+        "设计",
+        "界面",
+        "车窗",
+        "哨兵"
+      ],
+      "project": "tesla-assistant",
+      "created": "2026-10-27",
+      "updated": "2026-10-27",
+      "path": "文档/tesla-assistant/特助手 车窗与哨兵.html"
+    },
+    {
       "slug": "ui-directions",
       "title": "特助手 界面方向",
       "description": "特助手首页、指令进行中提示、日志详情的多套界面做法对比（示例数据）",
