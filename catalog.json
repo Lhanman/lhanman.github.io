@@ -1,6 +1,21 @@
 {
   "pages": [
     {
+      "slug": "db-migration",
+      "title": "特助手 数据库迁移方案",
+      "description": "特助手服务端数据库怎么迁移、靠什么保证稳定，以及 2026-11-01 上线新增的六张表和一列",
+      "tags": [
+        "数据库",
+        "迁移",
+        "部署",
+        "PostgreSQL"
+      ],
+      "project": "tesla-assistant",
+      "created": "2026-11-01",
+      "updated": "2026-11-01",
+      "path": "文档/tesla-assistant/特助手 数据库迁移方案.html"
+    },
+    {
       "slug": "log-directions",
       "title": "特助手 日志方向",
       "description": "特助手日志页按首页读数风格重做的三套方向",

@@ -13,7 +13,7 @@
 
 这些文件全部由 `dispatch-pages` 自动生成，不要手动修改；笔记的正文请在知识库里改，下一次同步会覆盖这里的副本。
 
-## 文档清单（15 篇）
+## 文档清单（16 篇）
 
 ### ashare-quant
 
@@ -30,6 +30,7 @@
 
 ### tesla-assistant
 
+- [特助手 数据库迁移方案](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB%E6%96%B9%E6%A1%88.html) · [线上](https://lhanman.github.io/p/db-migration/) · 2026-11-01 — 特助手服务端数据库怎么迁移、靠什么保证稳定，以及 2026-11-01 上线新增的六张表和一列
 - [特助手 日志方向](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E6%97%A5%E5%BF%97%E6%96%B9%E5%90%91.html) · [线上](https://lhanman.github.io/p/log-directions/) · 2026-10-28 — 特助手日志页按首页读数风格重做的三套方向
 - [特助手 车窗与哨兵](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E8%BD%A6%E7%AA%97%E4%B8%8E%E5%93%A8%E5%85%B5.html) · [线上](https://lhanman.github.io/p/ui-directions-4/) · 2026-10-27 — 状态区车窗四种做法与哨兵图标两态的设计方案
 - [特助手 界面方向](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E7%95%8C%E9%9D%A2%E6%96%B9%E5%90%91.html) · [线上](https://lhanman.github.io/p/ui-directions/) · 2026-10-26 — 特助手首页、指令进行中提示、日志详情的多套界面做法对比（示例数据）
