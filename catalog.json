@@ -1,6 +1,22 @@
 {
   "pages": [
     {
+      "slug": "tesla-home-insights-recap",
+      "title": "特助手首页改版",
+      "description": "特助手首页改版做了什么：新版本提示、电池读数、今天时间条、软件版本页，以及服务端上线和遥测订阅下发的经过",
+      "tags": [
+        "特助手",
+        "首页改版",
+        "iOS",
+        "Android",
+        "遥测"
+      ],
+      "project": "tesla-assistant",
+      "created": "2026-11-02",
+      "updated": "2026-11-02",
+      "path": "文档/tesla-assistant/特助手首页改版.html"
+    },
+    {
       "slug": "db-migration",
       "title": "特助手 数据库迁移方案",
       "description": "特助手服务端数据库怎么迁移、靠什么保证稳定，以及 2026-11-01 上线新增的六张表和一列",
