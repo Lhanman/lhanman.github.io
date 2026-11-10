@@ -1,6 +1,21 @@
 {
   "pages": [
     {
+      "slug": "tesla-reverse-geocoding",
+      "title": "地点为什么叫不出名字",
+      "description": "特助手地点叫不出名字的原因：反向地理编码从上线起没成功过（百度密钥没开通服务），常去地点的名字都来自导航",
+      "tags": [
+        "特助手",
+        "地点",
+        "百度地图",
+        "排查"
+      ],
+      "project": "tesla-assistant",
+      "created": "2026-11-11",
+      "updated": "2026-11-11",
+      "path": "文档/tesla-assistant/地点为什么叫不出名字.html"
+    },
+    {
       "slug": "tesla-home-slow-cause",
       "title": "首页为什么一直读取中",
       "description": "特助手首页一直读取中的原因：导航对比每次重算、路线比较逐点重量整条路线、服务器只有一个核，以及修复前后的耗时",
