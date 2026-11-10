@@ -13,7 +13,7 @@
 
 这些文件全部由 `dispatch-pages` 自动生成，不要手动修改；笔记的正文请在知识库里改，下一次同步会覆盖这里的副本。
 
-## 文档清单（17 篇）
+## 文档清单（18 篇）
 
 ### ashare-quant
 
@@ -30,6 +30,7 @@
 
 ### tesla-assistant
 
+- [首页为什么一直读取中](%E6%96%87%E6%A1%A3/tesla-assistant/%E9%A6%96%E9%A1%B5%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%80%E7%9B%B4%E8%AF%BB%E5%8F%96%E4%B8%AD.html) · [线上](https://lhanman.github.io/p/tesla-home-slow-cause/) · 2026-11-11 — 特助手首页一直读取中的原因：导航对比每次重算、路线比较逐点重量整条路线、服务器只有一个核，以及修复前后的耗时
 - [特助手首页改版](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%E9%A6%96%E9%A1%B5%E6%94%B9%E7%89%88.html) · [线上](https://lhanman.github.io/p/tesla-home-insights-recap/) · 2026-11-02 — 特助手首页改版做了什么：新版本提示、电池读数、今天时间条、软件版本页，以及服务端上线和遥测订阅下发的经过
 - [特助手 数据库迁移方案](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB%E6%96%B9%E6%A1%88.html) · [线上](https://lhanman.github.io/p/db-migration/) · 2026-11-01 — 特助手服务端数据库怎么迁移、靠什么保证稳定，以及 2026-11-01 上线新增的六张表和一列
 - [特助手 日志方向](%E6%96%87%E6%A1%A3/tesla-assistant/%E7%89%B9%E5%8A%A9%E6%89%8B%20%E6%97%A5%E5%BF%97%E6%96%B9%E5%90%91.html) · [线上](https://lhanman.github.io/p/log-directions/) · 2026-10-28 — 特助手日志页按首页读数风格重做的三套方向

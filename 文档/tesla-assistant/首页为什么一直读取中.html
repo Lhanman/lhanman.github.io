@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="特助手首页一直读取中的原因：导航对比每次重算、路线比较逐点重量整条路线、服务器只有一个核，以及修复前后的耗时">
+<link rel="index" href="../../index.html">
+<title>首页为什么一直读取中</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+/* 版式：一栏读下去，每节一句结论 + 一张图；沿用 App 读数风格的细线与窄体数字，琥珀只标「问题所在」，绿只标「修好后」 */
+:root {
+  --bg: #f3f4f2; --paper: #ffffff; --ink: #15181a; --ink2: #5d6468; --hair: #d5d9d8;
+  --hot: #c2410c; --hotsoft: #fbe3d6; --ok: #1f8a4c; --oksoft: #d8efe1; --net: #8a94a0;
+  --display: "Barlow Condensed", "Arial Narrow", "Noto Sans SC", sans-serif;
+  --body: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1112; --paper: #171a1c; --ink: #eceeee; --ink2: #9aa2a6; --hair: #2c3133;
+    --hot: #ff8a4c; --hotsoft: #3a2216; --ok: #4cc27f; --oksoft: #15301f; --net: #6c7680; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1112; --paper: #171a1c; --ink: #eceeee; --ink2: #9aa2a6; --hair: #2c3133;
+  --hot: #ff8a4c; --hotsoft: #3a2216; --ok: #4cc27f; --oksoft: #15301f; --net: #6c7680; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15.5px; line-height: 1.75;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 72px;
+}
+.wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 48px; }
+h1, h2 { margin: 0; text-wrap: balance; line-height: 1.3; }
+h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 900; }
+h2 { font-size: 21px; font-weight: 900; }
+p { margin: 0; }
+.eyebrow { font-size: 12.5px; letter-spacing: .12em; color: var(--ink2); font-weight: 500; }
+.answer { border-left: 4px solid var(--hot); background: var(--paper); padding: 16px 18px; font-size: 17px; line-height: 1.7; }
+.answer b { color: var(--hot); }
+section { display: flex; flex-direction: column; gap: 14px; border-top: 1px solid var(--ink); padding-top: 14px; }
+.fig { background: var(--paper); border: 1px solid var(--hair); padding: 14px 14px 10px; overflow-x: auto; }
+.fig svg { display: block; width: 100%; height: auto; min-width: 520px; }
+.cap { font-size: 12.5px; color: var(--ink2); line-height: 1.55; }
+svg text { font-family: var(--body); fill: var(--ink); }
+svg .num { font-family: var(--display); font-variant-numeric: tabular-nums; }
+svg .muted { fill: var(--ink2); }
+svg .hot { fill: var(--hot); }
+svg .ok { fill: var(--ok); }
+.pts { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; border-top: 1px solid var(--hair); }
+.pts li { padding: 10px 0; border-bottom: 1px solid var(--hair); display: grid; grid-template-columns: 5.5em 1fr; gap: 12px; }
+.pts li b { font-size: 14.5px; }
+.pts li span { min-width: 0; }
+@media (max-width: 480px) { .pts li { grid-template-columns: 1fr; gap: 0; } }
+.foot { font-size: 13px; color: var(--ink2); border-top: 1px solid var(--hair); padding-top: 12px; }
+</style>
+
+<div class="wrap">
+
+  <header style="display:flex;flex-direction:column;gap:14px">
+    <div class="eyebrow">特助手　2026-11-11</div>
+    <h1>首页为什么一直「读取中」</h1>
+    <p class="answer">打开首页时，服务器要把最近 30 天每趟行程的导航对比<b>全部重算一遍</b>。重算里有一步写得很笨：每比较一个点，就把整条路线的长度从头再量一次。服务器只有 1 个核，几件事排队算下来要半分钟，App 就一直停在「读取中」。</p>
+  </header>
+
+  <section>
+    <div class="eyebrow">现象</div>
+    <h2>不是某一天坏的，是越用越慢</h2>
+    <div class="fig">
+      <svg viewBox="0 0 600 230" role="img" aria-label="每天第一次打开首页时车况请求的耗时：10月29日1.1秒，10月30日11.1秒，11月1日20.1秒，11月3日25.2秒，11月10日33.1秒">
+        <!-- 刻度：0 到 35 秒，y = 190 - 秒 * 4.8 -->
+        <g stroke="var(--hair)" stroke-width="1">
+          <line x1="60" y1="190" x2="580" y2="190"/><line x1="60" y1="142" x2="580" y2="142"/>
+          <line x1="60" y1="94" x2="580" y2="94"/><line x1="60" y1="46" x2="580" y2="46"/>
+        </g>
+        <text x="50" y="194" text-anchor="end" class="num muted" font-size="13">0</text>
+        <text x="50" y="146" text-anchor="end" class="num muted" font-size="13">10 秒</text>
+        <text x="50" y="98" text-anchor="end" class="num muted" font-size="13">20 秒</text>
+        <text x="50" y="50" text-anchor="end" class="num muted" font-size="13">30 秒</text>
+        <rect x="88" y="184.7" width="56" height="5.3" fill="var(--ink2)"/>
+        <rect x="190" y="136.7" width="56" height="53.3" fill="var(--hot)"/>
+        <rect x="292" y="93.5" width="56" height="96.5" fill="var(--hot)"/>
+        <rect x="394" y="69" width="56" height="121" fill="var(--hot)"/>
+        <rect x="496" y="31.1" width="56" height="158.9" fill="var(--hot)"/>
+        <text x="116" y="178" text-anchor="middle" class="num" font-size="16" font-weight="700">1.1</text>
+        <text x="218" y="130" text-anchor="middle" class="num" font-size="16" font-weight="700">11.1</text>
+        <text x="320" y="87" text-anchor="middle" class="num" font-size="16" font-weight="700">20.1</text>
+        <text x="422" y="63" text-anchor="middle" class="num" font-size="16" font-weight="700">25.2</text>
+        <text x="524" y="25" text-anchor="middle" class="num" font-size="16" font-weight="700">33.1</text>
+        <text x="116" y="212" text-anchor="middle" font-size="13" class="muted">10-29</text>
+        <text x="218" y="212" text-anchor="middle" font-size="13" class="muted">10-30</text>
+        <text x="320" y="212" text-anchor="middle" font-size="13" class="muted">11-01</text>
+        <text x="422" y="212" text-anchor="middle" font-size="13" class="muted">11-03</text>
+        <text x="524" y="212" text-anchor="middle" font-size="13" class="muted">11-10</text>
+      </svg>
+    </div>
+    <p class="cap">每天第一次打开首页时，「读车况」这个请求在服务器上花了多少秒（取自服务器日志）。10 月 30 日起，行程攒得越多越慢。</p>
+  </section>
+
+  <section>
+    <div class="eyebrow">原因</div>
+    <h2>比一条路线，要把另一条路线量几百遍</h2>
+    <p>导航开着时，车会反复重报「剩下的路线」，服务器要判断重报的是不是同一条路。做法是看重报路线上每个点，离原路线有没有在 150 米以内。</p>
+    <div class="fig">
+      <svg viewBox="0 0 600 300" role="img" aria-label="示意：重报路线上的每个点都要和原路线的每一段比较；原来每比一次都重新量这一段的长度，现在长度只量一次，并且找到 150 米内的一段就停">
+        <!-- 上半：原来 -->
+        <text x="14" y="24" font-size="14" font-weight="700" class="hot">原来</text>
+        <text x="62" y="24" font-size="13" class="muted">每个点都把每一段重新量一遍长度</text>
+        <polyline points="40,110 110,80 180,96 250,64 320,86 390,58 460,76 560,52" fill="none" stroke="var(--ink)" stroke-width="3"/>
+        <g fill="var(--ink)">
+          <circle cx="40" cy="110" r="3.5"/><circle cx="110" cy="80" r="3.5"/><circle cx="180" cy="96" r="3.5"/><circle cx="250" cy="64" r="3.5"/>
+          <circle cx="320" cy="86" r="3.5"/><circle cx="390" cy="58" r="3.5"/><circle cx="460" cy="76" r="3.5"/><circle cx="560" cy="52" r="3.5"/>
+        </g>
+        <circle cx="300" cy="122" r="6" fill="var(--hot)"/>
+        <g stroke="var(--hot)" stroke-width="1" stroke-dasharray="3 3" fill="none" opacity=".85">
+          <line x1="300" y1="122" x2="75" y2="95"/><line x1="300" y1="122" x2="145" y2="88"/><line x1="300" y1="122" x2="215" y2="80"/>
+          <line x1="300" y1="122" x2="285" y2="75"/><line x1="300" y1="122" x2="355" y2="72"/><line x1="300" y1="122" x2="425" y2="67"/>
+          <line x1="300" y1="122" x2="510" y2="64"/>
+        </g>
+        <text x="312" y="138" font-size="12.5" class="hot">一个点 × 每一段，每段都重新算一次球面距离</text>
+        <!-- 下半：现在 -->
+        <line x1="14" y1="160" x2="586" y2="160" stroke="var(--hair)"/>
+        <text x="14" y="188" font-size="14" font-weight="700" class="ok">现在</text>
+        <text x="62" y="188" font-size="13" class="muted">各段长度先量好存起来；找到 150 米内的一段就停</text>
+        <polyline points="40,270 110,240 180,256 250,224 320,246 390,218 460,236 560,212" fill="none" stroke="var(--ink)" stroke-width="3"/>
+        <polygon points="40,270 110,240 180,256 250,224 320,246 390,218 460,236 560,212 560,232 460,256 390,238 320,266 250,244 180,276 110,260 40,290" fill="var(--oksoft)" opacity=".9"/>
+        <polyline points="40,270 110,240 180,256 250,224 320,246 390,218 460,236 560,212" fill="none" stroke="var(--ink)" stroke-width="3"/>
+        <circle cx="300" cy="258" r="6" fill="var(--ok)"/>
+        <line x1="300" y1="258" x2="300" y2="241" stroke="var(--ok)" stroke-width="2"/>
+        <text x="312" y="282" font-size="12.5" class="ok">落在走廊里，比一段就够</text>
+        <g font-size="11.5" class="num muted" text-anchor="middle">
+          <text x="75" y="232">已量</text><text x="145" y="232">已量</text><text x="215" y="222">已量</text><text x="285" y="218">已量</text>
+        </g>
+      </svg>
+    </div>
+    <ul class="pts">
+      <li><b>笨在哪</b><span>一条路线几十到几百段，重报路线也有几十到几百个点，两两相乘就是上万次「量长度」。其实每段长度从头到尾都没变，量一次就够了。</span></li>
+      <li><b>为什么每次都算</b><span>最近 30 天的行程，每次打开都重新算导航对比，算完也不存。打开首页时，「近 15 天日均里程」「本周里程」「行程列表」都要用到它，所以同一批路线被反复比较。</span></li>
+      <li><b>为什么越来越慢</b><span>10 月 30 日以后，每天新增的行程都会进入这 30 天的窗口，要重算的东西每天都在变多。</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="eyebrow">为什么会卡这么久</div>
+    <h2>服务器只有 1 个核，几件事排队算</h2>
+    <div class="fig">
+      <svg viewBox="0 0 600 190" role="img" aria-label="11月10日一次打开首页：唯一的处理器先后要算行程列表约10秒、近15天日均里程约13秒、本周里程约2秒，同时向特斯拉查车是否在线约6秒，车况请求总共33秒才返回">
+        <!-- 0 到 35 秒：x = 120 + 秒 * 13.4 -->
+        <g stroke="var(--hair)"><line x1="120" y1="30" x2="120" y2="150"/><line x1="254" y1="30" x2="254" y2="150"/><line x1="388" y1="30" x2="388" y2="150"/><line x1="522" y1="30" x2="522" y2="150"/></g>
+        <g font-size="12" class="num muted" text-anchor="middle"><text x="120" y="170">0</text><text x="254" y="170">10 秒</text><text x="388" y="170">20 秒</text><text x="522" y="170">30 秒</text></g>
+        <text x="110" y="62" text-anchor="end" font-size="13" font-weight="700">服务器 CPU</text>
+        <rect x="120" y="44" width="129" height="28" fill="var(--hot)"/>
+        <rect x="249" y="44" width="174" height="28" fill="var(--hot)" opacity=".75"/>
+        <rect x="423" y="44" width="27" height="28" fill="var(--hot)" opacity=".55"/>
+        <text x="184" y="63" text-anchor="middle" font-size="12.5" fill="var(--paper)" style="fill:var(--paper)">行程列表 约 10 秒</text>
+        <text x="336" y="63" text-anchor="middle" font-size="12.5" fill="var(--paper)" style="fill:var(--paper)">近 15 天日均里程 约 13 秒</text>
+        <text x="110" y="104" text-anchor="end" font-size="13" font-weight="700">问特斯拉</text>
+        <rect x="120" y="88" width="80" height="24" fill="var(--net)"/>
+        <text x="208" y="105" font-size="12.5" class="muted">车在不在线 约 6 秒（网络，不占 CPU）</text>
+        <text x="110" y="140" text-anchor="end" font-size="13" font-weight="700">App 在等</text>
+        <rect x="120" y="128" width="444" height="16" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+        <text x="572" y="141" font-size="13" class="num" font-weight="700">33 秒</text>
+        <text x="460" y="36" font-size="11.5" class="muted" text-anchor="middle">本周里程</text>
+      </svg>
+    </div>
+    <p class="cap">11 月 10 日夜里一次打开首页的拆解。行程列表 9.6 秒、总计 33 秒取自服务器日志；中间两段是用本机实测时间按服务器的速度（约慢 6.6 倍）换算的估计。</p>
+  </section>
+
+  <section>
+    <div class="eyebrow">修好了没有</div>
+    <h2>同样的数据，快了 4 到 8 倍，结论一个字都没变</h2>
+    <div class="fig">
+      <svg viewBox="0 0 600 200" role="img" aria-label="本机用线上数据测：行程列表 1.45 秒降到 0.27 秒；近15天日均里程 2.0 秒降到 0.26 秒；本周里程 0.30 秒降到 0.07 秒">
+        <!-- x = 170 + 秒 * 190 -->
+        <g font-size="13" font-weight="700" text-anchor="end"><text x="160" y="44">行程列表</text><text x="160" y="104">近 15 天日均里程</text><text x="160" y="164">本周里程</text></g>
+        <rect x="170" y="28" width="275.5" height="14" fill="var(--hot)"/><text x="452" y="40" class="num hot" font-size="15" font-weight="700">1.45 秒</text>
+        <rect x="170" y="46" width="51.3" height="14" fill="var(--ok)"/><text x="228" y="58" class="num ok" font-size="15" font-weight="700">0.27 秒</text>
+        <rect x="170" y="88" width="380" height="14" fill="var(--hot)"/><text x="556" y="100" class="num hot" font-size="15" font-weight="700">2.0</text>
+        <rect x="170" y="106" width="49.4" height="14" fill="var(--ok)"/><text x="226" y="118" class="num ok" font-size="15" font-weight="700">0.26</text>
+        <rect x="170" y="148" width="57" height="14" fill="var(--hot)"/><text x="234" y="160" class="num hot" font-size="15" font-weight="700">0.30</text>
+        <rect x="170" y="166" width="13.3" height="14" fill="var(--ok)"/><text x="190" y="178" class="num ok" font-size="15" font-weight="700">0.07</text>
+      </svg>
+    </div>
+    <p class="cap">用线上数据库的备份在本机测的，同一份数据先跑旧代码，再跑新代码。橙色是原来，绿色是现在。</p>
+    <ul class="pts">
+      <li><b>改了什么</b><span>每段长度只量一次；找到 150 米内的一段就停；点数已经够了，或者已经不可能够，也提前结束。同一对路线的判断结果记在内存里，再打开就直接用。</span></li>
+      <li><b>怎么保证没改错</b><span>旧算法原样留在测试里，和新算法对 3000 组随机路线，两种处理器架构下都一致；线上 49 趟行程，新旧输出逐字节相同。</span></li>
+      <li><b>已上线</b><span>11 月 11 日凌晨随 <span class="num">v2.0.0-perf1</span> 上线。线上实测要等你下次打开首页才有数。</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="eyebrow">还没根治的</div>
+    <h2>算得快了，但还是每次都在算</h2>
+    <p>30 天内的行程每次打开仍然重算导航对比，只是现在算得快。行程再攒下去，耗时还会跟着涨。彻底的办法是一趟行程的数据齐了以后，把对比结果算一次存下来，之后直接读。这是行程模块的设计，要和负责那块的会话一起改。</p>
+  </section>
+
+  <p class="foot">数据来源：服务器日志（请求耗时）、线上数据库 11 月 11 日备份在本机的 CPU 剖析。提交：提速 <span class="num">4720cb0</span>，部署记录 <span class="num">cbf4672</span>。</p>
+</div>
+</body>
+</html>

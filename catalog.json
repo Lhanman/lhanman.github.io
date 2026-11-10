@@ -1,6 +1,21 @@
 {
   "pages": [
     {
+      "slug": "tesla-home-slow-cause",
+      "title": "首页为什么一直读取中",
+      "description": "特助手首页一直读取中的原因：导航对比每次重算、路线比较逐点重量整条路线、服务器只有一个核，以及修复前后的耗时",
+      "tags": [
+        "特助手",
+        "性能",
+        "排查",
+        "Go"
+      ],
+      "project": "tesla-assistant",
+      "created": "2026-11-11",
+      "updated": "2026-11-11",
+      "path": "文档/tesla-assistant/首页为什么一直读取中.html"
+    },
+    {
       "slug": "tesla-home-insights-recap",
       "title": "特助手首页改版",
       "description": "特助手首页改版做了什么：新版本提示、电池读数、今天时间条、软件版本页，以及服务端上线和遥测订阅下发的经过",
