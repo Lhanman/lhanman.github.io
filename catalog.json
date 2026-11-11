@@ -16,6 +16,21 @@
       "path": "文档/tesla-assistant/地点为什么叫不出名字.html"
     },
     {
+      "slug": "tesla-map-providers",
+      "title": "国内地图服务选型",
+      "description": "中国大陆地图服务选型：九个候选筛选、高德腾讯百度对比、成本与迁移量，推荐整体换高德、腾讯备选",
+      "tags": [
+        "特助手",
+        "地图",
+        "选型",
+        "调研"
+      ],
+      "project": "tesla-assistant",
+      "created": "2026-11-11",
+      "updated": "2026-11-11",
+      "path": "文档/tesla-assistant/国内地图服务选型.html"
+    },
+    {
       "slug": "tesla-home-slow-cause",
       "title": "首页为什么一直读取中",
       "description": "特助手首页一直读取中的原因：导航对比每次重算、路线比较逐点重量整条路线、服务器只有一个核，以及修复前后的耗时",
