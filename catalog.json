@@ -47,6 +47,18 @@
       "path": "文档/tesla-assistant/特助手首页改版.html"
     },
     {
+      "slug": "slot-directions",
+      "title": "熟路时段三种写法",
+      "description": "熟路页时段一行的三种写法对比：表格、一句话、横条",
+      "tags": [
+        "设计"
+      ],
+      "project": "tesla-assistant",
+      "created": "2026-11-11",
+      "updated": "2026-11-11",
+      "path": "文档/tesla-assistant/熟路时段三种写法.html"
+    },
+    {
       "slug": "db-migration",
       "title": "特助手 数据库迁移方案",
       "description": "特助手服务端数据库怎么迁移、靠什么保证稳定，以及 2026-11-01 上线新增的六张表和一列",

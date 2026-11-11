@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="熟路页时段一行的三种写法对比：表格、一句话、横条">
+<link rel="index" href="../../index.html">
+<title>熟路时段三种写法</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+/* 布局：三块手机宽的「读数行」并排（窄屏竖排），每块是 App 里熟路页「时段」那一行的一种写法 */
+:root {
+  --bg: #e9ecf0; --panel: #f6f7f9; --ink: #14171a; --ink2: rgba(20,23,26,.62); --rule: rgba(20,23,26,.16);
+  --amber: #f5a300; --amberText: #8a5300; --r1: #3b5bff; --r2: #9b51e0; --win: rgba(59,91,255,.08);
+  --num: "Barlow Condensed", "DIN Alternate", "Roboto Condensed", system-ui, sans-serif;
+  --body: -apple-system, "PingFang SC", "Noto Sans SC", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0b0d10; --panel: #15181c; --ink: #f3f4f5; --ink2: rgba(243,244,245,.66); --rule: rgba(243,244,245,.16);
+  --amber: #ffb627; --amberText: #ffc65a; --r1: #7c9bff; --r2: #c08cff; --win: rgba(124,155,255,.12); color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0b0d10; --panel: #15181c; --ink: #f3f4f5; --ink2: rgba(243,244,245,.66); --rule: rgba(243,244,245,.16);
+  --amber: #ffb627; --amberText: #ffc65a; --r1: #7c9bff; --r2: #c08cff; --win: rgba(124,155,255,.12); color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 40px; }
+h1 { font-size: 22px; margin: 0 0 6px; text-wrap: balance; }
+.lead { color: var(--ink2); font-size: 14px; line-height: 1.6; max-width: 62ch; margin: 0 0 18px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; align-items: start; }
+.opt { background: var(--panel); border: 1px solid var(--rule); min-width: 0; }
+.opt header { padding: 14px 16px 10px; display: flex; flex-direction: column; gap: 4px; }
+.opt header b { font-size: 16px; }
+.opt header span { color: var(--ink2); font-size: 13px; line-height: 1.5; }
+.tag { align-self: flex-start; font-size: 12px; color: var(--amberText); font-weight: 700; letter-spacing: .04em; }
+.row { border-top: 1px solid var(--rule); display: grid; grid-template-columns: 44px 1fr; gap: 10px; padding: 14px 16px; }
+.lab { color: var(--ink2); font-size: 12.5px; padding-top: 3px; }
+.sub { color: var(--ink2); font-size: 12.5px; margin-bottom: 8px; }
+.legend { display: flex; gap: 14px; font-size: 13px; margin-bottom: 8px; flex-wrap: wrap; }
+.sw { display: inline-block; width: 18px; height: 3px; vertical-align: middle; margin-right: 6px; }
+.sw.r1 { background: var(--r1); } .sw.r2 { background: repeating-linear-gradient(90deg, var(--r2) 0 5px, transparent 5px 8px); }
+.num { font-family: var(--num); font-variant-numeric: tabular-nums; }
+.note { color: var(--ink2); font-size: 12px; line-height: 1.5; margin-top: 8px; }
+/* A 表格 */
+table { width: 100%; border-collapse: collapse; }
+th { text-align: right; font-size: 12.5px; font-weight: 700; padding: 0 0 6px; }
+th:first-child { text-align: left; color: var(--ink2); font-weight: 400; }
+td { border-top: 1px solid var(--rule); padding: 8px 0; text-align: right; font-size: 17px; }
+td:first-child { text-align: left; font-size: 15px; }
+td.best { font-weight: 700; font-size: 20px; }
+td.dim { color: var(--ink2); font-size: 15px; }
+tr.now td { background: var(--win); }
+tr.now td:first-child { box-shadow: inset 3px 0 var(--amber); padding-left: 8px; }
+.few { font-family: var(--body); font-size: 11px; color: var(--ink2); margin-left: 3px; }
+/* B 一句话 */
+.line { border-top: 1px solid var(--rule); padding: 9px 0; display: grid; grid-template-columns: 54px 1fr; gap: 8px; align-items: baseline; }
+.line:first-of-type { border-top: 0; }
+.line .t { font-size: 17px; }
+.line p { margin: 0; font-size: 14.5px; line-height: 1.5; }
+.line p em { font-style: normal; font-weight: 700; }
+.line.now { background: var(--win); box-shadow: inset 3px 0 var(--amber); padding-left: 8px; margin-inline: -8px; padding-right: 8px; }
+.r1t { color: var(--r1); font-weight: 700; } .r2t { color: var(--r2); font-weight: 700; }
+/* C 横条 */
+.slot { border-top: 1px solid var(--rule); padding: 8px 0; display: grid; grid-template-columns: 48px 1fr; gap: 8px; }
+.slot:first-of-type { border-top: 0; }
+.slot.now { background: var(--win); box-shadow: inset 3px 0 var(--amber); padding-left: 8px; margin-inline: -8px; padding-right: 8px; }
+.bars { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.bar { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.bar i { height: 10px; display: block; }
+.bar.r1 i { background: var(--r1); } .bar.r2 i { background: var(--r2); }
+.bar.faint i { opacity: .35; }
+.bar.none { color: var(--ink2); font-size: 12px; }
+.pick { margin-top: 18px; color: var(--ink2); font-size: 13.5px; line-height: 1.6; max-width: 62ch; }
+</style>
+
+<h1>熟路「时段」三种写法</h1>
+<p class="lead">现在的图用方块和范围条，要先懂图才看得出意思。下面三种都用同一份演示数据（公司 → 住宅，工作日），出发时间 18:00 那一档标出来。挑一种，我两端一起换。</p>
+
+<div class="grid">
+  <section class="opt" aria-labelledby="a-t">
+    <header><span class="tag">A</span><b id="a-t">时段表</b><span>每个出发时段一行，每种走法一列写平时要多少分钟，快的那格加粗。数字最全。</span></header>
+    <div class="row"><div class="lab">时段</div><div>
+      <div class="sub">工作日出发，平时要几分钟</div>
+      <table>
+        <thead><tr><th>出发</th><th><span class="sw r1"></span>走法 1</th><th><span class="sw r2"></span>Ring</th></tr></thead>
+        <tbody>
+          <tr><td class="num">17:30</td><td class="dim">没走过</td><td class="num best">43</td></tr>
+          <tr class="now"><td class="num">18:00</td><td class="num">43</td><td class="num">43</td></tr>
+          <tr><td class="num">18:30</td><td class="num best">42</td><td class="dim">没走过</td></tr>
+          <tr><td class="num">19:00</td><td class="num best">40</td><td class="num dim">52<span class="few">次数少</span></td></tr>
+        </tbody>
+      </table>
+      <div class="note">琥珀色那行是你选的出发时间。「次数少」表示这一档只走过一两次，仅供参考。</div>
+    </div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="b-t">
+    <header><span class="tag">B</span><b id="b-t">一句话</b><span>每个时段直接写结论：哪条快、快多少、大概要多久。不用看图。</span></header>
+    <div class="row"><div class="lab">时段</div><div>
+      <div class="sub">工作日这几个时间出发</div>
+      <div class="line"><span class="t num">17:30</span><p>只走过 <span class="r2t">Ring</span>，约 <em class="num">43</em> 分钟</p></div>
+      <div class="line now"><span class="t num">18:00</span><p>两条差不多，都约 <em class="num">43</em> 分钟</p></div>
+      <div class="line"><span class="t num">18:30</span><p>只走过 <span class="r1t">走法 1</span>，约 <em class="num">42</em> 分钟</p></div>
+      <div class="line"><span class="t num">19:00</span><p><span class="r1t">走法 1</span> 快 <em class="num">12</em> 分钟，约 <em class="num">40</em> 分钟（Ring 这档只走过 1 次）</p></div>
+      <div class="note">琥珀色那行是你选的出发时间。</div>
+    </div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="c-t">
+    <header><span class="tag">C</span><b id="c-t">横条</b><span>还是图，但改成横向的条，越长越慢，每根条后面直接写分钟数。一眼比长短。</span></header>
+    <div class="row"><div class="lab">时段</div><div>
+      <div class="legend"><span><span class="sw r1"></span>走法 1</span><span><span class="sw r2"></span>Ring</span></div>
+      <div class="slot"><span class="num">17:30</span><div class="bars">
+        <div class="bar none">走法 1 没走过</div>
+        <div class="bar r2"><i style="width:69%"></i><span class="num">43 分</span></div></div></div>
+      <div class="slot now"><span class="num">18:00</span><div class="bars">
+        <div class="bar r1"><i style="width:69%"></i><span class="num">43 分</span></div>
+        <div class="bar r2"><i style="width:69%"></i><span class="num">43 分</span></div></div></div>
+      <div class="slot"><span class="num">18:30</span><div class="bars">
+        <div class="bar r1"><i style="width:67%"></i><span class="num">42 分</span></div>
+        <div class="bar none">Ring 没走过</div></div></div>
+      <div class="slot"><span class="num">19:00</span><div class="bars">
+        <div class="bar r1"><i style="width:64%"></i><span class="num">40 分</span></div>
+        <div class="bar r2 faint"><i style="width:83%"></i><span class="num">52 分（次数少）</span></div></div></div>
+      <div class="note">条从同一条线起画，长度按分钟数比例。淡色表示次数少。</div>
+    </div></div>
+  </section>
+</div>
+
+<p class="pick">我推荐 B：你说单看图看不懂，B 直接把结论写成话，不需要读图；需要细看数字时，「差在哪」那张表还在上面。A 适合想自己比数字的时候，C 保留了图但更直观。</p>
+</body>
+</html>
