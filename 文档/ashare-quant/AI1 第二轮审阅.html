@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI1 第二轮审阅</title>
+<style>
+:root{
+  --bg:#f7f5f0; --card:#ffffff; --fg:#1f2328; --muted:#6b6f76; --line:#d9d5cc;
+  --accent:#c2410c; --accent-bg:#fff1e8; --gray:#9aa0a6; --gray-bg:#eef0f2;
+  --ok:#15803d; --mid:#b45309; --hi:#b91c1c; --ok-bg:#e8f6ec; --mid-bg:#fdf3e2; --hi-bg:#fdeaea;
+  --blue:#1d4ed8; --blue-bg:#e8eefc;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#16181c; --card:#1f2228; --fg:#e6e6e6; --muted:#9ba1a8; --line:#353a42;
+    --accent:#fb923c; --accent-bg:#3a2516; --gray:#6b7178; --gray-bg:#2a2e35;
+    --ok:#4ade80; --mid:#fbbf24; --hi:#f87171; --ok-bg:#183222; --mid-bg:#3a2e14; --hi-bg:#3a1a1a;
+    --blue:#93b4ff; --blue-bg:#1d2840;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+main{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+header{border-bottom:2px solid var(--fg);padding-bottom:10px;margin-bottom:18px}
+header h1{margin:0;font-size:24px}
+header .meta{color:var(--muted);font-size:13px}
+h2{font-size:19px;margin:30px 0 10px;padding-left:10px;border-left:4px solid var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:10px 0}
+.lead{font-size:18px;font-weight:600}
+.muted{color:var(--muted);font-size:14px}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.tag{display:inline-block;padding:0 8px;border-radius:10px;font-size:12px;font-weight:600}
+.lo{background:var(--ok-bg);color:var(--ok)} .md{background:var(--mid-bg);color:var(--mid)} .hi{background:var(--hi-bg);color:var(--hi)}
+ol.q>li{margin:10px 0}
+.rec{background:var(--accent-bg);border-radius:6px;padding:2px 8px;font-size:14px}
+code{background:var(--gray-bg);padding:0 4px;border-radius:4px;font-size:13px}
+blockquote{margin:8px 0;padding:8px 12px;border-left:3px solid var(--accent);background:var(--accent-bg);border-radius:4px;font-size:14px}
+ul{padding-left:20px}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>AI 问股 · 第二轮改动审阅</h1>
+  <div class="meta">变更：<code>ai1-stock-ai-analysis</code>（第 15—22 组）· 生成于 2026-11-13 · 代码还没动，等你点头</div>
+</header>
+
+<h2>一句话结论</h2>
+<div class="card lead">问一只股票，以后会分别得到短期（5 天）、中期（20 天）、长期（120 天）三个看法，每个看法旁边先摆程序算好的事实。除了股票，ETF 和指数也能问。三个看法以后分别看准不准。</div>
+
+<h2>大白话摘要</h2>
+<div class="card">
+<p><b>要解决什么：</b>现在 AI 只给一个笼统的"偏多 / 偏空"，你分不清它说的是这几天还是这几个月；也只能问股票，持仓里的 ETF 问不了。</p>
+<p><b>打算怎么做：</b>还是开一次会，不开三次。会上要求每位"分析师"按短、中、长三段写报告，最后整理出三个看法。再接上 ETF 和指数的数据，借参考项目 TradingAgents-CN 的几段提示词写法（照开源协议写明出处），最后用 LangGraph 把整条流程串起来。</p>
+<p><b>代价和风险：</b>花费基本不变，还是一次会，只多一次很便宜的补问。短期、长期两个看法是会后整理出来的，不如中期那个可靠，页面上会标出来。长期看法要半年后才有第一批成绩。</p>
+</div>
+
+<h2>改前 / 改后：问一只股票，你拿到什么</h2>
+<div class="card">
+<svg viewBox="0 0 800 400" role="img" aria-label="改前改后对比">
+  <!-- 左：改前 -->
+  <text x="190" y="24" text-anchor="middle" font-size="16" font-weight="700" fill="var(--muted)">改前</text>
+  <rect x="20" y="40" width="340" height="44" rx="8" fill="var(--gray-bg)" stroke="var(--gray)"/>
+  <text x="190" y="67" text-anchor="middle" font-size="14" fill="var(--fg)">只能问股票（ETF、指数直接拒绝）</text>
+  <path d="M190 84 V104" stroke="var(--gray)" stroke-width="2"/>
+  <rect x="20" y="104" width="340" height="44" rx="8" fill="var(--gray-bg)" stroke="var(--gray)"/>
+  <text x="190" y="131" text-anchor="middle" font-size="14" fill="var(--fg)">四位分析师开会（一次）</text>
+  <path d="M190 148 V168" stroke="var(--gray)" stroke-width="2"/>
+  <rect x="20" y="168" width="340" height="64" rx="8" fill="var(--gray-bg)" stroke="var(--gray)"/>
+  <text x="190" y="196" text-anchor="middle" font-size="15" font-weight="700" fill="var(--fg)">一个看法：偏多</text>
+  <text x="190" y="218" text-anchor="middle" font-size="12" fill="var(--muted)">说的是几天还是几个月？说不清</text>
+  <path d="M190 232 V252" stroke="var(--gray)" stroke-width="2"/>
+  <rect x="20" y="252" width="340" height="64" rx="8" fill="var(--gray-bg)" stroke="var(--gray)"/>
+  <text x="190" y="279" text-anchor="middle" font-size="14" fill="var(--fg)">成绩单：1 / 5 / 20 天后</text>
+  <text x="190" y="300" text-anchor="middle" font-size="12" fill="var(--muted)">都拿同一个看法去对</text>
+
+  <!-- 右：改后 -->
+  <text x="600" y="24" text-anchor="middle" font-size="16" font-weight="700" fill="var(--accent)">改后</text>
+  <rect x="420" y="40" width="360" height="44" rx="8" fill="var(--accent-bg)" stroke="var(--accent)"/>
+  <text x="600" y="67" text-anchor="middle" font-size="14" fill="var(--fg)">股票 · ETF · 指数 都能问</text>
+  <path d="M600 84 V104" stroke="var(--gray)" stroke-width="2"/>
+  <rect x="420" y="104" width="360" height="44" rx="8" fill="var(--gray-bg)" stroke="var(--gray)"/>
+  <text x="600" y="124" text-anchor="middle" font-size="14" fill="var(--fg)">四位分析师开会（还是一次）</text>
+  <text x="600" y="141" text-anchor="middle" font-size="12" fill="var(--accent)">报告按 短 / 中 / 长 三段写</text>
+  <path d="M600 148 V168" stroke="var(--gray)" stroke-width="2"/>
+  <g font-size="13">
+    <rect x="420" y="168" width="114" height="64" rx="8" fill="var(--accent-bg)" stroke="var(--accent)"/>
+    <text x="477" y="192" text-anchor="middle" font-weight="700" fill="var(--fg)">短期 5 天</text>
+    <text x="477" y="214" text-anchor="middle" font-size="11" fill="var(--muted)">摘要整理</text>
+    <rect x="543" y="168" width="114" height="64" rx="8" fill="var(--accent-bg)" stroke="var(--accent)" stroke-width="2.5"/>
+    <text x="600" y="192" text-anchor="middle" font-weight="700" fill="var(--fg)">中期 20 天</text>
+    <text x="600" y="214" text-anchor="middle" font-size="11" fill="var(--muted)">组合经理评级</text>
+    <rect x="666" y="168" width="114" height="64" rx="8" fill="var(--accent-bg)" stroke="var(--accent)"/>
+    <text x="723" y="192" text-anchor="middle" font-weight="700" fill="var(--fg)">长期 120 天</text>
+    <text x="723" y="214" text-anchor="middle" font-size="11" fill="var(--muted)">摘要整理</text>
+  </g>
+  <path d="M600 232 V252" stroke="var(--gray)" stroke-width="2"/>
+  <rect x="420" y="252" width="360" height="64" rx="8" fill="var(--accent-bg)" stroke="var(--accent)"/>
+  <text x="600" y="279" text-anchor="middle" font-size="14" fill="var(--fg)">成绩单：各看法对各自的天数</text>
+  <text x="600" y="300" text-anchor="middle" font-size="12" fill="var(--muted)">"中性"也打分：±2% 以内算说中</text>
+
+  <!-- 底部 -->
+  <rect x="20" y="340" width="760" height="44" rx="8" fill="none" stroke="var(--line)" stroke-dasharray="5 4"/>
+  <text x="400" y="367" text-anchor="middle" font-size="13" fill="var(--muted)">没变：花费上限 · 不下单 · 持仓提醒不经过 AI · 不把成本盈亏发给大模型 · 考试账户不动</text>
+</svg>
+<p class="muted">橙色是这次改的，灰色是原样不动的。</p>
+</div>
+
+<h2>三个期限，每格先摆事实、再写看法</h2>
+<div class="card">
+<svg viewBox="0 0 800 230" role="img" aria-label="三栏看法卡">
+  <g font-size="13">
+    <rect x="10" y="10" width="250" height="210" rx="10" fill="var(--card)" stroke="var(--line)"/>
+    <text x="135" y="36" text-anchor="middle" font-size="15" font-weight="700" fill="var(--fg)">短期 · 5 天</text>
+    <rect x="24" y="50" width="222" height="88" rx="6" fill="var(--blue-bg)"/>
+    <text x="34" y="70" fill="var(--blue)" font-weight="700">程序算的事实</text>
+    <text x="34" y="92" fill="var(--fg)">日线 MACD、KDJ、RSI…</text>
+    <text x="34" y="112" fill="var(--fg)">支撑位 / 压力位</text>
+    <rect x="24" y="148" width="222" height="60" rx="6" fill="var(--accent-bg)"/>
+    <text x="34" y="168" fill="var(--accent)" font-weight="700">AI 看法：偏多</text>
+    <text x="34" y="190" font-size="12" fill="var(--muted)">标"来自摘要整理"</text>
+
+    <rect x="275" y="10" width="250" height="210" rx="10" fill="var(--card)" stroke="var(--accent)" stroke-width="2"/>
+    <text x="400" y="36" text-anchor="middle" font-size="15" font-weight="700" fill="var(--fg)">中期 · 20 天</text>
+    <rect x="289" y="50" width="222" height="88" rx="6" fill="var(--blue-bg)"/>
+    <text x="299" y="70" fill="var(--blue)" font-weight="700">程序算的事实</text>
+    <text x="299" y="92" fill="var(--fg)">日线 20 日趋势</text>
+    <text x="299" y="112" fill="var(--fg)">周线均线、周线 MACD</text>
+    <rect x="289" y="148" width="222" height="60" rx="6" fill="var(--accent-bg)"/>
+    <text x="299" y="168" fill="var(--accent)" font-weight="700">AI 看法：中性</text>
+    <text x="299" y="190" font-size="12" fill="var(--muted)">= 组合经理的正式评级</text>
+
+    <rect x="540" y="10" width="250" height="210" rx="10" fill="var(--card)" stroke="var(--line)"/>
+    <text x="665" y="36" text-anchor="middle" font-size="15" font-weight="700" fill="var(--fg)">长期 · 120 天</text>
+    <rect x="554" y="50" width="222" height="88" rx="6" fill="var(--blue-bg)"/>
+    <text x="564" y="70" fill="var(--blue)" font-weight="700">程序算的事实</text>
+    <text x="564" y="92" fill="var(--fg)">估值分位（PE、PB）</text>
+    <text x="564" y="112" fill="var(--fg)">个股近 5 年 / 指数近 10 年</text>
+    <rect x="554" y="148" width="222" height="60" rx="6" fill="var(--accent-bg)"/>
+    <text x="564" y="168" fill="var(--accent)" font-weight="700">AI 看法：偏空</text>
+    <text x="564" y="190" font-size="12" fill="var(--muted)">标"来自摘要整理"</text>
+  </g>
+</svg>
+<p class="muted">三个看法可以不一致，比如短期偏多、长期偏空，各自记分。报告首屏还会多三行：<b>数据缺口</b>、<b>最强的看多理由</b>、<b>最强的看空理由</b>。</p>
+</div>
+
+<h2>流程怎么串：LangGraph 只是换了个"串法"</h2>
+<div class="card">
+<svg viewBox="0 0 800 150" role="img" aria-label="LangGraph 流程">
+  <rect x="6" y="6" width="788" height="138" rx="10" fill="none" stroke="var(--gray)" stroke-dasharray="6 4"/>
+  <text x="18" y="26" font-size="12" fill="var(--muted)">外面一圈原样：总开关 · 预检 · 一次只跑一个（锁）· 超时看门狗 · 花费护栏</text>
+  <g font-size="13" text-anchor="middle">
+    <rect x="20"  y="50" width="100" height="56" rx="8" fill="var(--accent-bg)" stroke="var(--accent)"/><text x="70"  y="75" fill="var(--fg)">备料</text><text x="70" y="94" font-size="11" fill="var(--muted)">先落盘</text>
+    <rect x="148" y="50" width="120" height="56" rx="8" fill="var(--gray-bg)" stroke="var(--gray)"/><text x="208" y="75" fill="var(--fg)">开会</text><text x="208" y="94" font-size="11" fill="var(--muted)">官方原图</text>
+    <rect x="296" y="50" width="100" height="56" rx="8" fill="var(--accent-bg)" stroke="var(--accent)"/><text x="346" y="75" fill="var(--fg)">写摘要</text><text x="346" y="94" font-size="11" fill="var(--muted)">三个看法</text>
+    <rect x="424" y="50" width="100" height="56" rx="8" fill="var(--gray-bg)" stroke="var(--gray)"/><text x="474" y="82" fill="var(--fg)">存档</text>
+    <rect x="552" y="50" width="100" height="56" rx="8" fill="var(--accent-bg)" stroke="var(--accent)"/><text x="602" y="75" fill="var(--fg)">出页面</text><text x="602" y="94" font-size="11" fill="var(--muted)">三栏版式</text>
+    <rect x="680" y="50" width="100" height="56" rx="8" fill="var(--gray-bg)" stroke="var(--gray)"/><text x="730" y="75" fill="var(--fg)">托管</text><text x="730" y="94" font-size="11" fill="var(--muted)">仍挂着</text>
+  </g>
+  <g stroke="var(--fg)" stroke-width="1.5">
+    <path d="M120 78 H146"/><path d="M268 78 H294"/><path d="M396 78 H422"/><path d="M524 78 H550"/><path d="M652 78 H678"/>
+  </g>
+  <text x="400" y="132" text-anchor="middle" font-size="12" fill="var(--muted)">中途失败就整次重来，不做"从中间接着跑"；三场点评也用同样的串法</text>
+</svg>
+<p class="muted">你用起来感觉不到差别，好处是以后加步骤、查哪一步出错更方便。</p>
+</div>
+
+<h2>影响范围</h2>
+<div class="tbl"><table>
+<tr><th>哪里</th><th>怎么变</th><th>谁会感受到</th><th>风险</th></tr>
+<tr><td>AI 报告页</td><td>一个看法变成短、中、长三格；加数据缺口和最强多空理由</td><td>你（网页、Bark 点开）</td><td><span class="tag lo">低</span></td></tr>
+<tr><td>能问什么</td><td>ETF、指数也能问；三场点评里持仓 ETF 也点评</td><td>你</td><td><span class="tag md">中</span> ETF 和指数没有财报、公告，资料薄一些</td></tr>
+<tr><td>新数据源</td><td>指数估值（乐咕乐股月度 PE/PB，12 个指数）</td><td>长期那格</td><td><span class="tag md">中</span> 非官方接口，可能改版；取不到就写"缺估值"</td></tr>
+<tr><td>成绩单</td><td>三个看法各对各的天数；中性也打分；ETF 宽基看绝对涨跌</td><td>月报</td><td><span class="tag lo">低</span> 旧存档按"中期"读</td></tr>
+<tr><td>提示词</td><td>加 TradingAgents-CN 的"研究模式禁止清单"、角色分节、A 股特有因素</td><td>报告内容</td><td><span class="tag lo">低</span> 只追加，不改官方原文</td></tr>
+<tr><td>技术指标</td><td>AI 工具查指标也走我们自己那套算法，不再有第二套</td><td>报告里的数字</td><td><span class="tag lo">低</span></td></tr>
+<tr><td>流程</td><td>用 LangGraph 串起来</td><td>看不出</td><td><span class="tag md">中</span> 改动面最大，靠原有测试全部照过兜底</td></tr>
+</table></div>
+<p><b>明确不受影响：</b>回测引擎、模拟盘、机器学习、策略文件、正在考的账户、日报和简报的内容和推送时间、盘中监控、持仓提醒、花费上限。</p>
+
+<h2>风险与回退</h2>
+<div class="card"><ul>
+<li><b>短期、长期看法不够稳。</b>它们是会后整理出来的，不像中期那个是正式评级。应对：页面上标出来，成绩单分开统计，跑几个月就知道它们准不准。</li>
+<li><b>LangGraph 改造碰到原有功能。</b>应对：原来 6000 多个测试全部要照过才算做完。万一真机出问题，配置里 <code>ai.enabled: false</code> 一关就全停，其他功能都不依赖它。</li>
+<li>这次不改数据格式，也不迁移数据。旧存档照样能看，成绩单把旧存档当成"中期"看法来读。</li>
+</ul></div>
+
+<h2>需要你拍板的事</h2>
+<div class="card">
+<ol class="q">
+<li><b>000001 撞号了</b>：它既是上证指数，也是平安银行。<br><span class="rec">推荐 a：当股票。</span> 要问指数时发"上证指数"或"000001.SH"。b 是当指数，c 是每次让你选。</li>
+<li><b>ETF 怎么算成绩</b>：本地 ETF 分为宽基、红利、黄金、债券、货币、海外、商品、行业、其他。<br><span class="rec">推荐 a：行业和其他两类跟沪深 300 比超额，其余几类只看自己涨跌。</span> 黄金、债券这些和沪深 300 没什么可比性。b 是只有宽基看自己涨跌。</li>
+<li><b>短期除了 5 天，要不要再看 1 天？</b><br><span class="rec">推荐 a：留着当参考列，只显示，不进统计。</span> 第二天就能看到一点反馈。b 是不要。</li>
+<li><b>方案和 CLAUDE.md 那句话改成：</b>
+<blockquote>TradingAgents-CN 不运行；开源目录（tradingagents/、cli/、docs/、tests/，Apache-2.0）可复制改用、写明出处并登记 THIRD_PARTY_NOTICES.md，专有目录只看思路。整条流程用 LangGraph 串起，开会那段用官方的图；问股分短（5 日）、中（20 日）、长（120 日）三个期限；股票、ETF、指数都能问。</blockquote>
+<span class="rec">a：就这么写。</span> b：你直接写想要的样子。复制 TradingAgents-CN 代码那一组要等你点头才开工。</li>
+</ol>
+<p class="muted">回复格式：比如"1a 2a 3a 4a"。</p>
+<p><b>我先替你选了的默认项</b>（不同意就说）：</p>
+<ul>
+<li>三个看法不要求互相一致，各自记分。</li>
+<li>补问一次还判读不出来的期限不计分，也不算中性。</li>
+<li>ETF 的涨跌停只用行情里给的价，行情里没有就写"数据不足"，不硬套 10%。</li>
+<li>上证指数、深证成指、创业板指、北证 50 没有长期估值数据，长期那格写"缺估值"，分析照做。</li>
+</ul>
+</div>
+
+<h2>这次不做的事</h2>
+<div class="card"><ul>
+<li>AI 成绩单怎么判"无效、停推"，量化和 AI 怎么结合，考试改成边用边考：这几件你还没定，都不在这次范围里。</li>
+<li>托管到 LightNode（第 10 组）照旧挂着，等公网网站 W2 定下来再说；也不跑 TradingAgents-CN 的任何代码。</li>
+</ul></div>
+
+<h2>规格文件</h2>
+<div class="card muted">
+<code>openspec/changes/ai1-stock-ai-analysis/proposal.md</code>（「2026-11-13 第二轮改动」一节）<br>
+<code>design.md</code>（D19—D26）<br>
+<code>tasks.md</code>（第 15—22 组）<br>
+<code>specs/</code> 下六份 spec.md 中标着 2026-11-13 的条目
+</div>
+</main>
+</body>
+</html>

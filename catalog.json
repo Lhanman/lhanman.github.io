@@ -1,6 +1,20 @@
 {
   "pages": [
     {
+      "slug": "ashare-ai1-round2-review",
+      "title": "AI1 第二轮审阅",
+      "description": "A 股量化助手 AI 问股第二轮改动审阅：短中长三个期限、ETF 和指数、LangGraph 串流程",
+      "tags": [
+        "ashare-quant",
+        "ai",
+        "审阅"
+      ],
+      "project": "ashare-quant",
+      "created": "2026-11-13",
+      "updated": "2026-11-13",
+      "path": "文档/ashare-quant/AI1 第二轮审阅.html"
+    },
+    {
       "slug": "tesla-reverse-geocoding",
       "title": "地点为什么叫不出名字",
       "description": "特助手地点叫不出名字的原因：反向地理编码从上线起没成功过（百度密钥没开通服务），常去地点的名字都来自导航",
