@@ -1,6 +1,18 @@
 {
   "pages": [
     {
+      "slug": "mahjong-settlement-calculator",
+      "title": "牌局结算器",
+      "description": "填最后筹码和公池代币数，自动算房费分摊、真实盈亏和最少转账",
+      "tags": [
+        "麻将"
+      ],
+      "project": "麻将",
+      "created": "2026-11-24",
+      "updated": "2026-11-24",
+      "path": "文档/麻将/牌局结算器.html"
+    },
+    {
       "slug": "ashare-ai1-round2-review",
       "title": "AI1 第二轮审阅",
       "description": "A 股量化助手 AI 问股第二轮改动审阅：短中长三个期限、ETF 和指数、LangGraph 串流程",

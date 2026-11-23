@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="填最后筹码和公池代币数，自动算房费分摊、真实盈亏和最少转账">
+<link rel="index" href="../../index.html">
+<title>牌局结算器</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+/* 布局：单列卡片流，输入 → 公池/房费 → 结算表 → 转账清单；手机优先 */
+:root{
+  --bg:#f3f5f2; --surface:#ffffff; --fg:#1c2620; --muted:#66736b; --line:#dde3dd;
+  --accent:#1f7a55; --accent-soft:#e3f1ea; --pos:#1f7a55; --neg:#b4432f; --warn:#a86a00; --warn-soft:#fbf1dc;
+  --font:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --num:ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#131915; --surface:#1b231e; --fg:#e4ebe6; --muted:#93a198; --line:#2c3730;
+  --accent:#5cc493; --accent-soft:#1f3329; --pos:#5cc493; --neg:#f08a74; --warn:#e2b04f; --warn-soft:#3a2f17; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#131915; --surface:#1b231e; --fg:#e4ebe6; --muted:#93a198; --line:#2c3730;
+  --accent:#5cc493; --accent-soft:#1f3329; --pos:#5cc493; --neg:#f08a74; --warn:#e2b04f; --warn-soft:#3a2f17; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+main{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1{font-size:22px;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:2px 0 0;font-size:13px}
+section{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px}
+h2{font-size:15px;margin:0;display:flex;justify-content:space-between;align-items:center;gap:8px}
+h2 small{font-weight:400;color:var(--muted);font-size:12px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:4px;flex:1 1 120px;min-width:0}
+.field label{font-size:12px;color:var(--muted)}
+input,select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;min-width:0}
+input[type=number]{font-family:var(--num);font-variant-numeric:tabular-nums}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:7px 12px}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:600}
+button.link{border:none;background:none;color:var(--accent);padding:4px 6px}
+.players{display:flex;flex-direction:column;gap:8px}
+.p{display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;align-items:center}
+.p .delta{font-family:var(--num);font-variant-numeric:tabular-nums;text-align:right;min-width:52px;font-size:14px}
+.p .rm{padding:6px 9px;color:var(--muted)}
+.head{display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;font-size:12px;color:var(--muted)}
+.head span:nth-child(3){min-width:52px;text-align:right}
+.head span:nth-child(4){width:34px}
+.pos{color:var(--pos)} .neg{color:var(--neg)}
+.note{font-size:13px;padding:8px 10px;border-radius:8px;background:var(--accent-soft)}
+.note.warn{background:var(--warn-soft);color:var(--warn)}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:12px;color:var(--muted);font-weight:500}
+td{font-family:var(--num);font-variant-numeric:tabular-nums}
+td:first-child{font-family:var(--font)}
+td input{width:76px;padding:4px 6px;text-align:right}
+tfoot td{font-weight:600;border-bottom:none}
+.tag{font-size:11px;padding:1px 6px;border-radius:99px;background:var(--accent-soft);color:var(--accent);margin-left:4px;font-family:var(--font)}
+ol.tx{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px;font-size:16px}
+ol.tx b{font-family:var(--num);font-variant-numeric:tabular-nums}
+.big{font-size:13px;color:var(--muted)}
+@media (max-width:420px){ .p,.head{grid-template-columns:1fr 1fr auto auto} }
+</style>
+
+<main>
+  <header>
+    <h1>牌局结算器</h1>
+    <p class="sub">填最后的筹码和公池代币数，自动算出每人补多少房费、谁给谁转多少。</p>
+  </header>
+
+  <section>
+    <h2>基本设置</h2>
+    <div class="row">
+      <div class="field"><label for="base">每人起始筹码</label><input id="base" type="number" inputmode="decimal" value="100"></div>
+      <div class="field"><label for="fee">房费</label><input id="fee" type="number" inputmode="decimal" value="60"></div>
+      <div class="field"><label for="payer">谁付的房费</label><select id="payer"></select></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>最后筹码 <small>输赢 = 筹码 − 起始</small></h2>
+    <div class="head"><span>名字</span><span>最后筹码</span><span>输赢</span><span></span></div>
+    <div class="players" id="players"></div>
+    <div><button class="link" id="add">+ 加一个人</button></div>
+  </section>
+
+  <section>
+    <h2>公池 <small>罐子里的代币数</small></h2>
+    <div class="row">
+      <div class="field"><label for="pool">公池代币（留空则按筹码自动算）</label><input id="pool" type="number" inputmode="decimal" placeholder=""></div>
+    </div>
+    <div id="poolNote" class="note"></div>
+  </section>
+
+  <section>
+    <h2>房费分摊 <small>零头可手动改</small></h2>
+    <div class="row">
+      <div class="field"><label for="mode">分摊不是整数时</label>
+        <select id="mode">
+          <option value="ceil">取整，零头归付房费的人</option>
+          <option value="round">四舍五入，零头归付房费的人</option>
+          <option value="exact">不取整，保留两位小数</option>
+        </select>
+      </div>
+    </div>
+    <div id="gapNote" class="note"></div>
+    <div class="tbl"><table>
+      <thead><tr><th>人</th><th>输赢</th><th>分摊</th><th>结算数</th><th>真实盈亏</th></tr></thead>
+      <tbody id="tbody"></tbody>
+      <tfoot><tr><td>合计</td><td id="fDelta"></td><td id="fShare"></td><td id="fSettle"></td><td></td></tr></tfoot>
+    </table></div>
+    <p class="big">分摊：正数是要补的钱，负数是公池多了退给他的钱。改了别人的分摊，付房费的人那一格会自动补齐，保证总账为 0。<button class="link" id="reset">恢复平均</button></p>
+  </section>
+
+  <section>
+    <h2>转账清单 <button id="copy" class="primary">复制结果</button></h2>
+    <ol class="tx" id="tx"></ol>
+    <div id="copyNote" class="big" hidden></div>
+  </section>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const r2=x=>Math.round(x*100)/100;
+const fmt=x=>{x=r2(x);if(Object.is(x,-0)||Math.abs(x)<0.005)x=0;return Number.isInteger(x)?String(x):x.toFixed(2)};
+const sg=x=>(r2(x)>0?'+':'')+fmt(x);
+
+let state={players:[{n:'A',c:128},{n:'B',c:110},{n:'C',c:72},{n:'D',c:54}],payer:0,overrides:{}};
+try{const s=JSON.parse(localStorage.getItem('mj-names')||'null');if(Array.isArray(s)&&s.length>=2){state.players=s.map((n,i)=>({n,c:state.players[i]?state.players[i].c:100}))}}catch(e){}
+function saveNames(){try{localStorage.setItem('mj-names',JSON.stringify(state.players.map(p=>p.n)))}catch(e){}}
+
+function renderPlayers(){
+  const box=$('players');box.innerHTML='';
+  state.players.forEach((p,i)=>{
+    const d=document.createElement('div');d.className='p';
+    d.innerHTML=`<input id="n${i}" value="${p.n.replace(/"/g,'&quot;')}" aria-label="第${i+1}人名字">
+      <input id="c${i}" type="number" inputmode="decimal" value="${p.c}" aria-label="${p.n} 最后筹码">
+      <span class="delta" id="d${i}"></span>
+      <button class="rm" id="rm${i}" aria-label="删除 ${p.n}" ${state.players.length<=2?'disabled':''}>×</button>`;
+    box.appendChild(d);
+    $('n'+i).addEventListener('input',e=>{p.n=e.target.value||('玩家'+(i+1));saveNames();renderPayer();calc()});
+    $('c'+i).addEventListener('input',e=>{p.c=parseFloat(e.target.value)||0;calc()});
+    $('rm'+i).addEventListener('click',()=>{state.players.splice(i,1);if(state.payer>=state.players.length)state.payer=0;state.overrides={};saveNames();renderAll()});
+  });
+}
+function renderPayer(){
+  const s=$('payer');s.innerHTML=state.players.map((p,i)=>`<option value="${i}">${p.n.replace(/</g,'&lt;')}</option>`).join('');s.value=state.payer;
+}
+function renderAll(){renderPlayers();renderPayer();calc()}
+
+function roundShare(v,mode){
+  if(mode==='exact')return r2(v);
+  if(mode==='round')return Math.round(v);
+  // 取整且零头归付房费的人：要补时向上取整，要退时向下取整（按绝对值）
+  return v>=0?Math.ceil(v-1e-9):-Math.floor(-v+1e-9);
+}
+
+function calc(){
+  const base=parseFloat($('base').value)||0, fee=parseFloat($('fee').value)||0;
+  const P=state.players, n=P.length, payer=state.payer;
+  const deltas=P.map(p=>p.c-base);
+  P.forEach((p,i)=>{const el=$('d'+i);el.textContent=sg(deltas[i]);el.className='delta '+(deltas[i]>0?'pos':deltas[i]<0?'neg':'')});
+  const autoPool=r2(n*base-P.reduce((a,p)=>a+p.c,0));
+  $('pool').placeholder='自动：'+fmt(autoPool);
+  const poolRaw=$('pool').value.trim();
+  const pool=poolRaw===''?autoPool:(parseFloat(poolRaw)||0);
+  const pn=$('poolNote');
+  if(poolRaw!==''&&Math.abs(pool-autoPool)>0.005){
+    pn.className='note warn';
+    pn.textContent=`对不上：按筹码算公池应该是 ${fmt(autoPool)}，你填的是 ${fmt(pool)}，差 ${fmt(Math.abs(pool-autoPool))}。先查一下是不是有人筹码数错了。下面按你填的 ${fmt(pool)} 算，总账可能不为 0。`;
+  }else{pn.className='note';pn.textContent=`公池 ${fmt(pool)} 个代币，全部算进 ${P[payer].n} 的房费。`}
+
+  const G=fee-pool, mode=$('mode').value;
+  const avg=G/n;
+  const shares=P.map((_,i)=>{
+    if(i===payer)return 0;
+    if(state.overrides[i]!==undefined)return state.overrides[i];
+    return roundShare(avg,mode);
+  });
+  shares[payer]=r2(G-shares.reduce((a,b)=>a+b,0));
+  const gn=$('gapNote');
+  if(Math.abs(G)<0.005){gn.textContent='公池刚好等于房费，谁都不用补。'}
+  else if(G>0){gn.textContent=`房费 ${fmt(fee)} − 公池 ${fmt(pool)} = 还差 ${fmt(G)}，平均每人补 ${fmt(r2(avg))}。`}
+  else{gn.textContent=`公池 ${fmt(pool)} 比房费多 ${fmt(-G)}，平均每人退 ${fmt(r2(-avg))}。`}
+
+  const settle=P.map((_,i)=>deltas[i]-shares[i]+(i===payer?fee:0));
+  const tb=$('tbody');tb.innerHTML='';
+  P.forEach((p,i)=>{
+    const tr=document.createElement('tr');
+    const shareCell=i===payer?`${fmt(shares[i])}<span class="tag">补零头</span>`:`<input id="s${i}" type="number" inputmode="decimal" step="0.5" value="${fmt(shares[i])}" aria-label="${p.n} 分摊">`;
+    const real=deltas[i]-shares[i];
+    tr.innerHTML=`<td>${p.n.replace(/</g,'&lt;')}${i===payer?'<span class="tag">付房费</span>':''}</td><td>${sg(deltas[i])}</td><td>${shareCell}</td>
+      <td class="${settle[i]>0?'pos':settle[i]<0?'neg':''}"><b>${sg(settle[i])}</b></td><td class="${real>0?'pos':real<0?'neg':''}">${sg(real)}</td>`;
+    tb.appendChild(tr);
+    if(i!==payer){$('s'+i).addEventListener('change',e=>{const v=parseFloat(e.target.value);state.overrides[i]=isNaN(v)?0:r2(v);calc()})}
+  });
+  const sum=r2(settle.reduce((a,b)=>a+b,0));
+  $('fDelta').textContent=sg(deltas.reduce((a,b)=>a+b,0));
+  $('fShare').textContent=fmt(shares.reduce((a,b)=>a+b,0));
+  const fs=$('fSettle');fs.textContent=fmt(sum);fs.className=Math.abs(sum)>0.005?'neg':'';
+
+  // 轧差配对：输最多的先付给赢最多的
+  const cred=[],debt=[];
+  settle.forEach((v,i)=>{v=r2(v);if(v>0.005)cred.push({i,v});else if(v<-0.005)debt.push({i,v:-v})});
+  cred.sort((a,b)=>b.v-a.v);debt.sort((a,b)=>b.v-a.v);
+  const tx=[];let ci=0,di=0;
+  while(ci<cred.length&&di<debt.length){
+    const m=r2(Math.min(cred[ci].v,debt[di].v));
+    if(m>0.005)tx.push({from:debt[di].i,to:cred[ci].i,m});
+    cred[ci].v=r2(cred[ci].v-m);debt[di].v=r2(debt[di].v-m);
+    if(cred[ci].v<=0.005)ci++; if(debt[di].v<=0.005)di++;
+  }
+  const ol=$('tx');
+  ol.innerHTML=tx.length?tx.map(t=>`<li>${P[t.from].n.replace(/</g,'&lt;')} → ${P[t.to].n.replace(/</g,'&lt;')}　<b>${fmt(t.m)}</b> 元</li>`).join(''):'<li>不用转账</li>';
+  if(Math.abs(sum)>0.005)ol.insertAdjacentHTML('beforeend',`<li class="neg">总账差 ${fmt(sum)}，请先核对筹码或公池数</li>`);
+
+  window._summary=[
+    `房费 ${fmt(fee)}（${P[payer].n} 付），公池 ${fmt(pool)}，${G>=0?'每人补':'每人退'}约 ${fmt(Math.abs(r2(avg)))}`,
+    ...P.map((p,i)=>`${p.n}：输赢 ${sg(deltas[i])}，真实盈亏 ${sg(deltas[i]-shares[i])}`),
+    '转账：',...(tx.length?tx.map(t=>`${P[t.from].n} → ${P[t.to].n} ${fmt(t.m)} 元`):['不用转账'])
+  ].join('\n');
+}
+
+$('base').addEventListener('input',calc);
+$('fee').addEventListener('input',calc);
+$('pool').addEventListener('input',calc);
+$('mode').addEventListener('change',()=>{state.overrides={};calc()});
+$('payer').addEventListener('change',e=>{state.payer=+e.target.value;state.overrides={};calc()});
+$('reset').addEventListener('click',()=>{state.overrides={};calc()});
+$('add').addEventListener('click',()=>{if(state.players.length>=8)return;state.players.push({n:'玩家'+(state.players.length+1),c:parseFloat($('base').value)||100});state.overrides={};saveNames();renderAll()});
+$('copy').addEventListener('click',()=>{
+  const t=window._summary||'',note=$('copyNote');
+  const done=m=>{note.hidden=false;note.textContent=m};
+  try{navigator.clipboard.writeText(t).then(()=>done('已复制，可以直接发到群里。'),()=>{done(t)})}catch(e){done(t)}
+});
+renderAll();
+</script>
+</body>
+</html>
