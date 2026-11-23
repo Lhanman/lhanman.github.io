@@ -3,7 +3,7 @@
     {
       "slug": "mahjong-settlement-calculator",
       "title": "牌局结算器",
-      "description": "填最后筹码和公池代币数，自动算房费分摊、真实盈亏和最少转账",
+      "description": "填最后筹码和公池代币数，自动算房费分摊、最少转账，并保存每局记录和累计战绩",
       "tags": [
         "麻将"
       ],

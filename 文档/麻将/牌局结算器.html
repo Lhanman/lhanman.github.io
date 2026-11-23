@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="填最后筹码和公池代币数，自动算房费分摊、真实盈亏和最少转账">
+<meta name="description" content="填最后筹码和公池代币数，自动算房费分摊、最少转账，并保存每局记录和累计战绩">
 <link rel="index" href="../../index.html">
 <title>牌局结算器</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -65,6 +65,17 @@ tfoot td{font-weight:600;border-bottom:none}
 ol.tx{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px;font-size:16px}
 ol.tx b{font-family:var(--num);font-variant-numeric:tabular-nums}
 .big{font-size:13px;color:var(--muted)}
+.hist{display:flex;flex-direction:column;gap:10px}
+.game{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.game .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.game .top b{font-size:15px}
+.game .meta{font-size:12px;color:var(--muted)}
+.game .ppl{display:flex;flex-wrap:wrap;gap:6px 14px;font-family:var(--num);font-variant-numeric:tabular-nums;font-size:14px}
+.game .ppl span{font-family:var(--font)}
+.game .acts{display:flex;gap:6px;justify-content:flex-end}
+.game .acts button{padding:4px 10px;font-size:13px}
+.game .acts button.danger{color:var(--neg);border-color:var(--neg)}
+.empty{color:var(--muted);font-size:14px;padding:6px 0}
 @media (max-width:420px){ .p,.head{grid-template-columns:1fr 1fr auto auto} }
 </style>
 
@@ -122,6 +133,25 @@ ol.tx b{font-family:var(--num);font-variant-numeric:tabular-nums}
     <h2>转账清单 <button id="copy" class="primary">复制结果</button></h2>
     <ol class="tx" id="tx"></ol>
     <div id="copyNote" class="big" hidden></div>
+    <div class="row" style="align-items:flex-end">
+      <div class="field"><label for="gdate">日期</label><input id="gdate" type="date"></div>
+      <div class="field"><label for="gnote">备注（可不填）</label><input id="gnote" placeholder="比如：周五晚上 老地方"></div>
+      <button class="primary" id="save">保存这一局</button>
+    </div>
+    <div id="saveNote" class="big" hidden></div>
+  </section>
+
+  <section>
+    <h2>累计战绩 <small id="storeLabel">读取中…</small></h2>
+    <div class="tbl"><table>
+      <thead><tr><th>人</th><th>局数</th><th>累计真实盈亏</th><th>平均每局</th></tr></thead>
+      <tbody id="totals"></tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>历史记录 <small id="histCount"></small></h2>
+    <div id="hist" class="hist"></div>
   </section>
 </main>
 
@@ -220,6 +250,9 @@ function calc(){
   ol.innerHTML=tx.length?tx.map(t=>`<li>${P[t.from].n.replace(/</g,'&lt;')} → ${P[t.to].n.replace(/</g,'&lt;')}　<b>${fmt(t.m)}</b> 元</li>`).join(''):'<li>不用转账</li>';
   if(Math.abs(sum)>0.005)ol.insertAdjacentHTML('beforeend',`<li class="neg">总账差 ${fmt(sum)}，请先核对筹码或公池数</li>`);
 
+  window._game={base,fee,payer:P[payer].n,pool,mode,
+    rows:P.map((p,i)=>({n:p.n,c:p.c,delta:r2(deltas[i]),share:r2(shares[i]),settle:r2(settle[i]),real:r2(deltas[i]-shares[i])})),
+    tx:tx.map(t=>({from:P[t.from].n,to:P[t.to].n,m:t.m})),balanced:Math.abs(sum)<=0.005};
   window._summary=[
     `房费 ${fmt(fee)}（${P[payer].n} 付），公池 ${fmt(pool)}，${G>=0?'每人补':'每人退'}约 ${fmt(Math.abs(r2(avg)))}`,
     ...P.map((p,i)=>`${p.n}：输赢 ${sg(deltas[i])}，真实盈亏 ${sg(deltas[i]-shares[i])}`),
@@ -240,6 +273,91 @@ $('copy').addEventListener('click',()=>{
   try{navigator.clipboard.writeText(t).then(()=>done('已复制，可以直接发到群里。'),()=>{done(t)})}catch(e){done(t)}
 });
 renderAll();
+
+/* ---------- 记录存储：claude.ai 上用云端 db，其他地方（文档站）用本机浏览器 ---------- */
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+$('gdate').value=today();
+let games=[], store=null;
+
+const local={
+  label:'只存在这台设备的浏览器里，换手机或清缓存会丢',
+  read(){try{return JSON.parse(localStorage.getItem('mj-games')||'[]')}catch(e){return []}},
+  write(list){try{localStorage.setItem('mj-games',JSON.stringify(list));return true}catch(e){return false}},
+  async start(){games=this.read();renderHist()},
+  async add(g){const list=this.read();list.push(g);if(!this.write(list))throw new Error('浏览器不允许保存');games=list;renderHist()},
+  async remove(id){const list=this.read().filter(g=>g.id!==id);this.write(list);games=list;renderHist()}
+};
+function cloud(db){
+  const col=db.collection('games');
+  return {
+    label:'已存到云端，在哪台设备打开这个链接都能看到',
+    async start(){
+      const timer=setTimeout(()=>{$('storeLabel').textContent='云端记录暂时读不到，稍后再看'},10000);
+      col.onSnapshot(s=>{if(!s.metadata.fromCache)clearTimeout(timer);games=s.docs.map(d=>({...d.data(),id:d.id}));renderHist();$('storeLabel').textContent=this.label},
+        e=>{clearTimeout(timer);$('storeLabel').textContent='云端记录读取失败（'+e.code+'）'});
+    },
+    async add(g){const {id,...body}=g;await col.doc(id).set(body)},
+    async remove(id){await col.doc(id).delete()}
+  };
+}
+
+function renderHist(){
+  const list=[...games].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.ts||0)-(a.ts||0));
+  $('histCount').textContent=list.length?`共 ${list.length} 局`:'';
+  const tot={};
+  list.forEach(g=>(g.rows||[]).forEach(r=>{const t=tot[r.n]||(tot[r.n]={k:0,s:0});t.k++;t.s+=r.real}));
+  const names=Object.keys(tot).sort((a,b)=>tot[b].s-tot[a].s);
+  $('totals').innerHTML=names.length?names.map(n=>{const t=tot[n],s=r2(t.s),a=r2(t.s/t.k);
+    return `<tr><td>${esc(n)}</td><td>${t.k}</td><td class="${s>0?'pos':s<0?'neg':''}"><b>${sg(s)}</b></td><td>${sg(a)}</td></tr>`}).join('')
+    :'<tr><td colspan="4" class="empty" style="text-align:left">还没有记录。算完一局点"保存这一局"，这里会按人名累计。</td></tr>';
+  const h=$('hist');
+  if(!list.length){h.innerHTML='<div class="empty">保存过的牌局会按日期列在这里，可以载入修改或删除。</div>';return}
+  h.innerHTML=list.map(g=>`<div class="game">
+    <div class="top"><b>${esc(g.date||'')}${g.note?'　'+esc(g.note):''}</b><span class="meta">房费 ${fmt(g.fee)}（${esc(g.payer)}付）· 公池 ${fmt(g.pool)}</span></div>
+    <div class="ppl">${(g.rows||[]).map(r=>`<div><span>${esc(r.n)}</span> <b class="${r.real>0?'pos':r.real<0?'neg':''}">${sg(r.real)}</b></div>`).join('')}</div>
+    <div class="meta">转账：${(g.tx||[]).length?g.tx.map(t=>`${esc(t.from)}→${esc(t.to)} ${fmt(t.m)}`).join('，'):'无'}</div>
+    <div class="acts"><button data-load="${esc(g.id)}">载入修改</button><button data-del="${esc(g.id)}">删除</button></div>
+  </div>`).join('');
+}
+$('hist').addEventListener('click',async e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.load){
+    const g=games.find(x=>x.id===b.dataset.load);if(!g)return;
+    $('base').value=g.base;$('fee').value=g.fee;$('pool').value=fmt(g.pool);$('gdate').value=g.date||today();$('gnote').value=g.note||'';
+    state.players=g.rows.map(r=>({n:r.n,c:r.c}));state.payer=Math.max(0,g.rows.findIndex(r=>r.n===g.payer));state.overrides={};
+    g.rows.forEach((r,i)=>{if(i!==state.payer)state.overrides[i]=r.share});
+    if(g.mode)$('mode').value=g.mode;
+    renderAll();editingId=g.id;$('save').textContent='保存修改';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }else if(b.dataset.del){
+    if(b.dataset.confirm!=='1'){b.dataset.confirm='1';b.textContent='再点一次确认删除';b.classList.add('danger');setTimeout(()=>{if(b.isConnected){b.dataset.confirm='';b.textContent='删除';b.classList.remove('danger')}},4000);return}
+    b.disabled=true;try{await store.remove(b.dataset.del)}catch(err){b.disabled=false;b.textContent='删除失败，再试'}
+  }
+});
+let editingId=null;
+$('save').addEventListener('click',async()=>{
+  const g=window._game,note=$('saveNote');note.hidden=false;
+  if(!store){note.textContent='记录还在加载，稍等一下再点。';return}
+  if(!g.balanced){note.textContent='总账不为 0，先核对筹码或公池数再保存。';return}
+  const rec={...g,id:editingId||('g'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)),date:$('gdate').value||today(),note:$('gnote').value.trim(),ts:Date.now()};
+  $('save').disabled=true;
+  try{
+    if(editingId)await store.remove(editingId);
+    await store.add(rec);
+    note.textContent=editingId?'已保存修改。':'已保存，可以在下面的历史记录里看到。';
+    editingId=null;$('save').textContent='保存这一局';
+  }catch(err){note.textContent='保存失败：'+(err&&(err.code||err.message)||'未知原因')+'。可以再点一次。'}
+  $('save').disabled=false;
+});
+
+(async()=>{
+  let db=null;
+  try{if(window.claude&&window.claude.use)db=await Promise.race([window.claude.use('db'),new Promise(r=>setTimeout(()=>r(null),10000))])}catch(e){db=null}
+  store=db?cloud(db):local;
+  $('storeLabel').textContent=store.label;
+  await store.start();
+})();
 </script>
 </body>
 </html>
