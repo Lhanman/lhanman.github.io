@@ -47,7 +47,7 @@
 
 ### 麻将
 
-- [牌局结算器](%E6%96%87%E6%A1%A3/%E9%BA%BB%E5%B0%86/%E7%89%8C%E5%B1%80%E7%BB%93%E7%AE%97%E5%99%A8.html) · [线上](https://lhanman.github.io/p/mahjong-settlement-calculator/) · 2026-11-24 — 填最后筹码和公池代币数，自动算房费分摊、最少转账，并保存每局记录和累计战绩
+- [牌局结算器](%E6%96%87%E6%A1%A3/%E9%BA%BB%E5%B0%86/%E7%89%8C%E5%B1%80%E7%BB%93%E7%AE%97%E5%99%A8.html) · [线上](https://lhanman.github.io/p/mahjong-settlement-calculator/) · 2026-11-24 — 填最后筹码和公池代币数，自动算房费分摊（可让赢家多补、输家多退）、最少转账，并保存每局记录和累计战绩
 
 ### 其他
 

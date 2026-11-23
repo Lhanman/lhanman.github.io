@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="填最后筹码和公池代币数，自动算房费分摊、最少转账，并保存每局记录和累计战绩">
+<meta name="description" content="填最后筹码和公池代币数，自动算房费分摊（可让赢家多补、输家多退）、最少转账，并保存每局记录和累计战绩">
 <link rel="index" href="../../index.html">
 <title>牌局结算器</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -112,6 +112,17 @@ ol.tx b{font-family:var(--num);font-variant-numeric:tabular-nums}
   <section>
     <h2>房费分摊 <small>零头可手动改</small></h2>
     <div class="row">
+      <div class="field"><label for="split">分摊方式</label>
+        <select id="split">
+          <option value="even">平均分</option>
+          <option value="tilt">赢家多补、输家多退</option>
+        </select>
+      </div>
+      <div class="field" id="tiltBox" hidden><label for="tilt">倾斜程度：<b id="tiltVal">50%</b></label>
+        <input id="tilt" type="range" min="0" max="100" step="10" value="50" style="padding:0">
+      </div>
+    </div>
+    <div class="row">
       <div class="field"><label for="mode">分摊不是整数时</label>
         <select id="mode">
           <option value="ceil">取整，零头归付房费的人</option>
@@ -206,18 +217,22 @@ function calc(){
     pn.textContent=`对不上：按筹码算公池应该是 ${fmt(autoPool)}，你填的是 ${fmt(pool)}，差 ${fmt(Math.abs(pool-autoPool))}。先查一下是不是有人筹码数错了。下面按你填的 ${fmt(pool)} 算，总账可能不为 0。`;
   }else{pn.className='note';pn.textContent=`公池 ${fmt(pool)} 个代币，全部算进 ${P[payer].n} 的房费。`}
 
-  const G=fee-pool, mode=$('mode').value;
+  const G=fee-pool, mode=$('mode').value, split=$('split').value, w=split==='tilt'?(+$('tilt').value)/100:0;
   const avg=G/n;
+  // 倾斜分摊：要补时按"赢了多少"占比分给赢家，要退时按"输了多少"占比退给输家，再和平均分按倾斜程度混合
+  const weight=deltas.map(d=>G>0?Math.max(d,0):Math.max(-d,0));
+  const wsum=weight.reduce((a,b)=>a+b,0);
+  const target=deltas.map((_,i)=>wsum>0?(1-w)*avg+w*G*weight[i]/wsum:avg);
   const shares=P.map((_,i)=>{
     if(i===payer)return 0;
     if(state.overrides[i]!==undefined)return state.overrides[i];
-    return roundShare(avg,mode);
+    return roundShare(target[i],mode);
   });
   shares[payer]=r2(G-shares.reduce((a,b)=>a+b,0));
   const gn=$('gapNote');
   if(Math.abs(G)<0.005){gn.textContent='公池刚好等于房费，谁都不用补。'}
-  else if(G>0){gn.textContent=`房费 ${fmt(fee)} − 公池 ${fmt(pool)} = 还差 ${fmt(G)}，平均每人补 ${fmt(r2(avg))}。`}
-  else{gn.textContent=`公池 ${fmt(pool)} 比房费多 ${fmt(-G)}，平均每人退 ${fmt(r2(-avg))}。`}
+  else if(G>0){gn.textContent=`房费 ${fmt(fee)} − 公池 ${fmt(pool)} = 还差 ${fmt(G)}，`+(w>0&&wsum>0?`按倾斜 ${Math.round(w*100)}% 分摊，赢得越多补得越多。`:`平均每人补 ${fmt(r2(avg))}。`)}
+  else{gn.textContent=`公池 ${fmt(pool)} 比房费多 ${fmt(-G)}，`+(w>0&&wsum>0?`按倾斜 ${Math.round(w*100)}% 退回，输得越多退得越多。`:`平均每人退 ${fmt(r2(-avg))}。`)}
 
   const settle=P.map((_,i)=>deltas[i]-shares[i]+(i===payer?fee:0));
   const tb=$('tbody');tb.innerHTML='';
@@ -250,11 +265,11 @@ function calc(){
   ol.innerHTML=tx.length?tx.map(t=>`<li>${P[t.from].n.replace(/</g,'&lt;')} → ${P[t.to].n.replace(/</g,'&lt;')}　<b>${fmt(t.m)}</b> 元</li>`).join(''):'<li>不用转账</li>';
   if(Math.abs(sum)>0.005)ol.insertAdjacentHTML('beforeend',`<li class="neg">总账差 ${fmt(sum)}，请先核对筹码或公池数</li>`);
 
-  window._game={base,fee,payer:P[payer].n,pool,mode,
+  window._game={base,fee,payer:P[payer].n,pool,mode,split,tilt:+$('tilt').value,
     rows:P.map((p,i)=>({n:p.n,c:p.c,delta:r2(deltas[i]),share:r2(shares[i]),settle:r2(settle[i]),real:r2(deltas[i]-shares[i])})),
     tx:tx.map(t=>({from:P[t.from].n,to:P[t.to].n,m:t.m})),balanced:Math.abs(sum)<=0.005};
   window._summary=[
-    `房费 ${fmt(fee)}（${P[payer].n} 付），公池 ${fmt(pool)}，${G>=0?'每人补':'每人退'}约 ${fmt(Math.abs(r2(avg)))}`,
+    `房费 ${fmt(fee)}（${P[payer].n} 付），公池 ${fmt(pool)}，`+(w>0&&wsum>0?`${G>=0?'差':'多'} ${fmt(Math.abs(G))}，按赢家多补、输家多退（倾斜 ${Math.round(w*100)}%）分摊`:`${G>=0?'每人补':'每人退'}约 ${fmt(Math.abs(r2(avg)))}`),
     ...P.map((p,i)=>`${p.n}：输赢 ${sg(deltas[i])}，真实盈亏 ${sg(deltas[i]-shares[i])}`),
     '转账：',...(tx.length?tx.map(t=>`${P[t.from].n} → ${P[t.to].n} ${fmt(t.m)} 元`):['不用转账'])
   ].join('\n');
@@ -264,6 +279,9 @@ $('base').addEventListener('input',calc);
 $('fee').addEventListener('input',calc);
 $('pool').addEventListener('input',calc);
 $('mode').addEventListener('change',()=>{state.overrides={};calc()});
+function syncTilt(){$('tiltBox').hidden=$('split').value!=='tilt';$('tiltVal').textContent=$('tilt').value+'%'}
+$('split').addEventListener('change',()=>{syncTilt();state.overrides={};calc()});
+$('tilt').addEventListener('input',()=>{syncTilt();state.overrides={};calc()});
 $('payer').addEventListener('change',e=>{state.payer=+e.target.value;state.overrides={};calc()});
 $('reset').addEventListener('click',()=>{state.overrides={};calc()});
 $('add').addEventListener('click',()=>{if(state.players.length>=8)return;state.players.push({n:'玩家'+(state.players.length+1),c:parseFloat($('base').value)||100});state.overrides={};saveNames();renderAll()});
@@ -328,6 +346,7 @@ $('hist').addEventListener('click',async e=>{
     state.players=g.rows.map(r=>({n:r.n,c:r.c}));state.payer=Math.max(0,g.rows.findIndex(r=>r.n===g.payer));state.overrides={};
     g.rows.forEach((r,i)=>{if(i!==state.payer)state.overrides[i]=r.share});
     if(g.mode)$('mode').value=g.mode;
+    $('split').value=g.split||'even';$('tilt').value=g.tilt??50;syncTilt();
     renderAll();editingId=g.id;$('save').textContent='保存修改';
     window.scrollTo({top:0,behavior:'smooth'});
   }else if(b.dataset.del){
